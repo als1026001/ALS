@@ -1,11 +1,4 @@
-import {
-    AfterViewInit,
-    Component,
-    ElementRef,
-    HostListener,
-    inject,
-    ViewChild
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, inject, ViewChild } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -18,17 +11,11 @@ import { LayoutService } from '@/app/layout/service/layout.service';
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [
-        CommonModule,
-        RouterModule,
-        StyleClassModule,
-        AppConfigurator
-    ],
+    imports: [CommonModule, RouterModule, StyleClassModule, AppConfigurator],
     templateUrl: './app.topbar.html',
     styleUrls: ['./app.topbar.scss']
 })
 export class AppTopbar implements AfterViewInit {
-
     layoutService = inject(LayoutService);
 
     @ViewChild('menuScroll')
@@ -41,7 +28,6 @@ export class AppTopbar implements AfterViewInit {
     */
 
     items: MenuItem[] = [
-
         {
             label: 'Dashboard',
             icon: 'pi pi-home',
@@ -243,7 +229,6 @@ export class AppTopbar implements AfterViewInit {
         }
     ];
 
-
     /*
     ============================================================
     CURRENT MENU
@@ -260,7 +245,6 @@ export class AppTopbar implements AfterViewInit {
 
     menuLeft = 0;
 
-
     /*
     ============================================================
     HORIZONTAL SCROLL
@@ -271,7 +255,6 @@ export class AppTopbar implements AfterViewInit {
 
     canScrollRight = false;
 
-
     /*
     ============================================================
     INIT
@@ -279,13 +262,10 @@ export class AppTopbar implements AfterViewInit {
     */
 
     ngAfterViewInit(): void {
-
         setTimeout(() => {
             this.updateScrollButtons();
         });
-
     }
-
 
     /*
     ============================================================
@@ -295,19 +275,14 @@ export class AppTopbar implements AfterViewInit {
 
     @HostListener('window:resize')
     onResize(): void {
-
         this.updateScrollButtons();
 
         if (this.openMenu) {
-
             setTimeout(() => {
                 this.repositionDropdown();
             });
-
         }
-
     }
-
 
     /*
     ============================================================
@@ -317,11 +292,8 @@ export class AppTopbar implements AfterViewInit {
 
     @HostListener('document:click')
     onDocumentClick(): void {
-
         this.closeMenu();
-
     }
-
 
     /*
     ============================================================
@@ -329,41 +301,32 @@ export class AppTopbar implements AfterViewInit {
     ============================================================
     */
 
-    toggleMenu(
-        item: MenuItem,
-        event: MouseEvent
-    ): void {
-
+    toggleMenu(item: MenuItem, event: MouseEvent): void {
         /*
         Prevent document click
         */
 
         event.stopPropagation();
 
-
         /*
         Menu without children
         */
 
         if (!item.items || item.items.length === 0) {
-
             this.closeMenu();
 
             return;
         }
-
 
         /*
         Toggle
         */
 
         if (this.openMenu === item) {
-
             this.closeMenu();
 
             return;
         }
-
 
         /*
         Open selected menu
@@ -371,25 +334,17 @@ export class AppTopbar implements AfterViewInit {
 
         this.openMenu = item;
 
-
         /*
         Calculate dropdown position
         */
 
-        const button =
-            event.currentTarget as HTMLElement;
+        const button = event.currentTarget as HTMLElement;
 
-        const rect =
-            button.getBoundingClientRect();
+        const rect = button.getBoundingClientRect();
 
+        this.menuTop = rect.bottom;
 
-        this.menuTop =
-            rect.bottom;
-
-
-        this.menuLeft =
-            rect.left;
-
+        this.menuLeft = rect.left;
 
         /*
         Make sure dropdown doesn't go outside
@@ -397,13 +352,9 @@ export class AppTopbar implements AfterViewInit {
         */
 
         setTimeout(() => {
-
             this.repositionDropdown();
-
         });
-
     }
-
 
     /*
     ============================================================
@@ -412,10 +363,7 @@ export class AppTopbar implements AfterViewInit {
     */
 
     repositionDropdown(): void {
-
-        const screenWidth =
-            window.innerWidth;
-
+        const screenWidth = window.innerWidth;
 
         /*
         Approximate dropdown width
@@ -423,35 +371,22 @@ export class AppTopbar implements AfterViewInit {
 
         const dropdownWidth = 250;
 
-
         /*
         If dropdown would go outside right
         */
 
-        if (
-            this.menuLeft + dropdownWidth >
-            screenWidth - 10
-        ) {
-
-            this.menuLeft =
-                screenWidth -
-                dropdownWidth -
-                10;
+        if (this.menuLeft + dropdownWidth > screenWidth - 10) {
+            this.menuLeft = screenWidth - dropdownWidth - 10;
         }
-
 
         /*
         Never go outside left
         */
 
         if (this.menuLeft < 10) {
-
             this.menuLeft = 10;
-
         }
-
     }
-
 
     /*
     ============================================================
@@ -460,11 +395,8 @@ export class AppTopbar implements AfterViewInit {
     */
 
     closeMenu(): void {
-
         this.openMenu = null;
-
     }
-
 
     /*
     ============================================================
@@ -473,9 +405,7 @@ export class AppTopbar implements AfterViewInit {
     */
 
     onMenuScroll(): void {
-
         this.updateScrollButtons();
-
 
         /*
         Close dropdown while horizontal scrolling.
@@ -484,13 +414,9 @@ export class AppTopbar implements AfterViewInit {
         */
 
         if (this.openMenu) {
-
             this.closeMenu();
-
         }
-
     }
-
 
     /*
     ============================================================
@@ -499,51 +425,35 @@ export class AppTopbar implements AfterViewInit {
     */
 
     onMenuWheel(event: WheelEvent): void {
-
         if (!this.menuScroll) {
             return;
         }
 
-
-        const element =
-            this.menuScroll.nativeElement;
-
+        const element = this.menuScroll.nativeElement;
 
         /*
         Only convert wheel to horizontal
         when horizontal scrolling is possible.
         */
 
-        if (
-            element.scrollWidth <=
-            element.clientWidth
-        ) {
-
+        if (element.scrollWidth <= element.clientWidth) {
             return;
         }
 
-
         event.preventDefault();
-
 
         element.scrollLeft += event.deltaY;
 
-
         this.updateScrollButtons();
-
 
         /*
         Close dropdown
         */
 
         if (this.openMenu) {
-
             this.closeMenu();
-
         }
-
     }
-
 
     /*
     ============================================================
@@ -552,29 +462,21 @@ export class AppTopbar implements AfterViewInit {
     */
 
     scrollMenuLeft(): void {
-
         if (!this.menuScroll) {
             return;
         }
-
 
         this.menuScroll.nativeElement.scrollBy({
             left: -250,
             behavior: 'smooth'
         });
 
-
         this.closeMenu();
 
-
         setTimeout(() => {
-
             this.updateScrollButtons();
-
         }, 300);
-
     }
-
 
     /*
     ============================================================
@@ -583,29 +485,21 @@ export class AppTopbar implements AfterViewInit {
     */
 
     scrollMenuRight(): void {
-
         if (!this.menuScroll) {
             return;
         }
-
 
         this.menuScroll.nativeElement.scrollBy({
             left: 250,
             behavior: 'smooth'
         });
 
-
         this.closeMenu();
 
-
         setTimeout(() => {
-
             this.updateScrollButtons();
-
         }, 300);
-
     }
-
 
     /*
     ============================================================
@@ -614,27 +508,16 @@ export class AppTopbar implements AfterViewInit {
     */
 
     updateScrollButtons(): void {
-
         if (!this.menuScroll) {
             return;
         }
 
+        const element = this.menuScroll.nativeElement;
 
-        const element =
-            this.menuScroll.nativeElement;
+        this.canScrollLeft = element.scrollLeft > 5;
 
-
-        this.canScrollLeft =
-            element.scrollLeft > 5;
-
-
-        this.canScrollRight =
-            element.scrollLeft +
-            element.clientWidth <
-            element.scrollWidth - 5;
-
+        this.canScrollRight = element.scrollLeft + element.clientWidth < element.scrollWidth - 5;
     }
-
 
     /*
     ============================================================
@@ -643,14 +526,9 @@ export class AppTopbar implements AfterViewInit {
     */
 
     toggleDarkMode(): void {
-
-        this.layoutService.layoutConfig.update(
-            (state) => ({
-                ...state,
-                darkTheme: !state.darkTheme
-            })
-        );
-
+        this.layoutService.layoutConfig.update((state) => ({
+            ...state,
+            darkTheme: !state.darkTheme
+        }));
     }
-
 }
