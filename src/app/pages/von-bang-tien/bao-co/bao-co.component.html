@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div class="accounting-page">
+            <!-- HEADER -->
+            <div class="page-header">
+                <div class="header-left">
+                    <div class="page-title">
+                        <i class="pi pi-building-columns"></i>
+
+                        <div>
+                            <h1>Báo có</h1>
+                            <span>Danh sách báo có tiền gửi ngân hàng</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="btn btn-primary" (click)="addNew()">
+                        <i class="pi pi-plus"></i>
+                        Thêm
+                    </button>
+
+                    <button class="btn btn-secondary" (click)="edit()">
+                        <i class="pi pi-pencil"></i>
+                        Sửa
+                    </button>
+
+                    <button class="btn btn-danger" (click)="delete()">
+                        <i class="pi pi-trash"></i>
+                        Xóa
+                    </button>
+
+                    <button class="btn btn-secondary" (click)="print()">
+                        <i class="pi pi-print"></i>
+                        In
+                    </button>
+
+                    <button class="btn btn-secondary" (click)="refresh()">
+                        <i class="pi pi-refresh"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- FILTER -->
+            <div class="filter-panel">
+                <div class="filter-item">
+                    <label>Từ ngày</label>
+
+                    <input type="date" [(ngModel)]="fromDate" />
+                </div>
+
+                <div class="filter-item">
+                    <label>Đến ngày</label>
+
+                    <input type="date" [(ngModel)]="toDate" />
+                </div>
+
+                <div class="filter-item search">
+                    <label>Tìm kiếm</label>
+
+                    <div class="search-box">
+                        <i class="pi pi-search"></i>
+
+                        <input type="text" placeholder="Số chứng từ, đối tượng, nội dung..." [(ngModel)]="searchText" />
+                    </div>
+                </div>
+
+                <button class="btn btn-primary filter-button">
+                    <i class="pi pi-filter"></i>
+
+                    Lọc
+                </button>
+            </div>
+
+            <!-- TOOLBAR -->
+            <div class="table-toolbar">
+                <div class="toolbar-left">
+                    <button class="toolbar-btn">
+                        <i class="pi pi-check-square"></i>
+                        Ghi sổ
+                    </button>
+
+                    <button class="toolbar-btn">
+                        <i class="pi pi-copy"></i>
+                        Nhân bản
+                    </button>
+
+                    <button class="toolbar-btn">
+                        <i class="pi pi-file-edit"></i>
+                        Định khoản
+                    </button>
+                </div>
+
+                <div class="toolbar-right">
+                    <span>
+                        Tổng số: <strong>{{ filteredReceipts.length }}</strong>
+                    </span>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="checkbox-column">
+                                <input type="checkbox" />
+                            </th>
+
+                            <th>Ngày</th>
+
+                            <th>Số chứng từ</th>
+
+                            <th>Đối tượng</th>
+
+                            <th>Nội dung</th>
+
+                            <th>TK</th>
+
+                            <th class="money-column">Số tiền</th>
+
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @for (item of filteredReceipts; track item.number) {
+                            <tr (dblclick)="viewDetail(item)" class="data-row">
+                                <td class="checkbox-column">
+                                    <input type="checkbox" [(ngModel)]="item.checked" />
+                                </td>
+
+                                <td>
+                                    {{ item.date }}
+                                </td>
+
+                                <td>
+                                    <button class="link-button" (click)="viewDetail(item)">
+                                        {{ item.number }}
+                                    </button>
+                                </td>
+
+                                <td>
+                                    {{ item.customer }}
+                                </td>
+
+                                <td>
+                                    {{ item.description }}
+                                </td>
+
+                                <td>
+                                    {{ item.account }}
+                                </td>
+
+                                <td class="money-column">
+                                    {{ formatMoney(item.amount) }}
+                                </td>
+
+                                <td>
+                                    <span class="status" [class.completed]="item.status === 'Đã ghi sổ'">
+                                        {{ item.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                    <!-- FOOTER -->
+                    <tfoot>
+                        <tr>
+                            <td colspan="6">
+                                <strong>Tổng cộng</strong>
+                            </td>
+
+                            <td class="money-column">
+                                <strong>
+                                    {{ formatMoney(totalAmount) }}
+                                </strong>
+                            </td>
+
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- BOTTOM -->
+            <div class="page-footer">
+                <span>
+                    Đang hiển thị
+                    <strong>{{ filteredReceipts.length }}</strong>
+                    chứng từ
+                </span>
+
+                <div class="pagination">
+                    <button>
+                        <i class="pi pi-angle-left"></i>
+                    </button>
+
+                    <button class="active">1</button>
+
+                    <button>2</button>
+
+                    <button>3</button>
+
+                    <button>
+                        <i class="pi pi-angle-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

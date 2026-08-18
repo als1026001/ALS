@@ -39,34 +39,34 @@ export class AppMenu {
                     {
                         label: 'Vốn bằng tiền',
                         icon: 'pi pi-fw pi-wallet',
-                        path: '/von-bang-tien',
+                        path: '/pages/von-bang-tien',
 
                         items: [
                             {
                                 label: 'Giao dịch',
                                 icon: 'pi pi-fw pi-money-bill',
-                                path: '/von-bang-tien/giao-dich',
+                                path: '/pages/von-bang-tien/giao-dich',
 
                                 items: [
                                     {
                                         label: 'Phiếu thu tiền mặt',
                                         icon: 'pi pi-fw pi-plus-circle',
-                                        routerLink: ['/von-bang-tien/phieu-thu-tien-mat']
+                                        routerLink: ['/pages/von-bang-tien/phieu-thu-tien-mat']
                                     },
                                     {
                                         label: 'Phiếu chi tiền mặt',
                                         icon: 'pi pi-fw pi-minus-circle',
-                                        routerLink: ['/von-bang-tien/phieu-chi-tien-mat']
+                                        routerLink: ['/pages/von-bang-tien/phieu-chi-tien-mat']
                                     },
                                     {
                                         label: 'Báo có',
-                                        icon: 'pi pi-fw pi-arrow-down',
-                                        routerLink: ['/von-bang-tien/bao-co']
+                                        icon: 'pi pi-building-columns',
+                                        routerLink: ['/pages/von-bang-tien/bao-co']
                                     },
                                     {
                                         label: 'Báo nợ',
                                         icon: 'pi pi-fw pi-arrow-up',
-                                        routerLink: ['/von-bang-tien/bao-no']
+                                        routerLink: ['/pages/von-bang-tien/bao-no']
                                     }
                                 ]
                             },
@@ -74,38 +74,38 @@ export class AppMenu {
                             {
                                 label: 'Sổ sách',
                                 icon: 'pi pi-fw pi-book',
-                                path: '/von-bang-tien/so-sach',
+                                path: '/pages/von-bang-tien/so-sach',
 
                                 items: [
                                     {
                                         label: 'Sổ quỹ tiền mặt',
                                         icon: 'pi pi-fw pi-wallet',
-                                        routerLink: ['/von-bang-tien/so-quy-tien-mat']
+                                        routerLink: ['/pages/von-bang-tien/so-quy-tien-mat']
                                     },
                                     {
                                         label: 'Sổ tiền gửi ngân hàng',
                                         icon: 'pi pi-fw pi-building',
-                                        routerLink: ['/von-bang-tien/so-tien-gui-ngan-hang']
+                                        routerLink: ['/pages/von-bang-tien/so-tien-gui-ngan-hang']
                                     },
                                     {
                                         label: 'Sổ chi tiết tài khoản',
                                         icon: 'pi pi-fw pi-list',
-                                        routerLink: ['/von-bang-tien/so-chi-tiet-tai-khoan']
+                                        routerLink: ['/pages/von-bang-tien/so-chi-tiet-tai-khoan']
                                     },
                                     {
                                         label: 'Sổ tổng hợp tài khoản',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/von-bang-tien/so-tong-hop-tai-khoan']
+                                        routerLink: ['/pages/von-bang-tien/so-tong-hop-tai-khoan']
                                     },
                                     {
                                         label: 'Sổ cái tài khoản',
                                         icon: 'pi pi-fw pi-book',
-                                        routerLink: ['/von-bang-tien/so-cai-tai-khoan']
+                                        routerLink: ['/pages/von-bang-tien/so-cai-tai-khoan']
                                     },
                                     {
                                         label: 'Nhật ký chung',
                                         icon: 'pi pi-fw pi-calendar',
-                                        routerLink: ['/von-bang-tien/nhat-ky-chung']
+                                        routerLink: ['/pages/von-bang-tien/nhat-ky-chung']
                                     }
                                 ]
                             },
@@ -113,43 +113,43 @@ export class AppMenu {
                             {
                                 label: 'Danh mục',
                                 icon: 'pi pi-fw pi-list',
-                                path: '/von-bang-tien/danh-muc',
+                                path: '/pages/von-bang-tien/danh-muc',
 
                                 items: [
                                     {
                                         label: 'Danh mục tài khoản',
                                         icon: 'pi pi-fw pi-wallet',
-                                        routerLink: ['/von-bang-tien/danh-muc-tai-khoan']
+                                        routerLink: ['/pages/von-bang-tien/danh-muc-tai-khoan']
                                     },
                                     {
                                         label: 'Danh mục đối tượng',
                                         icon: 'pi pi-fw pi-users',
-                                        routerLink: ['/von-bang-tien/danh-muc-doi-tuong']
+                                        routerLink: ['/pages/von-bang-tien/danh-muc-doi-tuong']
                                     },
                                     {
                                         label: 'Danh mục hợp đồng, công trình, dự án',
                                         icon: 'pi pi-fw pi-briefcase',
-                                        routerLink: ['/von-bang-tien/danh-muc-hop-dong']
+                                        routerLink: ['/pages/von-bang-tien/danh-muc-hop-dong']
                                     },
                                     {
                                         label: 'Danh mục sản phẩm',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/von-bang-tien/danh-muc-san-pham']
+                                        routerLink: ['/pages/von-bang-tien/danh-muc-san-pham']
                                     },
                                     {
                                         label: 'Danh mục bộ phận',
                                         icon: 'pi pi-fw pi-sitemap',
-                                        routerLink: ['/von-bang-tien/danh-muc-bo-phan']
+                                        routerLink: ['/pages/von-bang-tien/danh-muc-bo-phan']
                                     },
                                     {
                                         label: 'Danh mục khoản mục phí',
                                         icon: 'pi pi-fw pi-money-bill',
-                                        routerLink: ['/von-bang-tien/danh-muc-khoan-muc-phi']
+                                        routerLink: ['/pages/von-bang-tien/danh-muc-khoan-muc-phi']
                                     },
                                     {
                                         label: 'Danh mục nghiệp vụ kế toán',
                                         icon: 'pi pi-fw pi-calculator',
-                                        routerLink: ['/von-bang-tien/danh-muc-nghiep-vu-ke-toan']
+                                        routerLink: ['/pages/von-bang-tien/danh-muc-nghiep-vu-ke-toan']
                                     }
                                 ]
                             }
@@ -162,64 +162,64 @@ export class AppMenu {
                     {
                         label: 'Mua hàng',
                         icon: 'pi pi-fw pi-shopping-cart',
-                        path: '/mua-hang',
+                        path: '/pages/mua-hang',
 
                         items: [
                             {
                                 label: 'Nghiệp vụ',
                                 icon: 'pi pi-fw pi-file-edit',
-                                path: '/mua-hang/nghiep-vu',
+                                path: '/pages/mua-hang/nghiep-vu',
 
                                 items: [
                                     {
                                         label: 'Phiếu nhập hàng',
                                         icon: 'pi pi-fw pi-download',
-                                        routerLink: ['/mua-hang/phieu-nhap-hang']
+                                        routerLink: ['/pages/mua-hang/phieu-nhap-hang']
                                     },
                                     {
                                         label: 'Yêu cầu trả hàng',
                                         icon: 'pi pi-fw pi-replay',
-                                        routerLink: ['/mua-hang/yeu-cau-tra-hang']
+                                        routerLink: ['/pages/mua-hang/yeu-cau-tra-hang']
                                     },
                                     {
                                         label: 'Quản lý trả hàng theo yêu cầu',
                                         icon: 'pi pi-fw pi-list',
-                                        routerLink: ['/mua-hang/quan-ly-tra-hang']
+                                        routerLink: ['/pages/mua-hang/quan-ly-tra-hang']
                                     },
                                     {
                                         label: 'Xuất trả hàng',
                                         icon: 'pi pi-fw pi-upload',
-                                        routerLink: ['/mua-hang/xuat-tra-hang']
+                                        routerLink: ['/pages/mua-hang/xuat-tra-hang']
                                     },
                                     {
                                         label: 'Yêu cầu thanh toán',
                                         icon: 'pi pi-fw pi-credit-card',
-                                        routerLink: ['/mua-hang/yeu-cau-thanh-toan']
+                                        routerLink: ['/pages/mua-hang/yeu-cau-thanh-toan']
                                     },
                                     {
                                         label: 'Chi trả công nợ',
                                         icon: 'pi pi-fw pi-money-bill',
-                                        routerLink: ['/mua-hang/chi-tra-cong-no']
+                                        routerLink: ['/pages/mua-hang/chi-tra-cong-no']
                                     },
                                     {
                                         label: 'Bảng tổng kết phải trả',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/mua-hang/tong-ket-phai-tra']
+                                        routerLink: ['/pages/mua-hang/tong-ket-phai-tra']
                                     },
                                     {
                                         label: 'Chuyển đổi đơn vị tính',
                                         icon: 'pi pi-fw pi-sync',
-                                        routerLink: ['/mua-hang/chuyen-doi-don-vi']
+                                        routerLink: ['/pages/mua-hang/chuyen-doi-don-vi']
                                     },
                                     {
                                         label: 'Điều chỉnh giá',
                                         icon: 'pi pi-fw pi-pencil',
-                                        routerLink: ['/mua-hang/dieu-chinh-gia']
+                                        routerLink: ['/pages/mua-hang/dieu-chinh-gia']
                                     },
                                     {
                                         label: 'Hàng hóa không dùng',
                                         icon: 'pi pi-fw pi-ban',
-                                        routerLink: ['/mua-hang/hang-hoa-khong-dung']
+                                        routerLink: ['/pages/mua-hang/hang-hoa-khong-dung']
                                     }
                                 ]
                             },
@@ -227,18 +227,18 @@ export class AppMenu {
                             {
                                 label: 'Danh mục',
                                 icon: 'pi pi-fw pi-list',
-                                path: '/mua-hang/danh-muc',
+                                path: '/pages/mua-hang/danh-muc',
 
                                 items: [
                                     {
                                         label: 'Danh mục nhà cung cấp',
                                         icon: 'pi pi-fw pi-truck',
-                                        routerLink: ['/mua-hang/danh-muc-nha-cung-cap']
+                                        routerLink: ['/pages/mua-hang/danh-muc-nha-cung-cap']
                                     },
                                     {
                                         label: 'Danh mục hàng hóa dịch vụ',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/mua-hang/danh-muc-hang-hoa-dich-vu']
+                                        routerLink: ['/pages/mua-hang/danh-muc-hang-hoa-dich-vu']
                                     }
                                 ]
                             },
@@ -246,43 +246,43 @@ export class AppMenu {
                             {
                                 label: 'Báo cáo',
                                 icon: 'pi pi-fw pi-chart-bar',
-                                path: '/mua-hang/bao-cao',
+                                path: '/pages/mua-hang/bao-cao',
 
                                 items: [
                                     {
                                         label: 'Báo cáo tồn kho',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/mua-hang/bao-cao-ton-kho']
+                                        routerLink: ['/pages/mua-hang/bao-cao-ton-kho']
                                     },
                                     {
                                         label: 'Báo cáo đơn mua hàng',
                                         icon: 'pi pi-fw pi-file',
-                                        routerLink: ['/mua-hang/bao-cao-don-mua-hang']
+                                        routerLink: ['/pages/mua-hang/bao-cao-don-mua-hang']
                                     },
                                     {
                                         label: 'Bảng kê mua hàng',
                                         icon: 'pi pi-fw pi-list',
-                                        routerLink: ['/mua-hang/bang-ke-mua-hang']
+                                        routerLink: ['/pages/mua-hang/bang-ke-mua-hang']
                                     },
                                     {
                                         label: 'Xuất trả hàng nhà cung cấp',
                                         icon: 'pi pi-fw pi-upload',
-                                        routerLink: ['/mua-hang/xuat-tra-nha-cung-cap']
+                                        routerLink: ['/pages/mua-hang/xuat-tra-nha-cung-cap']
                                     },
                                     {
                                         label: 'Báo cáo công nợ phải trả chi tiết',
                                         icon: 'pi pi-fw pi-file',
-                                        routerLink: ['/mua-hang/cong-no-phai-tra-chi-tiet']
+                                        routerLink: ['/pages/mua-hang/cong-no-phai-tra-chi-tiet']
                                     },
                                     {
                                         label: 'Báo cáo công nợ phải trả tổng hợp',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/mua-hang/cong-no-phai-tra-tong-hop']
+                                        routerLink: ['/pages/mua-hang/cong-no-phai-tra-tong-hop']
                                     },
                                     {
                                         label: 'Báo cáo công nợ phải trả chi tiết theo chứng từ',
                                         icon: 'pi pi-fw pi-file-edit',
-                                        routerLink: ['/mua-hang/cong-no-phai-tra-theo-chung-tu']
+                                        routerLink: ['/pages/mua-hang/cong-no-phai-tra-theo-chung-tu']
                                     }
                                 ]
                             }
@@ -295,49 +295,49 @@ export class AppMenu {
                     {
                         label: 'Bán hàng',
                         icon: 'pi pi-fw pi-shopping-bag',
-                        path: '/ban-hang',
+                        path: '/pages/ban-hang',
 
                         items: [
                             {
                                 label: 'Nghiệp vụ',
                                 icon: 'pi pi-fw pi-file-edit',
-                                path: '/ban-hang/nghiep-vu',
+                                path: '/pages/ban-hang/nghiep-vu',
 
                                 items: [
                                     {
                                         label: 'Đặt cọc',
                                         icon: 'pi pi-fw pi-wallet',
-                                        routerLink: ['/ban-hang/dat-coc']
+                                        routerLink: ['/pages/ban-hang/dat-coc']
                                     },
                                     {
                                         label: 'Phiếu bán hàng',
                                         icon: 'pi pi-fw pi-shopping-cart',
-                                        routerLink: ['/ban-hang/phieu-ban-hang']
+                                        routerLink: ['/pages/ban-hang/phieu-ban-hang']
                                     },
                                     {
                                         label: 'Nhập trả hàng bán',
                                         icon: 'pi pi-fw pi-download',
-                                        routerLink: ['/ban-hang/nhap-tra-hang']
+                                        routerLink: ['/pages/ban-hang/nhap-tra-hang']
                                     },
                                     {
                                         label: 'Thu tiền công nợ',
                                         icon: 'pi pi-fw pi-money-bill',
-                                        routerLink: ['/ban-hang/thu-tien-cong-no']
+                                        routerLink: ['/pages/ban-hang/thu-tien-cong-no']
                                     },
                                     {
                                         label: 'Bảng tổng kết phải thu',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/ban-hang/tong-ket-phai-thu']
+                                        routerLink: ['/pages/ban-hang/tong-ket-phai-thu']
                                     },
                                     {
                                         label: 'Hóa đơn bán hàng',
                                         icon: 'pi pi-fw pi-file',
-                                        routerLink: ['/ban-hang/hoa-don-ban-hang']
+                                        routerLink: ['/pages/ban-hang/hoa-don-ban-hang']
                                     },
                                     {
                                         label: 'Hoàn trả tiền đặt cọc',
                                         icon: 'pi pi-fw pi-replay',
-                                        routerLink: ['/ban-hang/hoan-tra-dat-coc']
+                                        routerLink: ['/pages/ban-hang/hoan-tra-dat-coc']
                                     }
                                 ]
                             },
@@ -345,18 +345,18 @@ export class AppMenu {
                             {
                                 label: 'Danh mục',
                                 icon: 'pi pi-fw pi-list',
-                                path: '/ban-hang/danh-muc',
+                                path: '/pages/ban-hang/danh-muc',
 
                                 items: [
                                     {
                                         label: 'Danh mục khách hàng',
                                         icon: 'pi pi-fw pi-users',
-                                        routerLink: ['/ban-hang/danh-muc-khach-hang']
+                                        routerLink: ['/pages/ban-hang/danh-muc-khach-hang']
                                     },
                                     {
                                         label: 'Danh mục hàng hóa dịch vụ',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/ban-hang/danh-muc-hang-hoa-dich-vu']
+                                        routerLink: ['/pages/ban-hang/danh-muc-hang-hoa-dich-vu']
                                     }
                                 ]
                             },
@@ -364,78 +364,78 @@ export class AppMenu {
                             {
                                 label: 'Báo cáo',
                                 icon: 'pi pi-fw pi-chart-bar',
-                                path: '/ban-hang/bao-cao',
+                                path: '/pages/ban-hang/bao-cao',
 
                                 items: [
                                     {
                                         label: 'Báo cáo tồn kho',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/ban-hang/bao-cao-ton-kho']
+                                        routerLink: ['/pages/ban-hang/bao-cao-ton-kho']
                                     },
                                     {
                                         label: 'Bảng kê bán hàng',
                                         icon: 'pi pi-fw pi-list',
-                                        routerLink: ['/ban-hang/bang-ke-ban-hang']
+                                        routerLink: ['/pages/ban-hang/bang-ke-ban-hang']
                                     },
                                     {
                                         label: 'Hàng bán nhập trả lại',
                                         icon: 'pi pi-fw pi-replay',
-                                        routerLink: ['/ban-hang/hang-ban-nhap-tra']
+                                        routerLink: ['/pages/ban-hang/hang-ban-nhap-tra']
                                     },
                                     {
                                         label: 'Doanh số thường',
                                         icon: 'pi pi-fw pi-chart-line',
-                                        routerLink: ['/ban-hang/doanh-so']
+                                        routerLink: ['/pages/ban-hang/doanh-so']
                                     },
                                     {
                                         label: 'Báo cáo công nợ phải thu tổng hợp',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/ban-hang/cong-no-phai-thu']
+                                        routerLink: ['/pages/ban-hang/cong-no-phai-thu']
                                     },
                                     {
                                         label: 'Công nợ phải thu chi tiết theo mặt hàng',
                                         icon: 'pi pi-fw pi-list',
-                                        routerLink: ['/ban-hang/cong-no-theo-mat-hang']
+                                        routerLink: ['/pages/ban-hang/cong-no-theo-mat-hang']
                                     },
                                     {
                                         label: 'Báo cáo tồn đơn hàng giao hàng',
                                         icon: 'pi pi-fw pi-truck',
-                                        routerLink: ['/ban-hang/ton-don-giao-hang']
+                                        routerLink: ['/pages/ban-hang/ton-don-giao-hang']
                                     },
                                     {
                                         label: 'Phân tích doanh số khách hàng theo tháng',
                                         icon: 'pi pi-fw pi-chart-line',
-                                        routerLink: ['/ban-hang/phan-tich-doanh-so']
+                                        routerLink: ['/pages/ban-hang/phan-tich-doanh-so']
                                     },
                                     {
                                         label: 'Báo cáo tổng hợp thu chi tiết',
                                         icon: 'pi pi-fw pi-file',
-                                        routerLink: ['/ban-hang/tong-hop-thu-chi']
+                                        routerLink: ['/pages/ban-hang/tong-hop-thu-chi']
                                     },
                                     {
                                         label: 'Tuổi nợ khách hàng',
                                         icon: 'pi pi-fw pi-clock',
-                                        routerLink: ['/ban-hang/tuoi-no']
+                                        routerLink: ['/pages/ban-hang/tuoi-no']
                                     },
                                     {
                                         label: 'Báo cáo chi phí giao hàng',
                                         icon: 'pi pi-fw pi-money-bill',
-                                        routerLink: ['/ban-hang/chi-phi-giao-hang']
+                                        routerLink: ['/pages/ban-hang/chi-phi-giao-hang']
                                     },
                                     {
                                         label: 'Báo cáo giao hàng',
                                         icon: 'pi pi-fw pi-truck',
-                                        routerLink: ['/ban-hang/bao-cao-giao-hang']
+                                        routerLink: ['/pages/ban-hang/bao-cao-giao-hang']
                                     },
                                     {
                                         label: 'Kết quả hoạt động kinh doanh',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/ban-hang/ket-qua-kinh-doanh']
+                                        routerLink: ['/pages/ban-hang/ket-qua-kinh-doanh']
                                     },
                                     {
                                         label: 'Hiệu suất kinh doanh',
                                         icon: 'pi pi-fw pi-chart-line',
-                                        routerLink: ['/ban-hang/hieu-suat-kinh-doanh']
+                                        routerLink: ['/pages/ban-hang/hieu-suat-kinh-doanh']
                                     }
                                 ]
                             }
@@ -448,74 +448,74 @@ export class AppMenu {
                     {
                         label: 'Kho hàng',
                         icon: 'pi pi-fw pi-box',
-                        path: '/kho-hang',
+                        path: '/pages/kho-hang',
 
                         items: [
                             {
                                 label: 'Nhập / Xuất kho',
                                 icon: 'pi pi-fw pi-arrows-v',
-                                path: '/kho-hang/nhap-xuat',
+                                path: '/pages/kho-hang/nhap-xuat',
 
                                 items: [
                                     {
                                         label: 'Phiếu nhập kho',
                                         icon: 'pi pi-fw pi-download',
-                                        routerLink: ['/kho-hang/phieu-nhap']
+                                        routerLink: ['/pages/kho-hang/phieu-nhap']
                                     },
                                     {
                                         label: 'Phiếu xuất kho',
                                         icon: 'pi pi-fw pi-upload',
-                                        routerLink: ['/kho-hang/phieu-xuat']
+                                        routerLink: ['/pages/kho-hang/phieu-xuat']
                                     },
                                     {
                                         label: 'Xuất chuyển kho',
                                         icon: 'pi pi-fw pi-arrow-right',
-                                        routerLink: ['/kho-hang/xuat-chuyen-kho']
+                                        routerLink: ['/pages/kho-hang/xuat-chuyen-kho']
                                     },
                                     {
                                         label: 'Quản lý chuyển kho',
                                         icon: 'pi pi-fw pi-sync',
-                                        routerLink: ['/kho-hang/quan-ly-chuyen-kho']
+                                        routerLink: ['/pages/kho-hang/quan-ly-chuyen-kho']
                                     },
                                     {
                                         label: 'Nhập chuyển kho',
                                         icon: 'pi pi-fw pi-arrow-left',
-                                        routerLink: ['/kho-hang/nhap-chuyen-kho']
+                                        routerLink: ['/pages/kho-hang/nhap-chuyen-kho']
                                     },
                                     {
                                         label: 'Nhập trả hàng bán',
                                         icon: 'pi pi-fw pi-replay',
-                                        routerLink: ['/kho-hang/nhap-tra-hang']
+                                        routerLink: ['/pages/kho-hang/nhap-tra-hang']
                                     },
                                     {
                                         label: 'Quản lý trả hàng theo yêu cầu',
                                         icon: 'pi pi-fw pi-list',
-                                        routerLink: ['/kho-hang/quan-ly-tra-hang']
+                                        routerLink: ['/pages/kho-hang/quan-ly-tra-hang']
                                     },
                                     {
                                         label: 'Xuất trả hàng',
                                         icon: 'pi pi-fw pi-upload',
-                                        routerLink: ['/kho-hang/xuat-tra-hang']
+                                        routerLink: ['/pages/kho-hang/xuat-tra-hang']
                                     },
                                     {
                                         label: 'Kiểm kê kho',
                                         icon: 'pi pi-fw pi-check-square',
-                                        routerLink: ['/kho-hang/kiem-ke']
+                                        routerLink: ['/pages/kho-hang/kiem-ke']
                                     },
                                     {
                                         label: 'Nhập điều chỉnh',
                                         icon: 'pi pi-fw pi-download',
-                                        routerLink: ['/kho-hang/nhap-dieu-chinh']
+                                        routerLink: ['/pages/kho-hang/nhap-dieu-chinh']
                                     },
                                     {
                                         label: 'Xuất điều chỉnh',
                                         icon: 'pi pi-fw pi-upload',
-                                        routerLink: ['/kho-hang/xuat-dieu-chinh']
+                                        routerLink: ['/pages/kho-hang/xuat-dieu-chinh']
                                     },
                                     {
                                         label: 'Xuất khác',
                                         icon: 'pi pi-fw pi-external-link',
-                                        routerLink: ['/kho-hang/xuat-khac']
+                                        routerLink: ['/pages/kho-hang/xuat-khac']
                                     }
                                 ]
                             },
@@ -523,18 +523,18 @@ export class AppMenu {
                             {
                                 label: 'Giá vốn',
                                 icon: 'pi pi-fw pi-money-bill',
-                                path: '/kho-hang/gia-von',
+                                path: '/pages/kho-hang/gia-von',
 
                                 items: [
                                     {
                                         label: 'Quản lý giá vốn',
                                         icon: 'pi pi-fw pi-calculator',
-                                        routerLink: ['/kho-hang/quan-ly-gia-von']
+                                        routerLink: ['/pages/kho-hang/quan-ly-gia-von']
                                     },
                                     {
                                         label: 'Xem lịch sử giá',
                                         icon: 'pi pi-fw pi-history',
-                                        routerLink: ['/kho-hang/lich-su-gia']
+                                        routerLink: ['/pages/kho-hang/lich-su-gia']
                                     }
                                 ]
                             },
@@ -542,23 +542,23 @@ export class AppMenu {
                             {
                                 label: 'Danh mục',
                                 icon: 'pi pi-fw pi-list',
-                                path: '/kho-hang/danh-muc',
+                                path: '/pages/kho-hang/danh-muc',
 
                                 items: [
                                     {
                                         label: 'Danh mục kho hàng',
                                         icon: 'pi pi-fw pi-home',
-                                        routerLink: ['/kho-hang/danh-muc-kho']
+                                        routerLink: ['/pages/kho-hang/danh-muc-kho']
                                     },
                                     {
                                         label: 'Danh mục hàng hóa dịch vụ',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/kho-hang/danh-muc-hang-hoa']
+                                        routerLink: ['/pages/kho-hang/danh-muc-hang-hoa']
                                     },
                                     {
                                         label: 'Mã vạch hàng hóa',
                                         icon: 'pi pi-fw pi-tag',
-                                        routerLink: ['/kho-hang/ma-vach']
+                                        routerLink: ['/pages/kho-hang/ma-vach']
                                     }
                                 ]
                             },
@@ -566,33 +566,33 @@ export class AppMenu {
                             {
                                 label: 'Báo cáo',
                                 icon: 'pi pi-fw pi-chart-bar',
-                                path: '/kho-hang/bao-cao',
+                                path: '/pages/kho-hang/bao-cao',
 
                                 items: [
                                     {
                                         label: 'Bảng kê phiếu nhập',
                                         icon: 'pi pi-fw pi-download',
-                                        routerLink: ['/kho-hang/bang-ke-phieu-nhap']
+                                        routerLink: ['/pages/kho-hang/bang-ke-phieu-nhap']
                                     },
                                     {
                                         label: 'Bảng kê phiếu xuất',
                                         icon: 'pi pi-fw pi-upload',
-                                        routerLink: ['/kho-hang/bang-ke-phieu-xuat']
+                                        routerLink: ['/pages/kho-hang/bang-ke-phieu-xuat']
                                     },
                                     {
                                         label: 'Tồn kho tức thời',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/kho-hang/ton-kho-tuc-thoi']
+                                        routerLink: ['/pages/kho-hang/ton-kho-tuc-thoi']
                                     },
                                     {
                                         label: 'Báo cáo nhập xuất tồn',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/kho-hang/bao-cao-nhap-xuat-ton']
+                                        routerLink: ['/pages/kho-hang/bao-cao-nhap-xuat-ton']
                                     },
                                     {
                                         label: 'Thẻ kho',
                                         icon: 'pi pi-fw pi-credit-card',
-                                        routerLink: ['/kho-hang/the-kho']
+                                        routerLink: ['/pages/kho-hang/the-kho']
                                     }
                                 ]
                             }
@@ -605,44 +605,44 @@ export class AppMenu {
                     {
                         label: 'Tài sản',
                         icon: 'pi pi-fw pi-building',
-                        path: '/tai-san',
+                        path: '/pages/tai-san',
 
                         items: [
                             {
                                 label: 'Nghiệp vụ',
                                 icon: 'pi pi-fw pi-file-edit',
-                                path: '/tai-san/nghiep-vu',
+                                path: '/pages/tai-san/nghiep-vu',
 
                                 items: [
                                     {
                                         label: 'Quản lý tài sản',
                                         icon: 'pi pi-fw pi-building',
-                                        routerLink: ['/tai-san/quan-ly']
+                                        routerLink: ['/pages/tai-san/quan-ly']
                                     },
                                     {
                                         label: 'Điều chỉnh tài sản',
                                         icon: 'pi pi-fw pi-pencil',
-                                        routerLink: ['/tai-san/dieu-chinh']
+                                        routerLink: ['/pages/tai-san/dieu-chinh']
                                     },
                                     {
                                         label: 'Giảm tài sản',
                                         icon: 'pi pi-fw pi-minus-circle',
-                                        routerLink: ['/tai-san/giam']
+                                        routerLink: ['/pages/tai-san/giam']
                                     },
                                     {
                                         label: 'Khấu hao tài sản',
                                         icon: 'pi pi-fw pi-calculator',
-                                        routerLink: ['/tai-san/khau-hao']
+                                        routerLink: ['/pages/tai-san/khau-hao']
                                     },
                                     {
                                         label: 'Điều chỉnh khấu hao',
                                         icon: 'pi pi-fw pi-pencil',
-                                        routerLink: ['/tai-san/dieu-chinh-khau-hao']
+                                        routerLink: ['/pages/tai-san/dieu-chinh-khau-hao']
                                     },
                                     {
                                         label: 'Xem bút toán khấu hao',
                                         icon: 'pi pi-fw pi-eye',
-                                        routerLink: ['/tai-san/but-toan-khau-hao']
+                                        routerLink: ['/pages/tai-san/but-toan-khau-hao']
                                     }
                                 ]
                             },
@@ -650,28 +650,28 @@ export class AppMenu {
                             {
                                 label: 'Báo cáo',
                                 icon: 'pi pi-fw pi-chart-bar',
-                                path: '/tai-san/bao-cao',
+                                path: '/pages/tai-san/bao-cao',
 
                                 items: [
                                     {
                                         label: 'Quá trình khấu hao',
                                         icon: 'pi pi-fw pi-history',
-                                        routerLink: ['/tai-san/qua-trinh-khau-hao']
+                                        routerLink: ['/pages/tai-san/qua-trinh-khau-hao']
                                     },
                                     {
                                         label: 'Báo cáo tổng hợp tài sản',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/tai-san/tong-hop']
+                                        routerLink: ['/pages/tai-san/tong-hop']
                                     },
                                     {
                                         label: 'Sổ tài sản cố định',
                                         icon: 'pi pi-fw pi-book',
-                                        routerLink: ['/tai-san/so-tai-san']
+                                        routerLink: ['/pages/tai-san/so-tai-san']
                                     },
                                     {
                                         label: 'Thẻ tài sản cố định',
                                         icon: 'pi pi-fw pi-id-card',
-                                        routerLink: ['/tai-san/the-tai-san']
+                                        routerLink: ['/pages/tai-san/the-tai-san']
                                     }
                                 ]
                             }
@@ -684,29 +684,29 @@ export class AppMenu {
                     {
                         label: 'Thuế',
                         icon: 'pi pi-fw pi-file',
-                        path: '/thue',
+                        path: '/pages/thue',
 
                         items: [
                             {
                                 label: 'Kê khai / Thuế GTGT',
                                 icon: 'pi pi-fw pi-file-edit',
-                                path: '/thue/ke-khai',
+                                path: '/pages/thue/ke-khai',
 
                                 items: [
                                     {
                                         label: 'Duyệt số liệu thuế',
                                         icon: 'pi pi-fw pi-check-square',
-                                        routerLink: ['/thue/duyet-so-lieu']
+                                        routerLink: ['/pages/thue/duyet-so-lieu']
                                     },
                                     {
                                         label: 'So sánh chứng từ thuế',
                                         icon: 'pi pi-fw pi-clone',
-                                        routerLink: ['/thue/so-sanh-chung-tu']
+                                        routerLink: ['/pages/thue/so-sanh-chung-tu']
                                     },
                                     {
                                         label: 'So sánh kho thuế',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/thue/so-sanh-kho']
+                                        routerLink: ['/pages/thue/so-sanh-kho']
                                     }
                                 ]
                             },
@@ -714,43 +714,43 @@ export class AppMenu {
                             {
                                 label: 'Hóa đơn',
                                 icon: 'pi pi-fw pi-file',
-                                path: '/thue/hoa-don',
+                                path: '/pages/thue/hoa-don',
 
                                 items: [
                                     {
                                         label: 'Hóa đơn bán hàng',
                                         icon: 'pi pi-fw pi-shopping-cart',
-                                        routerLink: ['/thue/hoa-don-ban-hang']
+                                        routerLink: ['/pages/thue/hoa-don-ban-hang']
                                     },
                                     {
                                         label: 'Hóa đơn xuất trả',
                                         icon: 'pi pi-fw pi-upload',
-                                        routerLink: ['/thue/hoa-don-xuat-tra']
+                                        routerLink: ['/pages/thue/hoa-don-xuat-tra']
                                     },
                                     {
                                         label: 'Hóa đơn thay thế',
                                         icon: 'pi pi-fw pi-refresh',
-                                        routerLink: ['/thue/hoa-don-thay-the']
+                                        routerLink: ['/pages/thue/hoa-don-thay-the']
                                     },
                                     {
                                         label: 'Hóa đơn điều chỉnh',
                                         icon: 'pi pi-fw pi-pencil',
-                                        routerLink: ['/thue/hoa-don-dieu-chinh']
+                                        routerLink: ['/pages/thue/hoa-don-dieu-chinh']
                                     },
                                     {
                                         label: 'Hóa đơn tổng',
                                         icon: 'pi pi-fw pi-list',
-                                        routerLink: ['/thue/hoa-don-tong']
+                                        routerLink: ['/pages/thue/hoa-don-tong']
                                     },
                                     {
                                         label: 'Hóa đơn đơn vị lý',
                                         icon: 'pi pi-fw pi-file',
-                                        routerLink: ['/thue/hoa-don-don-vi-ly']
+                                        routerLink: ['/pages/thue/hoa-don-don-vi-ly']
                                     },
                                     {
                                         label: 'In HĐ đã phát hành',
                                         icon: 'pi pi-fw pi-print',
-                                        routerLink: ['/thue/in-hoa-don']
+                                        routerLink: ['/pages/thue/in-hoa-don']
                                     }
                                 ]
                             },
@@ -758,18 +758,18 @@ export class AppMenu {
                             {
                                 label: 'Bảng kê thuế',
                                 icon: 'pi pi-fw pi-list',
-                                path: '/thue/bang-ke',
+                                path: '/pages/thue/bang-ke',
 
                                 items: [
                                     {
                                         label: 'Bảng kê thuế đầu vào',
                                         icon: 'pi pi-fw pi-arrow-down',
-                                        routerLink: ['/thue/bang-ke-dau-vao']
+                                        routerLink: ['/pages/thue/bang-ke-dau-vao']
                                     },
                                     {
                                         label: 'Bảng kê thuế đầu ra',
                                         icon: 'pi pi-fw pi-arrow-up',
-                                        routerLink: ['/thue/bang-ke-dau-ra']
+                                        routerLink: ['/pages/thue/bang-ke-dau-ra']
                                     }
                                 ]
                             },
@@ -777,28 +777,28 @@ export class AppMenu {
                             {
                                 label: 'Báo cáo thuế',
                                 icon: 'pi pi-fw pi-chart-bar',
-                                path: '/thue/bao-cao',
+                                path: '/pages/thue/bao-cao',
 
                                 items: [
                                     {
                                         label: 'Báo cáo hóa đơn chi tiết',
                                         icon: 'pi pi-fw pi-file',
-                                        routerLink: ['/thue/bao-cao-hoa-don']
+                                        routerLink: ['/pages/thue/bao-cao-hoa-don']
                                     },
                                     {
                                         label: 'Báo cáo tồn kho thuế',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/thue/ton-kho-thue']
+                                        routerLink: ['/pages/thue/ton-kho-thue']
                                     },
                                     {
                                         label: 'Báo cáo NXT kho thuế',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/thue/nxt-kho-thue']
+                                        routerLink: ['/pages/thue/nxt-kho-thue']
                                     },
                                     {
                                         label: 'Báo cáo thẻ kho thuế',
                                         icon: 'pi pi-fw pi-credit-card',
-                                        routerLink: ['/thue/the-kho-thue']
+                                        routerLink: ['/pages/thue/the-kho-thue']
                                     }
                                 ]
                             },
@@ -806,23 +806,23 @@ export class AppMenu {
                             {
                                 label: 'Danh mục',
                                 icon: 'pi pi-fw pi-list',
-                                path: '/thue/danh-muc',
+                                path: '/pages/thue/danh-muc',
 
                                 items: [
                                     {
                                         label: 'Danh mục tài khoản',
                                         icon: 'pi pi-fw pi-wallet',
-                                        routerLink: ['/thue/danh-muc-tai-khoan']
+                                        routerLink: ['/pages/thue/danh-muc-tai-khoan']
                                     },
                                     {
                                         label: 'Danh mục đối tượng',
                                         icon: 'pi pi-fw pi-users',
-                                        routerLink: ['/thue/danh-muc-doi-tuong']
+                                        routerLink: ['/pages/thue/danh-muc-doi-tuong']
                                     },
                                     {
                                         label: 'Danh mục hàng hóa dịch vụ',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/thue/danh-muc-hang-hoa']
+                                        routerLink: ['/pages/thue/danh-muc-hang-hoa']
                                     }
                                 ]
                             }
@@ -835,34 +835,34 @@ export class AppMenu {
                     {
                         label: 'Chứng từ kế toán',
                         icon: 'pi pi-fw pi-file-edit',
-                        path: '/chung-tu-ke-toan',
+                        path: '/pages/chung-tu-ke-toan',
 
                         items: [
                             {
                                 label: 'Chứng từ kế toán',
                                 icon: 'pi pi-fw pi-file',
-                                path: '/chung-tu-ke-toan/chung-tu',
+                                path: '/pages/chung-tu-ke-toan/chung-tu',
 
                                 items: [
                                     {
                                         label: 'Phiếu kế toán',
                                         icon: 'pi pi-fw pi-file-edit',
-                                        routerLink: ['/chung-tu-ke-toan/phieu-ke-toan']
+                                        routerLink: ['/pages/chung-tu-ke-toan/phieu-ke-toan']
                                     },
                                     {
                                         label: 'Chứng từ bù trừ',
                                         icon: 'pi pi-fw pi-clone',
-                                        routerLink: ['/chung-tu-ke-toan/chung-tu-bu-tru']
+                                        routerLink: ['/pages/chung-tu-ke-toan/chung-tu-bu-tru']
                                     },
                                     {
                                         label: 'Tổng hợp phiếu kế toán',
                                         icon: 'pi pi-fw pi-list',
-                                        routerLink: ['/chung-tu-ke-toan/tong-hop-phieu']
+                                        routerLink: ['/pages/chung-tu-ke-toan/tong-hop-phieu']
                                     },
                                     {
                                         label: 'Sổ chứng từ gốc',
                                         icon: 'pi pi-fw pi-book',
-                                        routerLink: ['/chung-tu-ke-toan/so-chung-tu-goc']
+                                        routerLink: ['/pages/chung-tu-ke-toan/so-chung-tu-goc']
                                     }
                                 ]
                             },
@@ -870,28 +870,28 @@ export class AppMenu {
                             {
                                 label: 'Điều chỉnh / Định khoản',
                                 icon: 'pi pi-fw pi-calculator',
-                                path: '/chung-tu-ke-toan/dinh-khoan',
+                                path: '/pages/chung-tu-ke-toan/dinh-khoan',
 
                                 items: [
                                     {
                                         label: 'Bút toán điều chỉnh',
                                         icon: 'pi pi-fw pi-pencil',
-                                        routerLink: ['/chung-tu-ke-toan/but-toan-dieu-chinh']
+                                        routerLink: ['/pages/chung-tu-ke-toan/but-toan-dieu-chinh']
                                     },
                                     {
                                         label: 'Bút toán chuyển',
                                         icon: 'pi pi-fw pi-arrow-right',
-                                        routerLink: ['/chung-tu-ke-toan/but-toan-chuyen']
+                                        routerLink: ['/pages/chung-tu-ke-toan/but-toan-chuyen']
                                     },
                                     {
                                         label: 'Bút toán khóa sổ',
                                         icon: 'pi pi-fw pi-lock',
-                                        routerLink: ['/chung-tu-ke-toan/but-toan-khoa-so']
+                                        routerLink: ['/pages/chung-tu-ke-toan/but-toan-khoa-so']
                                     },
                                     {
                                         label: 'Chênh lệch tỷ giá',
                                         icon: 'pi pi-fw pi-money-bill',
-                                        routerLink: ['/chung-tu-ke-toan/chenh-lech-ty-gia']
+                                        routerLink: ['/pages/chung-tu-ke-toan/chenh-lech-ty-gia']
                                     }
                                 ]
                             },
@@ -899,28 +899,28 @@ export class AppMenu {
                             {
                                 label: 'Tiền lương',
                                 icon: 'pi pi-fw pi-users',
-                                path: '/chung-tu-ke-toan/tien-luong',
+                                path: '/pages/chung-tu-ke-toan/tien-luong',
 
                                 items: [
                                     {
                                         label: 'Nhận số liệu lương',
                                         icon: 'pi pi-fw pi-download',
-                                        routerLink: ['/chung-tu-ke-toan/nhan-so-lieu-luong']
+                                        routerLink: ['/pages/chung-tu-ke-toan/nhan-so-lieu-luong']
                                     },
                                     {
                                         label: 'Nhận số liệu lương T13',
                                         icon: 'pi pi-fw pi-download',
-                                        routerLink: ['/chung-tu-ke-toan/nhan-so-lieu-luong-t13']
+                                        routerLink: ['/pages/chung-tu-ke-toan/nhan-so-lieu-luong-t13']
                                     },
                                     {
                                         label: 'Bút toán lương',
                                         icon: 'pi pi-fw pi-calculator',
-                                        routerLink: ['/chung-tu-ke-toan/but-toan-luong']
+                                        routerLink: ['/pages/chung-tu-ke-toan/but-toan-luong']
                                     },
                                     {
                                         label: 'Bút toán khấu hao',
                                         icon: 'pi pi-fw pi-calculator',
-                                        routerLink: ['/chung-tu-ke-toan/but-toan-khau-hao']
+                                        routerLink: ['/pages/chung-tu-ke-toan/but-toan-khau-hao']
                                     }
                                 ]
                             },
@@ -928,13 +928,13 @@ export class AppMenu {
                             {
                                 label: 'Phân bổ / Kết chuyển',
                                 icon: 'pi pi-fw pi-sync',
-                                path: '/chung-tu-ke-toan/phan-bo',
+                                path: '/pages/chung-tu-ke-toan/phan-bo',
 
                                 items: [
                                     {
                                         label: 'Bút toán phân bổ',
                                         icon: 'pi pi-fw pi-calculator',
-                                        routerLink: ['/chung-tu-ke-toan/but-toan-phan-bo']
+                                        routerLink: ['/pages/chung-tu-ke-toan/but-toan-phan-bo']
                                     }
                                 ]
                             },
@@ -942,93 +942,93 @@ export class AppMenu {
                             {
                                 label: 'Sổ / Báo cáo kế toán',
                                 icon: 'pi pi-fw pi-chart-bar',
-                                path: '/chung-tu-ke-toan/bao-cao',
+                                path: '/pages/chung-tu-ke-toan/bao-cao',
 
                                 items: [
                                     {
                                         label: 'Sổ quỹ tiền mặt',
                                         icon: 'pi pi-fw pi-wallet',
-                                        routerLink: ['/chung-tu-ke-toan/so-quy']
+                                        routerLink: ['/pages/chung-tu-ke-toan/so-quy']
                                     },
                                     {
                                         label: 'Sổ tiền gửi ngân hàng',
                                         icon: 'pi pi-fw pi-building',
-                                        routerLink: ['/chung-tu-ke-toan/so-tien-gui']
+                                        routerLink: ['/pages/chung-tu-ke-toan/so-tien-gui']
                                     },
                                     {
                                         label: 'Sổ chi tiết tài khoản',
                                         icon: 'pi pi-fw pi-list',
-                                        routerLink: ['/chung-tu-ke-toan/so-chi-tiet']
+                                        routerLink: ['/pages/chung-tu-ke-toan/so-chi-tiet']
                                     },
                                     {
                                         label: 'Sổ tổng hợp tài khoản',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/chung-tu-ke-toan/so-tong-hop']
+                                        routerLink: ['/pages/chung-tu-ke-toan/so-tong-hop']
                                     },
                                     {
                                         label: 'Sổ tổng hợp tạm ứng',
                                         icon: 'pi pi-fw pi-wallet',
-                                        routerLink: ['/chung-tu-ke-toan/so-tam-ung']
+                                        routerLink: ['/pages/chung-tu-ke-toan/so-tam-ung']
                                     },
                                     {
                                         label: 'Sổ cái tài khoản',
                                         icon: 'pi pi-fw pi-book',
-                                        routerLink: ['/chung-tu-ke-toan/so-cai']
+                                        routerLink: ['/pages/chung-tu-ke-toan/so-cai']
                                     },
                                     {
                                         label: 'Nhật ký chung',
                                         icon: 'pi pi-fw pi-calendar',
-                                        routerLink: ['/chung-tu-ke-toan/nhat-ky-chung']
+                                        routerLink: ['/pages/chung-tu-ke-toan/nhat-ky-chung']
                                     },
                                     {
                                         label: 'Bảng kê thuế đầu vào',
                                         icon: 'pi pi-fw pi-arrow-down',
-                                        routerLink: ['/chung-tu-ke-toan/thue-dau-vao']
+                                        routerLink: ['/pages/chung-tu-ke-toan/thue-dau-vao']
                                     },
                                     {
                                         label: 'Bảng kê thuế đầu ra',
                                         icon: 'pi pi-fw pi-arrow-up',
-                                        routerLink: ['/chung-tu-ke-toan/thue-dau-ra']
+                                        routerLink: ['/pages/chung-tu-ke-toan/thue-dau-ra']
                                     },
                                     {
                                         label: 'Báo cáo tài chính',
                                         icon: 'pi pi-fw pi-chart-bar',
-                                        routerLink: ['/chung-tu-ke-toan/bao-cao-tai-chinh']
+                                        routerLink: ['/pages/chung-tu-ke-toan/bao-cao-tai-chinh']
                                     },
                                     {
                                         label: 'Cân đối phát sinh',
                                         icon: 'pi pi-fw pi-chart-pie',
-                                        routerLink: ['/chung-tu-ke-toan/can-doi-phat-sinh']
+                                        routerLink: ['/pages/chung-tu-ke-toan/can-doi-phat-sinh']
                                     },
                                     {
                                         label: 'Báo cáo quản trị',
                                         icon: 'pi pi-fw pi-chart-line',
-                                        routerLink: ['/chung-tu-ke-toan/bao-cao-quan-tri']
+                                        routerLink: ['/pages/chung-tu-ke-toan/bao-cao-quan-tri']
                                     },
                                     {
                                         label: 'Công nợ phải thu tổng hợp',
                                         icon: 'pi pi-fw pi-arrow-down',
-                                        routerLink: ['/chung-tu-ke-toan/cong-no-phai-thu']
+                                        routerLink: ['/pages/chung-tu-ke-toan/cong-no-phai-thu']
                                     },
                                     {
                                         label: 'Công nợ phải trả tổng hợp',
                                         icon: 'pi pi-fw pi-arrow-up',
-                                        routerLink: ['/chung-tu-ke-toan/cong-no-phai-tra']
+                                        routerLink: ['/pages/chung-tu-ke-toan/cong-no-phai-tra']
                                     },
                                     {
                                         label: 'Sổ tổng hợp TK theo đối tượng',
                                         icon: 'pi pi-fw pi-users',
-                                        routerLink: ['/chung-tu-ke-toan/so-tk-theo-doi-tuong']
+                                        routerLink: ['/pages/chung-tu-ke-toan/so-tk-theo-doi-tuong']
                                     },
                                     {
                                         label: 'Sổ chi tiết chi phí',
                                         icon: 'pi pi-fw pi-money-bill',
-                                        routerLink: ['/chung-tu-ke-toan/so-chi-tiet-chi-phi']
+                                        routerLink: ['/pages/chung-tu-ke-toan/so-chi-tiet-chi-phi']
                                     },
                                     {
                                         label: 'Sổ chi tiết doanh thu',
                                         icon: 'pi pi-fw pi-chart-line',
-                                        routerLink: ['/chung-tu-ke-toan/so-chi-tiet-doanh-thu']
+                                        routerLink: ['/pages/chung-tu-ke-toan/so-chi-tiet-doanh-thu']
                                     }
                                 ]
                             }
@@ -1041,49 +1041,49 @@ export class AppMenu {
                     {
                         label: 'Hệ thống',
                         icon: 'pi pi-fw pi-cog',
-                        path: '/he-thong',
+                        path: '/pages/he-thong',
 
                         items: [
                             {
                                 label: 'Thiết lập hệ thống',
                                 icon: 'pi pi-fw pi-sliders-h',
-                                path: '/he-thong/thiet-lap',
+                                path: '/pages/he-thong/thiet-lap',
 
                                 items: [
                                     {
                                         label: 'Tham số hệ thống',
                                         icon: 'pi pi-fw pi-cog',
-                                        routerLink: ['/he-thong/tham-so']
+                                        routerLink: ['/pages/he-thong/tham-so']
                                     },
                                     {
                                         label: 'Số dư kho',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/he-thong/so-du-kho']
+                                        routerLink: ['/pages/he-thong/so-du-kho']
                                     },
                                     {
                                         label: 'Số dư bán thành phẩm',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/he-thong/so-du-ban-thanh-pham']
+                                        routerLink: ['/pages/he-thong/so-du-ban-thanh-pham']
                                     },
                                     {
                                         label: 'Số dư tài khoản',
                                         icon: 'pi pi-fw pi-wallet',
-                                        routerLink: ['/he-thong/so-du-tai-khoan']
+                                        routerLink: ['/pages/he-thong/so-du-tai-khoan']
                                     },
                                     {
                                         label: 'Số dư cân đối TSCĐ',
                                         icon: 'pi pi-fw pi-building',
-                                        routerLink: ['/he-thong/so-du-tscd']
+                                        routerLink: ['/pages/he-thong/so-du-tscd']
                                     },
                                     {
                                         label: 'Số dư CN phải thu theo chứng từ',
                                         icon: 'pi pi-fw pi-arrow-down',
-                                        routerLink: ['/he-thong/so-du-phai-thu']
+                                        routerLink: ['/pages/he-thong/so-du-phai-thu']
                                     },
                                     {
                                         label: 'Số dư CN phải trả theo chứng từ',
                                         icon: 'pi pi-fw pi-arrow-up',
-                                        routerLink: ['/he-thong/so-du-phai-tra']
+                                        routerLink: ['/pages/he-thong/so-du-phai-tra']
                                     }
                                 ]
                             },
@@ -1091,88 +1091,88 @@ export class AppMenu {
                             {
                                 label: 'Danh mục',
                                 icon: 'pi pi-fw pi-list',
-                                path: '/he-thong/danh-muc',
+                                path: '/pages/he-thong/danh-muc',
 
                                 items: [
                                     {
                                         label: 'Danh mục tài khoản',
                                         icon: 'pi pi-fw pi-wallet',
-                                        routerLink: ['/he-thong/danh-muc-tai-khoan']
+                                        routerLink: ['/pages/he-thong/danh-muc-tai-khoan']
                                     },
                                     {
                                         label: 'Danh mục đối tượng',
                                         icon: 'pi pi-fw pi-users',
-                                        routerLink: ['/he-thong/danh-muc-doi-tuong']
+                                        routerLink: ['/pages/he-thong/danh-muc-doi-tuong']
                                     },
                                     {
                                         label: 'Danh mục khách hàng',
                                         icon: 'pi pi-fw pi-user',
-                                        routerLink: ['/he-thong/danh-muc-khach-hang']
+                                        routerLink: ['/pages/he-thong/danh-muc-khach-hang']
                                     },
                                     {
                                         label: 'Danh mục nhà cung cấp',
                                         icon: 'pi pi-fw pi-truck',
-                                        routerLink: ['/he-thong/danh-muc-nha-cung-cap']
+                                        routerLink: ['/pages/he-thong/danh-muc-nha-cung-cap']
                                     },
                                     {
                                         label: 'Danh mục khách hàng tiềm năng',
                                         icon: 'pi pi-fw pi-star',
-                                        routerLink: ['/he-thong/danh-muc-khach-hang-tiem-nang']
+                                        routerLink: ['/pages/he-thong/danh-muc-khach-hang-tiem-nang']
                                     },
                                     {
                                         label: 'Danh mục hợp đồng, công trình, dự án',
                                         icon: 'pi pi-fw pi-briefcase',
-                                        routerLink: ['/he-thong/danh-muc-hop-dong']
+                                        routerLink: ['/pages/he-thong/danh-muc-hop-dong']
                                     },
                                     {
                                         label: 'Danh mục khoản mục phí',
                                         icon: 'pi pi-fw pi-money-bill',
-                                        routerLink: ['/he-thong/danh-muc-khoan-muc-phi']
+                                        routerLink: ['/pages/he-thong/danh-muc-khoan-muc-phi']
                                     },
                                     {
                                         label: 'Danh mục nghiệp vụ kế toán',
                                         icon: 'pi pi-fw pi-calculator',
-                                        routerLink: ['/he-thong/danh-muc-nghiep-vu-ke-toan']
+                                        routerLink: ['/pages/he-thong/danh-muc-nghiep-vu-ke-toan']
                                     },
                                     {
                                         label: 'Danh mục sản phẩm',
                                         icon: 'pi pi-fw pi-box',
-                                        routerLink: ['/he-thong/danh-muc-san-pham']
+                                        routerLink: ['/pages/he-thong/danh-muc-san-pham']
                                     },
                                     {
                                         label: 'Danh mục kho hàng',
                                         icon: 'pi pi-fw pi-home',
-                                        routerLink: ['/he-thong/danh-muc-kho-hang']
+                                        routerLink: ['/pages/he-thong/danh-muc-kho-hang']
                                     },
                                     {
                                         label: 'Danh mục ngân hàng',
                                         icon: 'pi pi-fw pi-building',
-                                        routerLink: ['/he-thong/danh-muc-ngan-hang']
+                                        routerLink: ['/pages/he-thong/danh-muc-ngan-hang']
                                     },
                                     {
                                         label: 'Danh mục nhóm hàng',
                                         icon: 'pi pi-fw pi-tags',
-                                        routerLink: ['/he-thong/danh-muc-nhom-hang']
+                                        routerLink: ['/pages/he-thong/danh-muc-nhom-hang']
                                     },
                                     {
                                         label: 'Danh mục nhóm hàng chi tiết',
                                         icon: 'pi pi-fw pi-tag',
-                                        routerLink: ['/he-thong/danh-muc-nhom-hang-chi-tiet']
+                                        routerLink: ['/pages/he-thong/danh-muc-nhom-hang-chi-tiet']
                                     },
                                     {
                                         label: 'Danh mục hàng hóa dịch vụ',
                                         icon: 'pi pi-fw pi-shopping-cart',
-                                        routerLink: ['/he-thong/danh-muc-hang-hoa-dich-vu']
+                                        routerLink: ['/pages/he-thong/danh-muc-hang-hoa-dich-vu']
                                     },
                                     {
                                         label: 'Danh mục đơn vị tính',
                                         icon: 'pi pi-fw pi-sliders-v',
-                                        routerLink: ['/he-thong/danh-muc-don-vi-tinh']
+                                        routerLink: ['/pages/he-thong/danh-muc-don-vi-tinh']
                                     },
                                     {
                                         label: 'Danh mục nghiệp vụ nhập xuất',
                                         icon: 'pi pi-fw pi-arrows-v',
-                                        routerLink: ['/he-thong/danh-muc-nghiep-vu-nhap-xuat']
+                                        routerLink: ['/pages/he-thong/danh-muc-nghiep-vu-nhap-xuat']
                                     }
                                 ]
                             },
@@ -1180,13 +1180,13 @@ export class AppMenu {
                             {
                                 label: 'Định khoản',
                                 icon: 'pi pi-fw pi-calculator',
-                                path: '/he-thong/dinh-khoan',
+                                path: '/pages/he-thong/dinh-khoan',
 
                                 items: [
                                     {
                                         label: 'Thông số định khoản tự động kế toán theo nghiệp vụ',
                                         icon: 'pi pi-fw pi-cog',
-                                        routerLink: ['/he-thong/dinh-khoan-tu-dong']
+                                        routerLink: ['/pages/he-thong/dinh-khoan-tu-dong']
                                     }
                                 ]
                             },
@@ -1194,13 +1194,13 @@ export class AppMenu {
                             {
                                 label: 'Chuyển đổi dữ liệu',
                                 icon: 'pi pi-fw pi-sync',
-                                path: '/he-thong/chuyen-doi-du-lieu',
+                                path: '/pages/he-thong/chuyen-doi-du-lieu',
 
                                 items: [
                                     {
                                         label: 'Chuyển số dư sang năm',
                                         icon: 'pi pi-fw pi-calendar-plus',
-                                        routerLink: ['/he-thong/chuyen-so-du-sang-nam']
+                                        routerLink: ['/pages/he-thong/chuyen-so-du-sang-nam']
                                     }
                                 ]
                             },
@@ -1208,13 +1208,13 @@ export class AppMenu {
                             {
                                 label: 'Sao lưu dữ liệu',
                                 icon: 'pi pi-fw pi-database',
-                                path: '/he-thong/sao-luu',
+                                path: '/pages/he-thong/sao-luu',
 
                                 items: [
                                     {
                                         label: 'Sao lưu dữ liệu',
                                         icon: 'pi pi-fw pi-download',
-                                        routerLink: ['/he-thong/sao-luu-du-lieu']
+                                        routerLink: ['/pages/he-thong/sao-luu-du-lieu']
                                     }
                                 ]
                             },
@@ -1222,23 +1222,23 @@ export class AppMenu {
                             {
                                 label: 'Mã / Barcode',
                                 icon: 'pi pi-fw pi-tag',
-                                path: '/he-thong/barcode',
+                                path: '/pages/he-thong/barcode',
 
                                 items: [
                                     {
                                         label: 'Mã vạch',
                                         icon: 'pi pi-fw pi-tag',
-                                        routerLink: ['/he-thong/ma-vach']
+                                        routerLink: ['/pages/he-thong/ma-vach']
                                     },
                                     {
                                         label: 'Mã vạch theo lô',
                                         icon: 'pi pi-fw pi-tags',
-                                        routerLink: ['/he-thong/ma-vach-theo-lo']
+                                        routerLink: ['/pages/he-thong/ma-vach-theo-lo']
                                     },
                                     {
                                         label: 'Nhãn, mã vạch hàng hóa, sản phẩm',
                                         icon: 'pi pi-fw pi-print',
-                                        routerLink: ['/he-thong/nhan-ma-vach']
+                                        routerLink: ['/pages/he-thong/nhan-ma-vach']
                                     }
                                 ]
                             },
@@ -1246,31 +1246,31 @@ export class AppMenu {
                             {
                                 label: 'Thông tin doanh nghiệp',
                                 icon: 'pi pi-fw pi-building',
-                                routerLink: ['/he-thong/thong-tin-doanh-nghiep']
+                                routerLink: ['/pages/he-thong/thong-tin-doanh-nghiep']
                             },
 
                             {
                                 label: 'Người dùng',
                                 icon: 'pi pi-fw pi-user',
-                                routerLink: ['/he-thong/nguoi-dung']
+                                routerLink: ['/pages/he-thong/nguoi-dung']
                             },
 
                             {
                                 label: 'Phân quyền',
                                 icon: 'pi pi-fw pi-shield',
-                                routerLink: ['/he-thong/phan-quyen']
+                                routerLink: ['/pages/he-thong/phan-quyen']
                             },
 
                             {
                                 label: 'Khóa / Mở sổ',
                                 icon: 'pi pi-fw pi-lock',
-                                routerLink: ['/he-thong/khoa-mo-so']
+                                routerLink: ['/pages/he-thong/khoa-mo-so']
                             },
 
                             {
                                 label: 'Thoát',
                                 icon: 'pi pi-fw pi-sign-out',
-                                routerLink: ['/he-thong/thoat']
+                                routerLink: ['/pages/he-thong/thoat']
                             }
                         ]
                     }
