@@ -10,6 +10,6 @@ export class MenuService {
     private readonly apiUrl = 'https://localhost:7001/api/menu';
 
     getMenu(): Observable<AppMenuItem[]> {
-        return this.http.get<AppMenuItem[]>(this.apiUrl);
+        return this.http.get<AppMenuItem[]>(this.apiUrl);//
     }
 }
