@@ -1,0 +1,43 @@
+.form-group,
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-field input,
+.form-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-field input:focus,
+.form-field textarea:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+}
+
+.form-group textarea,
+.form-field textarea {
+    resize: vertical;
+}
+
+.form-group label,
+.form-field label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.required {
+    color: #dc2626;
+}

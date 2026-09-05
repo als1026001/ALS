@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-login',
@@ -41,11 +43,14 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                         </div>
 
                         <div>
-                            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                            <input pInputText id="email1" type="text" placeholder="Email address" class="w-full md:w-120 mb-8" [(ngModel)]="email" />
+                            <label for="tenantId" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Tenant</label>
+                            <input pInputText id="tenantId" name="tenantId" type="number" class="w-full md:w-120 mb-8" [(ngModel)]="tenantId" [disabled]="loading" />
+
+                            <label for="username" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Username</label>
+                            <input pInputText id="username" name="username" type="text" autocomplete="username" placeholder="Username" class="w-full md:w-120 mb-8" [(ngModel)]="username" [disabled]="loading" (keyup.enter)="login()" />
 
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <p-password id="password1" [(ngModel)]="password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
+                            <p-password id="password1" name="password" [(ngModel)]="password" autocomplete="current-password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false" [disabled]="loading" (keyup.enter)="login()"></p-password>
 
                             <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                                 <div class="flex items-center">
@@ -54,7 +59,10 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                 </div>
                                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
                             </div>
-                            <p-button label="Sign In" styleClass="w-full" routerLink="/"></p-button>
+                            @if (errorMessage) {
+                                <div class="text-red-500 mb-4" role="alert">{{ errorMessage }}</div>
+                            }
+                            <p-button label="Sign In" styleClass="w-full" [loading]="loading" [disabled]="loading" (onClick)="login()"></p-button>
                         </div>
                     </div>
                 </div>
@@ -63,9 +71,46 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
     `
 })
 export class Login {
-    email: string = '';
+    tenantId = 1;
 
-    password: string = '';
+    username = '';
 
-    checked: boolean = false;
+    password = '';
+
+    checked = false;
+
+    loading = false;
+
+    errorMessage = '';
+
+    constructor(
+        private readonly authService: AuthService,
+        private readonly router: Router,
+        private readonly route: ActivatedRoute
+    ) {}
+
+    login(): void {
+        const username = this.username.trim();
+
+        if (!this.tenantId || !username || !this.password) {
+            this.errorMessage = 'Tenant, username, and password are required.';
+            return;
+        }
+
+        this.loading = true;
+        this.errorMessage = '';
+
+        this.authService.login({ tenantId: this.tenantId, username, password: this.password }).subscribe({
+            next: () => {
+                const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
+                void this.router.navigateByUrl(returnUrl);
+            },
+            error: (error: HttpErrorResponse) => {
+                this.loading = false;
+                this.errorMessage = error.status === 401
+                    ? 'Invalid username or password.'
+                    : 'Unable to sign in. Please check that the API is running.';
+            }
+        });
+    }
 }

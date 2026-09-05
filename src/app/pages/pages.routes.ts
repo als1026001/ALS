@@ -1,9 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { Documentation } from './documentation/documentation';
-
 import { Crud } from './crud/crud';
-
 import { Empty } from './empty/empty';
 
 export default [
@@ -23,8 +21,13 @@ export default [
     },
 
     {
-        path: 'von-bang-tien/bao-co',
-        loadComponent: () => import('./von-bang-tien/bao-co/bao-co.component').then((m) => m.BaoCoComponent)
+        path: 'nghiep-vu',
+        children: [
+            {
+                path: 'von-bang-tien',
+                loadChildren: () => import('./nghiep-vu/von-bang-tien/von-bang-tien.routes')
+            }
+        ]
     },
 
     {

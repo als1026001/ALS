@@ -82,7 +82,7 @@
                          ========================================== -->
 
                     <a
-                        *ngIf="!item.items || item.items.length === 0"
+                        *ngIf="(!item.items || item.items.length === 0) && !item.isExternal"
 
                         class="top-menu-item"
 
@@ -109,6 +109,17 @@
 
                     </a>
 
+
+                    <a
+                        *ngIf="(!item.items || item.items.length === 0) && item.isExternal"
+                        class="top-menu-item"
+                        [href]="item.url"
+                        [target]="item.target || '_blank'"
+                        rel="noopener noreferrer"
+                        (click)="closeMenu()">
+                        <i *ngIf="item.icon" [class]="item.icon"></i>
+                        <span>{{ item.label }}</span>
+                    </a>
 
                     <!-- ==========================================
                          MENU WITH CHILDREN
@@ -186,18 +197,8 @@
             *ngFor="let child of openMenu.items">
 
 
-            <!-- SEPARATOR -->
-
-            <div
-                *ngIf="child.separator"
-                class="top-menu-separator">
-            </div>
-
-
-            <!-- CHILD -->
-
             <a
-                *ngIf="!child.separator"
+                *ngIf="!child.isExternal"
 
                 class="top-menu-dropdown-item"
 
@@ -216,6 +217,17 @@
                     {{ child.label }}
                 </span>
 
+            </a>
+
+            <a
+                *ngIf="child.isExternal"
+                class="top-menu-dropdown-item"
+                [href]="child.url"
+                [target]="child.target || '_blank'"
+                rel="noopener noreferrer"
+                (click)="closeMenu()">
+                <i *ngIf="child.icon" [class]="child.icon"></i>
+                <span>{{ child.label }}</span>
             </a>
 
         </ng-container>

@@ -1,7 +1,7 @@
 import { Component, computed, effect, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
-import { AppMenu } from './app.menu';
+import { AppMenu } from '../menu/app.menu';
 import { LayoutService } from '@/app/layout/service/layout.service';
 
 @Component({
@@ -105,11 +105,6 @@ export class AppSidebar implements OnInit, OnDestroy {
         const topbarButtonEl = document.querySelector('.topbar-start > button');
         const sidebarEl = this.el.nativeElement;
 
-        return !(
-            sidebarEl?.isSameNode(event.target as Node) ||
-            sidebarEl?.contains(event.target as Node) ||
-            topbarButtonEl?.isSameNode(event.target as Node) ||
-            topbarButtonEl?.contains(event.target as Node)
-        );
+        return !(sidebarEl?.isSameNode(event.target as Node) || sidebarEl?.contains(event.target as Node) || topbarButtonEl?.isSameNode(event.target as Node) || topbarButtonEl?.contains(event.target as Node));
     }
 }

@@ -1,0 +1,20 @@
+.btn {
+    border: 1px solid #dcdcdc;
+    background: white;
+    padding: 9px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+    background: #f5f5f5;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn i {
+    margin-right: 5px;
+}

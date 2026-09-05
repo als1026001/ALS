@@ -1,0 +1,557 @@
+<div class="bao-co-page">
+    <!-- ============================================================
+         HEADER
+         ============================================================ -->
+
+    <div class="page-header">
+        <div>
+            <h2>
+                <i class="pi pi-building-columns"></i>
+                Báo có
+            </h2>
+
+            <span> Danh sách báo có tiền gửi ngân hàng </span>
+        </div>
+
+        <div class="header-actions">
+            <!-- Thêm -->
+            <button type="button" class="btn btn-add" title="Thêm báo có" (click)="addNew()">
+                <i class="pi pi-plus"></i>
+                Thêm
+            </button>
+
+            <!-- Sửa -->
+            <button type="button" class="btn" title="Sửa chứng từ" [disabled]="!selectedReceipt" (click)="edit()">
+                <i class="pi pi-pencil"></i>
+                Sửa
+            </button>
+
+            <!-- Xóa -->
+            <button type="button" class="btn btn-danger" title="Xóa chứng từ" [disabled]="selectedReceipts.length === 0" (click)="delete()">
+                <i class="pi pi-trash"></i>
+                Xóa
+            </button>
+
+            <!-- In -->
+            <button type="button" class="btn" title="In" (click)="print()">
+                <i class="pi pi-print"></i>
+                In
+            </button>
+
+            <!-- Làm mới -->
+            <button type="button" class="btn" title="Làm mới" aria-label="Làm mới" (click)="refresh()">
+                <i class="pi pi-refresh"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         FILTER
+         ============================================================ -->
+
+    <div class="filter-box">
+        <!-- Từ ngày -->
+        <div class="filter-item">
+            <label for="fromDate"> Từ ngày </label>
+
+            <input id="fromDate" type="date" [(ngModel)]="fromDate" title="Từ ngày" />
+        </div>
+
+        <!-- Đến ngày -->
+        <div class="filter-item">
+            <label for="toDate"> Đến ngày </label>
+
+            <input id="toDate" type="date" [(ngModel)]="toDate" title="Đến ngày" />
+        </div>
+
+        <!-- Tìm kiếm -->
+        <div class="filter-search">
+            <label for="searchText"> Tìm kiếm </label>
+
+            <input id="searchText" type="text" [(ngModel)]="searchText" placeholder="Số chứng từ, đối tượng, nội dung..." title="Tìm kiếm chứng từ" (keyup.enter)="filter()" />
+        </div>
+
+        <!-- Lọc -->
+        <button type="button" class="btn btn-filter" title="Lọc dữ liệu" (click)="filter()">
+            <i class="pi pi-filter"></i>
+            Lọc
+        </button>
+
+        <!-- Xóa lọc -->
+        <button type="button" class="btn" title="Xóa bộ lọc" (click)="clearFilter()">
+            <i class="pi pi-times"></i>
+            Xóa lọc
+        </button>
+    </div>
+
+    <!-- ============================================================
+         TOOLBAR
+         ============================================================ -->
+
+    <div class="table-toolbar">
+        <!-- Ghi sổ -->
+        <button type="button" title="Ghi sổ" [disabled]="selectedReceipts.length === 0" (click)="post()">
+            <i class="pi pi-check"></i>
+            Ghi sổ
+        </button>
+
+        <!-- Nhân bản -->
+        <button type="button" title="Nhân bản chứng từ" [disabled]="!selectedReceipt" (click)="duplicate()">
+            <i class="pi pi-copy"></i>
+            Nhân bản
+        </button>
+
+        <!-- Định khoản -->
+        <button type="button" title="Định khoản chứng từ" [disabled]="!selectedReceipt" (click)="accounting()">
+            <i class="pi pi-file-edit"></i>
+            Định khoản
+        </button>
+
+        <!-- Tổng số -->
+        <span class="total"> Tổng số: {{ filteredReceipts.length }} </span>
+    </div>
+
+    <!-- ============================================================
+         TABLE
+         ============================================================ -->
+
+    <div class="table-container">
+        <table>
+            <!-- TABLE HEADER -->
+            <thead>
+                <tr>
+                    <!-- Checkbox chọn tất cả -->
+                    <th class="checkbox-column">
+                        <input type="checkbox" aria-label="Chọn tất cả báo có" title="Chọn tất cả" [checked]="isAllSelected()" (change)="toggleAll($event)" />
+                    </th>
+
+                    <th>Ngày</th>
+
+                    <th>Số chứng từ</th>
+
+                    <th>Đối tượng</th>
+
+                    <th>Nội dung</th>
+
+                    <th>TK</th>
+
+                    <th class="money">Số tiền</th>
+
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+
+            <!-- TABLE BODY -->
+            <tbody>
+                @for (item of filteredReceipts; track item.number) {
+                    <tr [class.selected-row]="item.checked" (click)="selectReceipt(item)">
+                        <!-- Checkbox -->
+                        <td class="checkbox-column">
+                            <input type="checkbox" [attr.aria-label]="'Chọn chứng từ ' + item.number" [attr.title]="'Chọn ' + item.number" [(ngModel)]="item.checked" (click)="$event.stopPropagation()" (change)="updateSelection()" />
+                        </td>
+
+                        <!-- Ngày -->
+                        <td>
+                            {{ item.date }}
+                        </td>
+
+                        <!-- Số chứng từ -->
+                        <td>
+                            <button type="button" class="document-number" [attr.title]="'Xem chi tiết ' + item.number" [attr.aria-label]="'Xem chi tiết chứng từ ' + item.number" (click)="viewDetail(item); $event.stopPropagation()">
+                                {{ item.number }}
+                            </button>
+                        </td>
+
+                        <!-- Đối tượng -->
+                        <td>
+                            {{ item.customer }}
+                        </td>
+
+                        <!-- Nội dung -->
+                        <td>
+                            {{ item.description }}
+                        </td>
+
+                        <!-- Tài khoản -->
+                        <td>
+                            {{ item.account }}
+                        </td>
+
+                        <!-- Số tiền -->
+                        <td class="money">
+                            {{ formatMoney(item.amount) }}
+                        </td>
+
+                        <!-- Trạng thái -->
+                        <td>
+                            <span class="status" [class.status-success]="item.status === 'Đã ghi sổ'" [class.status-warning]="item.status === 'Chưa ghi sổ'">
+                                {{ item.status }}
+                            </span>
+                        </td>
+                    </tr>
+                }
+
+                <!-- Không có dữ liệu -->
+                @if (filteredReceipts.length === 0) {
+                    <tr>
+                        <td colspan="8" class="empty-data">
+                            <i class="pi pi-inbox"></i>
+
+                            <span> Không có dữ liệu </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+            <!-- TABLE FOOTER -->
+            <tfoot>
+                <tr>
+                    <td colspan="6">
+                        <strong> Tổng cộng </strong>
+                    </td>
+
+                    <td class="money">
+                        <strong>
+                            {{ formatMoney(totalAmount) }}
+                        </strong>
+                    </td>
+
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- ============================================================
+         FORM THÊM / SỬA BÁO CÓ
+         CHỈ CÓ 1 FORM
+         ============================================================ -->
+
+    @if (showForm) {
+        <div class="form-overlay" (click)="closeForm()">
+            <div class="form-dialog" (click)="$event.stopPropagation()">
+                <!-- HEADER -->
+                <div class="form-header">
+                    <div>
+                        <h3>
+                            <i class="pi pi-file-plus"></i>
+
+                            {{ formTitle }}
+                        </h3>
+
+                        <span> Nhập thông tin chứng từ báo có </span>
+                    </div>
+
+                    <!-- Đóng -->
+                    <button type="button" class="form-close" title="Đóng" aria-label="Đóng form" (click)="closeForm()">
+                        <i class="pi pi-times"></i>
+                    </button>
+                </div>
+
+                <!-- BODY -->
+                <div class="form-body">
+                    <!-- NGÀY -->
+                    <div class="form-group">
+                        <label for="receiptDate">
+                            Ngày
+                            <span class="required">*</span>
+                        </label>
+
+                        <input id="receiptDate" type="date" [(ngModel)]="formData.date" title="Ngày chứng từ" />
+                    </div>
+
+                    <!-- ĐỐI TƯỢNG -->
+                    <div class="form-group">
+                        <label for="customer">
+                            Đối tượng
+                            <span class="required">*</span>
+                        </label>
+
+                        <input id="customer" type="text" [(ngModel)]="formData.customer" placeholder="Nhập tên đối tượng" title="Đối tượng" />
+                    </div>
+
+                    <!-- NỘI DUNG -->
+                    <div class="form-group form-group-full">
+                        <label for="description">
+                            Nội dung
+                            <span class="required">*</span>
+                        </label>
+
+                        <textarea id="description" rows="3" [(ngModel)]="formData.description" placeholder="Nhập nội dung báo có" title="Nội dung báo có"></textarea>
+                    </div>
+
+                    <!-- TÀI KHOẢN -->
+                    <div class="form-group">
+                        <label for="account">
+                            Tài khoản
+                            <span class="required">*</span>
+                        </label>
+
+                        <input id="account" type="text" [(ngModel)]="formData.account" placeholder="Ví dụ: 1121" title="Tài khoản" />
+                    </div>
+
+                    <!-- SỐ TIỀN -->
+                    <div class="form-group">
+                        <label for="amount">
+                            Số tiền
+                            <span class="required">*</span>
+                        </label>
+
+                        <input id="amount" type="number" min="1" [(ngModel)]="formData.amount" placeholder="Nhập số tiền" title="Số tiền" />
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="form-footer">
+                    <button type="button" class="btn" title="Hủy" (click)="closeForm()">
+                        <i class="pi pi-times"></i>
+                        Hủy
+                    </button>
+
+                    <button type="button" class="btn btn-add" title="Lưu chứng từ" (click)="saveForm()">
+                        <i class="pi pi-check"></i>
+                        Lưu
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ============================================================
+         DETAIL MODAL
+         ============================================================ -->
+
+    @if (showDetail && detailReceipt) {
+        <div class="modal-overlay" (click)="closeDetail()">
+            <div class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title" (click)="$event.stopPropagation()">
+                <!-- HEADER -->
+                <div class="modal-header">
+                    <div>
+                        <h3 id="detail-title">
+                            <i class="pi pi-file"></i>
+
+                            Chi tiết báo có
+                        </h3>
+
+                        <span> Chứng từ {{ detailReceipt.number }} </span>
+                    </div>
+
+                    <!-- Đóng -->
+                    <button type="button" class="modal-close" title="Đóng chi tiết" aria-label="Đóng chi tiết" (click)="closeDetail()">
+                        <i class="pi pi-times"></i>
+                    </button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body">
+                    <div class="detail-grid">
+                        <!-- Ngày -->
+                        <div class="detail-item">
+                            <label> Ngày </label>
+
+                            <div class="detail-value">
+                                {{ detailReceipt.date }}
+                            </div>
+                        </div>
+
+                        <!-- Số chứng từ -->
+                        <div class="detail-item">
+                            <label> Số chứng từ </label>
+
+                            <div class="detail-value">
+                                {{ detailReceipt.number }}
+                            </div>
+                        </div>
+
+                        <!-- Đối tượng -->
+                        <div class="detail-item detail-full">
+                            <label> Đối tượng </label>
+
+                            <div class="detail-value">
+                                {{ detailReceipt.customer }}
+                            </div>
+                        </div>
+
+                        <!-- Nội dung -->
+                        <div class="detail-item detail-full">
+                            <label> Nội dung </label>
+
+                            <div class="detail-value">
+                                {{ detailReceipt.description }}
+                            </div>
+                        </div>
+
+                        <!-- Tài khoản -->
+                        <div class="detail-item">
+                            <label> Tài khoản </label>
+
+                            <div class="detail-value">
+                                {{ detailReceipt.account }}
+                            </div>
+                        </div>
+
+                        <!-- Số tiền -->
+                        <div class="detail-item">
+                            <label> Số tiền </label>
+
+                            <div class="detail-value money">
+                                {{ formatMoney(detailReceipt.amount) }}
+                            </div>
+                        </div>
+
+                        <!-- Trạng thái -->
+                        <div class="detail-item">
+                            <label> Trạng thái </label>
+
+                            <div class="detail-value">
+                                <span class="status" [class.status-success]="detailReceipt.status === 'Đã ghi sổ'" [class.status-warning]="detailReceipt.status === 'Chưa ghi sổ'">
+                                    {{ detailReceipt.status }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer">
+                    <button type="button" class="btn" title="Đóng chi tiết" (click)="closeDetail()">
+                        <i class="pi pi-times"></i>
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ============================================================
+         FORM ĐỊNH KHOẢN
+         
+         QUAN TRỌNG:
+         Form này nằm NGOÀI Detail Modal.
+         Vì vậy khi:
+         
+         Tick BC000001
+         -> Bấm Định khoản
+         -> accounting()
+         -> showAccountingForm = true
+         -> Form định khoản mở ngay.
+         ============================================================ -->
+
+    @if (showAccountingForm && accountingReceipt) {
+        <div class="accounting-overlay" (click)="closeAccountingForm()">
+            <div class="accounting-dialog" role="dialog" aria-modal="true" aria-labelledby="accounting-title" (click)="$event.stopPropagation()">
+                <!-- HEADER -->
+                <div class="accounting-header">
+                    <div>
+                        <h3 id="accounting-title">
+                            <i class="pi pi-file-edit"></i>
+
+                            Định khoản chứng từ
+                        </h3>
+
+                        <span>
+                            {{ accountingReceipt.number }}
+                        </span>
+                    </div>
+
+                    <!-- Đóng -->
+                    <button type="button" class="dialog-close" title="Đóng định khoản" aria-label="Đóng định khoản" (click)="closeAccountingForm()">
+                        <i class="pi pi-times"></i>
+                    </button>
+                </div>
+
+                <!-- ==================================================
+                     THÔNG TIN CHỨNG TỪ
+                     ================================================== -->
+
+                <div class="accounting-info">
+                    <!-- Ngày -->
+                    <div class="info-item">
+                        <label> Ngày </label>
+
+                        <span>
+                            {{ accountingReceipt.date }}
+                        </span>
+                    </div>
+
+                    <!-- Đối tượng -->
+                    <div class="info-item">
+                        <label> Đối tượng </label>
+
+                        <span>
+                            {{ accountingReceipt.customer }}
+                        </span>
+                    </div>
+
+                    <!-- Nội dung -->
+                    <div class="info-item">
+                        <label> Nội dung </label>
+
+                        <span>
+                            {{ accountingReceipt.description }}
+                        </span>
+                    </div>
+
+                    <!-- Số tiền -->
+                    <div class="info-item">
+                        <label> Số tiền </label>
+
+                        <strong>
+                            {{ formatMoney(accountingReceipt.amount) }}
+                        </strong>
+                    </div>
+                </div>
+
+                <!-- ==================================================
+                     FORM ĐỊNH KHOẢN
+                     ================================================== -->
+
+                <div class="accounting-form">
+                    <!-- Tài khoản Nợ -->
+                    <div class="form-field">
+                        <label for="debitAccount"> Tài khoản Nợ </label>
+
+                        <input id="debitAccount" type="text" [(ngModel)]="accountingForm.debitAccount" placeholder="Ví dụ: 131" title="Tài khoản Nợ" />
+                    </div>
+
+                    <!-- Tài khoản Có -->
+                    <div class="form-field">
+                        <label for="creditAccount"> Tài khoản Có </label>
+
+                        <input id="creditAccount" type="text" [(ngModel)]="accountingForm.creditAccount" placeholder="Ví dụ: 1121" title="Tài khoản Có" />
+                    </div>
+
+                    <!-- Số tiền -->
+                    <div class="form-field">
+                        <label for="accountingAmount"> Số tiền </label>
+
+                        <input id="accountingAmount" type="number" min="0" [(ngModel)]="accountingForm.amount" title="Số tiền định khoản" />
+                    </div>
+
+                    <!-- Nội dung -->
+                    <div class="form-field form-field-full">
+                        <label for="accountingDescription"> Nội dung định khoản </label>
+
+                        <textarea id="accountingDescription" rows="3" [(ngModel)]="accountingForm.description" placeholder="Nhập nội dung định khoản..." title="Nội dung định khoản"></textarea>
+                    </div>
+                </div>
+
+                <!-- ==================================================
+                     FOOTER
+                     ================================================== -->
+
+                <div class="accounting-footer">
+                    <button type="button" class="btn" title="Hủy định khoản" (click)="closeAccountingForm()">
+                        <i class="pi pi-times"></i>
+                        Hủy
+                    </button>
+
+                    <button type="button" class="btn btn-add" title="Lưu định khoản" (click)="saveAccounting()">
+                        <i class="pi pi-save"></i>
+                        Lưu định khoản
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -56,8 +56,8 @@ export class TreeDemo implements OnInit {
     nodeService = inject(NodeService);
 
     ngOnInit() {
-        this.nodeService.getFiles().then((files) => this.treeValue.set(files));
-        this.nodeService.getTreeTableNodes().then((files: any) => this.treeTableValue.set(files));
+        this.nodeService.getFiles().then((files: TreeNode[]) => this.treeValue.set(files));
+        this.nodeService.getTreeTableNodes().then((files: TreeNode[]) => this.treeTableValue.set(files));
 
         this.cols = [
             { field: 'name', header: 'Name' },

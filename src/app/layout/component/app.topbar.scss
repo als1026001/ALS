@@ -32,8 +32,6 @@
     z-index: 9999 !important;
 }
 
-
-
 /* ============================================================
    LOGO
    ============================================================ */
@@ -56,7 +54,6 @@
     z-index: 10002;
 }
 
-
 .layout-topbar-logo {
     display: flex !important;
 
@@ -71,13 +68,11 @@
     flex-shrink: 0;
 }
 
-
 .layout-topbar-logo svg {
     width: 2rem;
 
     height: 2rem;
 }
-
 
 .layout-topbar-logo span {
     font-size: 1.4rem;
@@ -86,8 +81,6 @@
 
     color: var(--text-color);
 }
-
-
 
 /* ============================================================
    HORIZONTAL MENU WRAPPER
@@ -110,8 +103,6 @@
 
     background: var(--surface-card);
 }
-
-
 
 /* ============================================================
    SCROLL AREA
@@ -148,12 +139,9 @@
     z-index: 10000;
 }
 
-
 .top-menu-scroll-area::-webkit-scrollbar {
     display: none;
 }
-
-
 
 /* ============================================================
    MENU
@@ -183,8 +171,6 @@
     z-index: 10001;
 }
 
-
-
 /* ============================================================
    MENU CONTAINER
    ============================================================ */
@@ -200,8 +186,6 @@
 
     height: 100%;
 }
-
-
 
 /* ============================================================
    MENU ITEM
@@ -255,25 +239,17 @@
         color 0.2s ease;
 }
 
-
 .top-menu-item:hover {
     background: var(--surface-hover);
 
     color: var(--primary-color);
 }
 
-
 .top-menu-item.active {
-    background: color-mix(
-        in srgb,
-        var(--primary-color) 12%,
-        transparent
-    );
+    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
 
     color: var(--primary-color);
 }
-
-
 
 /* ============================================================
    MENU ICON
@@ -285,19 +261,15 @@
     font-size: 1rem;
 }
 
-
 .top-menu-item .menu-arrow {
     font-size: 0.65rem;
 
     transition: transform 0.2s ease;
 }
 
-
 .top-menu-item.active .menu-arrow {
     transform: rotate(180deg);
 }
-
-
 
 /* ============================================================
    DROPDOWN
@@ -325,13 +297,10 @@
 
     border-radius: var(--content-border-radius);
 
-    box-shadow:
-        0 8px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 
     z-index: 99999;
 }
-
-
 
 /* ============================================================
    DROPDOWN ITEM
@@ -359,13 +328,11 @@
     box-sizing: border-box;
 }
 
-
 .top-menu-dropdown-item:hover {
     background: var(--surface-hover);
 
     color: var(--primary-color);
 }
-
 
 .top-menu-dropdown-item > i {
     width: 1.25rem;
@@ -374,8 +341,6 @@
 
     color: var(--text-color-secondary);
 }
-
-
 
 /* ============================================================
    SEPARATOR
@@ -388,8 +353,6 @@
 
     background: var(--surface-border);
 }
-
-
 
 /* ============================================================
    LEFT / RIGHT SCROLL BUTTONS
@@ -432,7 +395,6 @@
         transform 0.2s ease;
 }
 
-
 .horizontal-scroll-button:hover {
     background: var(--primary-color);
 
@@ -441,22 +403,17 @@
     transform: translateY(-50%) scale(1.05);
 }
 
-
 .horizontal-scroll-button i {
     font-size: 0.7rem;
 }
-
 
 .horizontal-scroll-left {
     left: 0.15rem;
 }
 
-
 .horizontal-scroll-right {
     right: 0.15rem;
 }
-
-
 
 /* ============================================================
    RIGHT SIDE
@@ -478,14 +435,11 @@
     z-index: 10002;
 }
 
-
 .layout-config-menu {
     display: flex !important;
 
     align-items: center !important;
 }
-
-
 
 /* ============================================================
    PAGE CONTENT
@@ -499,14 +453,11 @@
     padding-top: 4rem !important;
 }
 
-
-
 /* ============================================================
    DESKTOP
    ============================================================ */
 
 @media screen and (max-width: 1400px) {
-
     .top-menu-item {
         padding-left: 0.55rem;
 
@@ -514,17 +465,13 @@
 
         font-size: 0.84rem;
     }
-
 }
-
-
 
 /* ============================================================
    TABLET
    ============================================================ */
 
 @media screen and (max-width: 992px) {
-
     .layout-topbar-logo span {
         display: none;
     }
@@ -534,19 +481,14 @@
 
         padding-right: 0.5rem;
     }
-
 }
-
-
 
 /* ============================================================
    MOBILE
    ============================================================ */
 
 @media screen and (max-width: 768px) {
-
     .horizontal-menu-wrapper {
         display: none;
     }
-
 }

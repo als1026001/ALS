@@ -1,0 +1,888 @@
+/* ============================================================
+   BÁO CÓ - MAIN
+   ============================================================ */
+
+.bao-co-page {
+    padding: 20px;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.page-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.page-header h2 i {
+    margin-right: 10px;
+}
+
+.page-header span {
+    color: #777;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ============================================================
+   BUTTON
+   ============================================================ */
+
+.btn-add {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+.btn-add:hover {
+    background: #059669;
+}
+
+.btn-danger {
+    color: #dc2626;
+}
+
+/* ============================================================
+   FILTER
+   ============================================================ */
+
+.filter-box {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    padding: 18px;
+    margin-bottom: 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: white;
+}
+
+.filter-item,
+.filter-search {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-item input {
+    width: 150px;
+}
+
+.filter-search {
+    flex: 1;
+}
+
+.filter-search input {
+    width: 100%;
+}
+
+.filter-box input {
+    box-sizing: border-box;
+    padding: 9px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+}
+
+.btn-filter {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+/* ============================================================
+   TABLE TOOLBAR
+   ============================================================ */
+
+.table-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-bottom: none;
+    background: white;
+}
+
+.table-toolbar button {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.table-toolbar button:hover:not(:disabled) {
+    color: #10b981;
+}
+
+.table-toolbar button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.total {
+    margin-left: auto;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th,
+td {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+th {
+    background: #f8fafc;
+    font-weight: 600;
+}
+
+.money {
+    text-align: right;
+}
+
+.checkbox-column {
+    width: 45px;
+    text-align: center;
+}
+
+tbody tr {
+    cursor: pointer;
+}
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+tbody tr.selected-row {
+    background: #ecfdf5;
+}
+
+/* ============================================================
+   DOCUMENT NUMBER
+   ============================================================ */
+
+.document-number {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #10b981;
+    cursor: pointer;
+    font: inherit;
+}
+
+.document-number:hover {
+    text-decoration: underline;
+}
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+.status {
+    padding: 5px 9px;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.status-success {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.status-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* ============================================================
+   EMPTY DATA
+   ============================================================ */
+
+.empty-data {
+    padding: 40px !important;
+    text-align: center;
+    color: #777;
+}
+
+.empty-data i {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 30px;
+}
+
+/* ============================================================
+   FORM OVERLAY
+   ============================================================ */
+
+.form-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.form-dialog {
+    width: 100%;
+    max-width: 700px;
+
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+
+    overflow: hidden;
+}
+
+/* ============================================================
+   FORM HEADER
+   ============================================================ */
+
+.form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-header h3 {
+    margin: 0 0 5px;
+    font-size: 20px;
+}
+
+.form-header h3 i {
+    margin-right: 8px;
+}
+
+.form-header span {
+    color: #777;
+    font-size: 14px;
+}
+
+.form-close {
+    width: 36px;
+    height: 36px;
+
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.form-close:hover {
+    background: #f3f4f6;
+}
+
+/* ============================================================
+   FORM BODY
+   ============================================================ */
+
+.form-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    padding: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-group-full {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.required {
+    color: #dc2626;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 10px 12px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+/* ============================================================
+   FORM FOOTER
+   ============================================================ */
+
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    padding: 15px 20px;
+
+    border-top: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+/* ============================================================
+   DETAIL MODAL
+   ============================================================ */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.detail-modal {
+    width: 700px;
+    max-width: 100%;
+
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+    overflow: hidden;
+}
+
+/* ============================================================
+   MODAL HEADER
+   ============================================================ */
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+    margin: 0 0 5px;
+    font-size: 20px;
+}
+
+.modal-header h3 i {
+    margin-right: 8px;
+}
+
+.modal-header span {
+    color: #777;
+    font-size: 14px;
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.modal-close:hover {
+    background: #f3f4f6;
+}
+
+/* ============================================================
+   MODAL BODY
+   ============================================================ */
+
+.modal-body {
+    padding: 20px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-full {
+    grid-column: 1 / -1;
+}
+
+.detail-item label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.detail-value {
+    min-height: 40px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 5px;
+
+    background: #f9fafb;
+}
+
+/* ============================================================
+   MODAL FOOTER
+   ============================================================ */
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    padding: 14px 20px;
+
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+/* ============================================================
+   ACCOUNTING
+   ============================================================ */
+
+.accounting-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.accounting-dialog {
+    width: 700px;
+    max-width: 100%;
+
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+
+    overflow: hidden;
+}
+
+/* ============================================================
+   ACCOUNTING HEADER
+   ============================================================ */
+
+.accounting-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.accounting-header h3 {
+    margin: 0 0 5px;
+    font-size: 18px;
+}
+
+.accounting-header h3 i {
+    margin-right: 8px;
+}
+
+.accounting-header span {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.dialog-close {
+    width: 35px;
+    height: 35px;
+
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+
+    cursor: pointer;
+}
+
+.dialog-close:hover {
+    background: #f3f4f6;
+}
+
+/* ============================================================
+   ACCOUNTING INFO
+   ============================================================ */
+
+.accounting-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+
+    padding: 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-item label {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.info-item span,
+.info-item strong {
+    color: #374151;
+}
+
+/* ============================================================
+   ACCOUNTING FORM
+   ============================================================ */
+
+.accounting-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+
+    padding: 20px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-field-full {
+    grid-column: 1 / -1;
+}
+
+.form-field label {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-field input,
+.form-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 9px 10px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+
+    font: inherit;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+    outline: none;
+
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+}
+
+/* ============================================================
+   ACCOUNTING FOOTER
+   ============================================================ */
+
+.accounting-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    padding: 15px 20px;
+
+    border-top: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .filter-box {
+        flex-wrap: wrap;
+    }
+
+    .filter-search {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 700px) {
+    .accounting-info,
+    .accounting-form {
+        grid-template-columns: 1fr;
+    }
+
+    .form-field-full {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .form-body,
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group-full,
+    .detail-full {
+        grid-column: auto;
+    }
+}
+
+/* ============================================================
+   PRINT - BÁO CÓ
+   ============================================================ */
+
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
+    /* ----------------------------------------------------------
+       ẨN CÁC NÚT / FORM / MODAL KHI IN
+       ---------------------------------------------------------- */
+
+    .page-header .header-actions,
+    .filter-box,
+    .table-toolbar,
+    .form-overlay,
+    .modal-overlay,
+    .accounting-overlay {
+        display: none !important;
+    }
+
+    /* ----------------------------------------------------------
+       HIỂN THỊ TRANG BÁO CÓ
+       ---------------------------------------------------------- */
+
+    .bao-co-page {
+        display: block !important;
+
+        width: 100% !important;
+        max-width: none !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    /* ----------------------------------------------------------
+       HEADER
+       ---------------------------------------------------------- */
+
+    .bao-co-page .page-header {
+        display: block !important;
+        margin-bottom: 20px !important;
+    }
+
+    .bao-co-page .page-header h2,
+    .bao-co-page .page-header span {
+        color: #000 !important;
+    }
+
+    /* ----------------------------------------------------------
+       TABLE CONTAINER
+       ---------------------------------------------------------- */
+
+    .bao-co-page .table-container {
+        display: block !important;
+
+        width: 100% !important;
+
+        overflow: visible !important;
+    }
+
+    /* ----------------------------------------------------------
+       TABLE
+       ---------------------------------------------------------- */
+
+    .bao-co-page table {
+        display: table !important;
+
+        width: 100% !important;
+
+        border-collapse: collapse !important;
+
+        color: #000 !important;
+        background: #fff !important;
+    }
+
+    .bao-co-page thead {
+        display: table-header-group !important;
+    }
+
+    .bao-co-page tbody {
+        display: table-row-group !important;
+    }
+
+    .bao-co-page tfoot {
+        display: table-footer-group !important;
+    }
+
+    .bao-co-page tr {
+        display: table-row !important;
+
+        page-break-inside: avoid !important;
+    }
+
+    .bao-co-page th,
+    .bao-co-page td {
+        display: table-cell !important;
+
+        padding: 8px !important;
+
+        border: 1px solid #999 !important;
+
+        color: #000 !important;
+        background: #fff !important;
+    }
+
+    /* ----------------------------------------------------------
+       KHÔNG IN CHECKBOX
+       ---------------------------------------------------------- */
+
+    .bao-co-page .checkbox-column {
+        display: none !important;
+    }
+
+    /* ----------------------------------------------------------
+       SỐ CHỨNG TỪ
+       ---------------------------------------------------------- */
+
+    .bao-co-page .document-number {
+        padding: 0 !important;
+
+        border: none !important;
+
+        background: transparent !important;
+
+        color: #000 !important;
+
+        font: inherit !important;
+    }
+
+    /* ----------------------------------------------------------
+       TRẠNG THÁI
+       ---------------------------------------------------------- */
+
+    .bao-co-page .status {
+        padding: 0 !important;
+
+        border: none !important;
+
+        background: transparent !important;
+
+        color: #000 !important;
+    }
+
+    /* ----------------------------------------------------------
+       ICON
+       ---------------------------------------------------------- */
+
+    .bao-co-page i {
+        color: #000 !important;
+    }
+
+    /* ----------------------------------------------------------
+       KHÔNG GIỮ MÀU DÒNG ĐƯỢC CHỌN
+       ---------------------------------------------------------- */
+
+    .bao-co-page tbody tr.selected-row {
+        background: #fff !important;
+    }
+
+    /* ----------------------------------------------------------
+       TỔNG CỘNG
+       ---------------------------------------------------------- */
+
+    .bao-co-page tfoot td {
+        font-weight: bold !important;
+    }
+}

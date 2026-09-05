@@ -4,7 +4,7 @@ import { TreeNode } from 'primeng/api';
 
 @Injectable()
 export class NodeService {
-    getTreeNodesData() {
+    getTreeNodesData(): TreeNode[] {
         return [
             {
                 key: '0',
@@ -73,7 +73,7 @@ export class NodeService {
         ];
     }
 
-    getTreeTableNodesData() {
+    getTreeTableNodesData(): TreeNode[] {
         return [
             {
                 key: '0',
@@ -794,15 +794,15 @@ export class NodeService {
         return Promise.resolve(this.getDynamicTreeNodes(10, 100));
     }
 
-    getTreeTableNodes() {
+    getTreeTableNodes(): Promise<TreeNode[]> {
         return Promise.resolve(this.getTreeTableNodesData());
     }
 
-    getTreeNodes() {
+    getTreeNodes(): Promise<TreeNode[]> {
         return Promise.resolve(this.getTreeNodesData());
     }
 
-    getFiles() {
+    getFiles(): Promise<TreeNode[]> {
         return Promise.resolve(this.getTreeNodesData());
     }
 
