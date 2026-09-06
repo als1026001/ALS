@@ -9,6 +9,8 @@ import Nora from '@primeuix/themes/nora';
 import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService } from '@/app/layout/service/layout.service';
+import { SidebarMenuService } from '@/app/layout/menu/services/sidebar-menu.service';
+import { SidebarMenuMode } from '@/app/layout/menu/config/sidebar-menu.config';
 
 const presets = {
     Aura,
@@ -86,8 +88,13 @@ declare type SurfacesType = {
                 <p-selectbutton [options]="presets" [ngModel]="selectedPreset()" (ngModelChange)="onPresetChange($event)" [allowEmpty]="false" size="small" />
             </div>
             <div *ngIf="showMenuModeButton()" class="flex flex-col gap-2">
-                <span class="text-sm text-muted-color font-semibold">Menu Mode</span>
+                <span class="text-sm text-muted-color font-semibold">Layout Menu</span>
                 <p-selectbutton [ngModel]="menuMode()" (ngModelChange)="onMenuModeChange($event)" [options]="menuModeOptions" [allowEmpty]="false" size="small" />
+            </div>
+            <div *ngIf="showMenuModeButton()" class="flex flex-col gap-2">
+                <span class="text-sm text-muted-color font-semibold">Sidebar Source</span>
+                <p-selectbutton [ngModel]="sidebarMenuMode" (ngModelChange)="onSidebarMenuModeChange($event)" [options]="sidebarMenuModeOptions" [allowEmpty]="false" size="small" />
+                <small class="text-muted-color">Fixed = APP_MENU, API = permission menu, Hybrid = selected fixed roots + API.</small>
             </div>
         </div>
     `,
@@ -102,6 +109,10 @@ export class AppConfigurator {
 
     layoutService: LayoutService = inject(LayoutService);
 
+    sidebarMenuService = inject(SidebarMenuService);
+
+    sidebarMenuMode: SidebarMenuMode = this.sidebarMenuService.mode;
+
     platformId = inject(PLATFORM_ID);
 
     primeng = inject(PrimeNG);
@@ -113,6 +124,12 @@ export class AppConfigurator {
     menuModeOptions = [
         { label: 'Static', value: 'static' },
         { label: 'Overlay', value: 'overlay' }
+    ];
+
+    sidebarMenuModeOptions = [
+        { label: 'Fixed', value: 'fixed' },
+        { label: 'API', value: 'api' },
+        { label: 'Hybrid', value: 'hybrid' }
     ];
 
     ngOnInit() {
@@ -442,5 +459,10 @@ export class AppConfigurator {
 
     onMenuModeChange(event: string) {
         this.layoutService.layoutConfig.update((prev) => ({ ...prev, menuMode: event }));
+    }
+
+    onSidebarMenuModeChange(mode: SidebarMenuMode) {
+        this.sidebarMenuMode = mode;
+        this.sidebarMenuService.setMode(mode);
     }
 }

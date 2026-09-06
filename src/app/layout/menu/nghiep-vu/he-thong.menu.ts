@@ -61,6 +61,11 @@ export const HE_THONG_MENU: AppMenuItem =
 
                 items: [
                     {
+                        label: 'Danh mục màu sắc',
+                        icon: 'pi pi-fw pi-palette',
+                        routerLink: ['/color']
+                    },
+                    {
                         label: 'Danh mục tài khoản',
                         icon: 'pi pi-fw pi-wallet',
                         routerLink: ['/pages/nghiep-vu/he-thong/danh-muc-tai-khoan']

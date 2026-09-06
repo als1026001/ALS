@@ -46,6 +46,9 @@ import { AuthService } from '../../core/services/auth.service';
                             <label for="tenantId" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Tenant</label>
                             <input pInputText id="tenantId" name="tenantId" type="number" class="w-full md:w-120 mb-8" [(ngModel)]="tenantId" [disabled]="loading" />
 
+                            <label for="companyId" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Company (optional)</label>
+                            <input pInputText id="companyId" name="companyId" type="number" class="w-full md:w-120 mb-8" [(ngModel)]="companyId" [disabled]="loading" />
+
                             <label for="username" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Username</label>
                             <input pInputText id="username" name="username" type="text" autocomplete="username" placeholder="Username" class="w-full md:w-120 mb-8" [(ngModel)]="username" [disabled]="loading" (keyup.enter)="login()" />
 
@@ -72,6 +75,8 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class Login {
     tenantId = 1;
+
+    companyId: number | null = null;
 
     username = '';
 
@@ -100,7 +105,7 @@ export class Login {
         this.loading = true;
         this.errorMessage = '';
 
-        this.authService.login({ tenantId: this.tenantId, username, password: this.password }).subscribe({
+        this.authService.login({ tenantId: this.tenantId, companyId: this.companyId || null, username, password: this.password }).subscribe({
             next: () => {
                 const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
                 void this.router.navigateByUrl(returnUrl);

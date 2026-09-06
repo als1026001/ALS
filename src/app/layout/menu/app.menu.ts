@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
+import { Subject, takeUntil } from 'rxjs';
 import { AppMenuitem } from './app.menuitem';
-import { APP_MENU } from './config/menu.config';
+import { AppMenuItem } from './menu.types';
+import { SidebarMenuService } from './services/sidebar-menu.service';
 
 @Component({
     selector: 'app-menu',
@@ -21,6 +22,22 @@ import { APP_MENU } from './config/menu.config';
         </ul>
     `
 })
-export class AppMenu {
-    model = APP_MENU;
+export class AppMenu implements OnInit, OnDestroy {
+    private readonly sidebarMenuService = inject(SidebarMenuService);
+    private readonly destroy$ = new Subject<void>();
+
+    model: AppMenuItem[] = [];
+
+    ngOnInit(): void {
+        this.sidebarMenuService.menu$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((menu) => {
+                this.model = menu;
+            });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

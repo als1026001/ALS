@@ -1,66 +1,34 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable, tap } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
+import { LoginRequest, LoginResponse } from '../models/auth.model';
+import { PermissionService } from './permission.service';
 
-import {
-    LoginRequest,
-    LoginResponse
-} from '../models/auth.model';
-
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
+    private readonly http = inject(HttpClient);
+    private readonly permissionService = inject(PermissionService);
+    private readonly apiUrl = `${API_BASE_URL}/auth`;
 
-    private readonly apiUrl =
-        'https://localhost:7001/api/auth';
-
-    constructor(
-        private http: HttpClient
-    ) {}
-
-    login(
-        request: LoginRequest
-    ): Observable<LoginResponse> {
-
-        return this.http
-            .post<LoginResponse>(
-                `${this.apiUrl}/login`,
-                request
-            )
-            .pipe(
-                tap(response => {
-
-                    localStorage.setItem(
-                        'access_token',
-                        response.accessToken
-                    );
-
-                    localStorage.setItem(
-                        'user',
-                        JSON.stringify(response)
-                    );
-
-                })
-            );
+    login(request: LoginRequest): Observable<LoginResponse> {
+        return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request).pipe(
+            tap((response) => {
+                localStorage.setItem('access_token', response.accessToken);
+                localStorage.setItem('user', JSON.stringify(response));
+                this.permissionService.clear();
+            })
+        );
     }
 
     logout(): void {
-
-        localStorage.removeItem(
-            'access_token'
-        );
-
-        localStorage.removeItem(
-            'user'
-        );
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
+        this.permissionService.clear();
     }
 
     getToken(): string | null {
-
-        return localStorage.getItem(
-            'access_token'
-        );
+        return localStorage.getItem('access_token');
     }
 
     isLoggedIn(): boolean {
@@ -75,15 +43,9 @@ export class AuthService {
         return true;
     }
 
-    getCurrentUser():
-        LoginResponse | null {
-
-        const value =
-            localStorage.getItem('user');
-
-        if (!value) {
-            return null;
-        }
+    getCurrentUser(): LoginResponse | null {
+        const value = localStorage.getItem('user');
+        if (!value) return null;
 
         try {
             return JSON.parse(value) as LoginResponse;
