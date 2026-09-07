@@ -18,3 +18,27 @@
 .btn i {
     margin-right: 5px;
 }
+
+.btn-add {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+.btn-add:hover:not(:disabled) {
+    background: #059669;
+}
+
+.btn-danger {
+    color: #dc2626;
+}
+
+.btn-filter {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+.btn-filter:hover:not(:disabled) {
+    background: #059669;
+}

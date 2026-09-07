@@ -5,11 +5,18 @@
     gap: 6px;
 }
 
+.form-group,
+.form-field {
+    min-width: 0;
+}
+
 .form-group input,
 .form-group textarea,
 .form-field input,
 .form-field textarea {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
     box-sizing: border-box;
     padding: 10px 12px;
     border: 1px solid #d1d5db;
@@ -40,4 +47,63 @@
 
 .required {
     color: #dc2626;
+}
+
+/* ============================================================
+   FORM LAYOUT
+   ============================================================ */
+
+.form-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px;
+
+    padding: 20px;
+}
+
+.form-group-full,
+.form-field-full {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 600px) {
+    .form-body {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .form-group-full,
+    .form-field-full {
+        grid-column: auto;
+    }
+}
+
+/* ============================================================
+   FORM TITLE ICON
+   ============================================================ */
+
+.form-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    flex: 0 0 32px;
+
+    border-radius: 7px;
+
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.form-title-icon i {
+    margin: 0;
+    font-size: 16px;
 }

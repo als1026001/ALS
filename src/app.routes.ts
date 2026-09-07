@@ -23,6 +23,14 @@ export const appRoutes: Routes = [
                 data: { permissionRoute: '/color' },
                 loadComponent: () => import('./app/pages/master/color/color').then((m) => m.ColorPage)
             },
+            {
+                path: 'saleChannel',
+                canActivate: [routePermissionGuard],
+                data: {
+                    permissionRoute: '/saleChannel'
+                },
+                loadComponent: () => import('./app/pages/master/sale-channel/sale-channel').then((m) => m.SaleChannelPage)
+            },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },

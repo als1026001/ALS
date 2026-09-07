@@ -1,0 +1,13 @@
+<div class="empty-state">
+    <i [class]="icon"></i>
+
+    <div class="empty-state-title">
+        {{ title }}
+    </div>
+
+    @if (message) {
+        <div class="empty-state-message">
+            {{ message }}
+        </div>
+    }
+</div>

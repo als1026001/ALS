@@ -1,0 +1,82 @@
+/* ============================================================
+   DOCUMENT NUMBER
+   ============================================================ */
+
+.document-number {
+    padding: 0;
+    border: none;
+    background: transparent;
+
+    color: #10b981;
+
+    cursor: pointer;
+    font: inherit;
+
+    transition:
+        color 0.15s ease,
+        text-decoration-color 0.15s ease;
+}
+
+.document-number:hover {
+    color: #047857;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+
+.document-number:focus-visible {
+    outline: 2px solid #10b981;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* ============================================================
+   DETAIL LAYOUT
+   ============================================================ */
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-full {
+    grid-column: 1 / -1;
+}
+
+.detail-item label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.detail-value {
+    min-height: 40px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 5px;
+
+    background: #f9fafb;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 600px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-full {
+        grid-column: auto;
+    }
+}

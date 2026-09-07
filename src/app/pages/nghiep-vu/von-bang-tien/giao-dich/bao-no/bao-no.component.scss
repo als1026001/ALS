@@ -1,0 +1,105 @@
+.bao-no-page {
+    padding: 20px;
+}
+
+tfoot td {
+    font-weight: 600;
+}
+
+/* ============================================================
+   ACCOUNTING INFO
+   ============================================================ */
+
+.accounting-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+
+    padding: 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-item label {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.info-item span,
+.info-item strong {
+    color: #374151;
+}
+
+/* ============================================================
+   ACCOUNTING FORM
+   ============================================================ */
+
+.accounting-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+
+    padding: 20px;
+}
+
+.form-field-full {
+    grid-column: 1 / -1;
+}
+
+.accounting-form .form-field input,
+.accounting-form .form-field textarea {
+    padding: 9px 10px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 700px) {
+    .accounting-info,
+    .accounting-form {
+        grid-template-columns: 1fr;
+    }
+
+    .form-field-full {
+        grid-column: auto;
+    }
+}
+
+/* ============================================================
+   ACCOUNTING - OVERFLOW FIX
+   ============================================================ */
+
+.accounting-info,
+.accounting-form {
+    min-width: 0;
+}
+
+.accounting-form .form-field {
+    min-width: 0;
+}
+
+.accounting-form input,
+.accounting-form textarea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+}
+
+.accounting-form textarea {
+    resize: vertical;
+}
+
+.accounting-header,
+.accounting-footer {
+    min-width: 0;
+}

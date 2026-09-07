@@ -75,13 +75,9 @@ export class SidebarMenuService {
     }
 
     private buildHybridMenu(apiMenu: AppMenuItem[]): AppMenuItem[] {
-        const allowedLabels = new Set(
-            SIDEBAR_MENU_CONFIG.hybridFixedRootLabels.map((label) => label.trim().toLocaleLowerCase())
-        );
+        const allowedLabels = new Set(SIDEBAR_MENU_CONFIG.hybridFixedRootLabels.map((label) => label.trim().toLocaleLowerCase()));
 
-        const fixedRoots = this.cloneMenu(APP_MENU).filter((item) =>
-            allowedLabels.has((item.label ?? '').trim().toLocaleLowerCase())
-        );
+        const fixedRoots = this.cloneMenu(APP_MENU).filter((item) => allowedLabels.has((item.label ?? '').trim().toLocaleLowerCase()));
 
         return this.dedupeRootItems([...fixedRoots, ...apiMenu]);
     }

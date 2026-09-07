@@ -8,5 +8,13 @@ export default [
     {
         path: 'bao-no',
         loadChildren: () => import('./bao-no/bao-no.routes')
+    },
+    {
+        path: 'phieu-thu',
+        loadChildren: () => import('./phieu-thu/phieu-thu.routes')
+    },
+    {
+        path: 'phieu-chi',
+        loadChildren: () => import('./phieu-chi/phieu-chi.routes')
     }
 ] as Routes;

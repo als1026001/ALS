@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaoCo, BaoCoService, BaoCoAccounting } from './bao-co.service';
+import { formatMoney } from '../../../../../shared/utils/number.utils';
+import { formatDisplayDate, toInputDate } from '../../../../../shared/utils/date.utils';
+import { EmptyStateComponent } from '../../../../../shared/components/empty-state/empty-state.component';
+import { StatusBadgeComponent } from '../../../../../shared/components/status-badge/status-badge.component';
 
 /**
  * Model dữ liệu Báo có.
@@ -28,7 +32,7 @@ interface AccountingForm {
 @Component({
     selector: 'app-bao-co',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, EmptyStateComponent, StatusBadgeComponent],
     templateUrl: './bao-co.component.html',
     styleUrl: './bao-co.component.scss'
 })
@@ -584,15 +588,7 @@ export class BaoCoComponent implements OnInit {
      * luôn hoạt động đúng.
      */
     selectReceipt(item: BaoCo): void {
-        // Bỏ chọn tất cả chứng từ trước đó.
-        this.receipts.forEach((receipt) => {
-            receipt.checked = false;
-        });
-
-        // Chọn chứng từ hiện tại.
-        item.checked = true;
-
-        // Đồng bộ selection.
+        item.checked = !item.checked;
         this.updateSelection();
     }
 
@@ -963,8 +959,8 @@ export class BaoCoComponent implements OnInit {
      *
      * 25000000 -> 25.000.000
      */
-    formatMoney(value: number): string {
-        return new Intl.NumberFormat('vi-VN').format(value);
+    formatMoney(value: number | null | undefined): string {
+        return formatMoney(value);
     }
 
     // ============================================================
@@ -1011,9 +1007,7 @@ export class BaoCoComponent implements OnInit {
      *     2026-08-18
      */
     private toInputDate(value: string): string {
-        const [day, month, year] = value.split('/');
-
-        return `${year}-${month}-${day}`;
+        return toInputDate(value);
     }
 
     /**
@@ -1026,13 +1020,7 @@ export class BaoCoComponent implements OnInit {
      * DD/MM/YYYY
      */
     formatDisplayDate(value: string): string {
-        if (!value) {
-            return '';
-        }
-
-        const [year, month, day] = value.split('-');
-
-        return `${day}/${month}/${year}`;
+        return formatDisplayDate(value);
     }
 
     // ============================================================

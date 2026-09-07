@@ -20,16 +20,28 @@ th {
     font-weight: 600;
 }
 
+/* ============================================================
+   TABLE ROW INTERACTION
+   ============================================================ */
+
 tbody tr {
     cursor: pointer;
+    transition: background-color 0.15s ease;
 }
 
-tbody tr:hover {
-    background: #f8fafc;
+tbody tr:hover,
+tbody tr:hover > td {
+    background-color: #ecfdf5;
 }
 
-tbody tr.selected-row {
-    background: #ecfdf5;
+tbody tr.selected-row,
+tbody tr.selected-row > td {
+    background-color: #d1fae5;
+}
+
+tbody tr.selected-row:hover,
+tbody tr.selected-row:hover > td {
+    background-color: #a7f3d0;
 }
 
 .money {

@@ -1,8 +1,13 @@
+/* ============================================================
+   OVERLAY
+   ============================================================ */
+
 .form-overlay,
 .modal-overlay,
 .accounting-overlay {
     position: fixed;
     inset: 0;
+    z-index: 1000;
 
     display: flex;
     align-items: center;
@@ -11,36 +16,160 @@
     padding: 20px;
 
     background: rgba(0, 0, 0, 0.35);
-
-    z-index: 1000;
 }
+
+/* ============================================================
+   DIALOG
+   ============================================================ */
 
 .form-dialog,
 .detail-modal,
 .accounting-dialog {
-    width: 700px;
-    max-width: 100%;
+    width: 100%;
+    max-width: 700px;
+
+    max-height: calc(100vh - 40px);
 
     background: white;
 
     border-radius: 8px;
 
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
 
     overflow: hidden;
 }
 
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.form-header,
+.modal-header,
+.accounting-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-header > div,
+.modal-header > div,
+.accounting-header > div {
+    min-width: 0;
+}
+
+.form-header h3,
+.modal-header h3,
+.accounting-header h3 {
+    margin: 0 0 5px;
+}
+
+.form-header h3,
+.modal-header h3 {
+    font-size: 20px;
+}
+
+.accounting-header h3 {
+    font-size: 18px;
+}
+
+.form-header h3 i,
+.modal-header h3 i,
+.accounting-header h3 i {
+    margin-right: 8px;
+}
+
+.form-header span,
+.modal-header span {
+    color: #777;
+    font-size: 14px;
+}
+
+.accounting-header span {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* ============================================================
+   CLOSE BUTTON
+   ============================================================ */
+
 .form-close,
 .modal-close,
 .dialog-close {
+    flex: 0 0 auto;
+
+    width: 36px;
+    height: 36px;
+
     border: none;
-    background: transparent;
-    cursor: pointer;
     border-radius: 5px;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 16px;
+}
+
+.dialog-close {
+    width: 35px;
+    height: 35px;
 }
 
 .form-close:hover,
 .modal-close:hover,
 .dialog-close:hover {
     background: #f3f4f6;
+}
+
+/* ============================================================
+   MODAL BODY
+   ============================================================ */
+
+.modal-body {
+    padding: 20px;
+
+    overflow-y: auto;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.form-footer,
+.modal-footer,
+.accounting-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+
+    padding: 14px 20px;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: #f8fafc;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 700px) {
+    .form-overlay,
+    .modal-overlay,
+    .accounting-overlay {
+        padding: 12px;
+    }
+
+    .form-dialog,
+    .detail-modal,
+    .accounting-dialog {
+        max-height: calc(100vh - 24px);
+    }
 }

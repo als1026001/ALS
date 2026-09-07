@@ -184,9 +184,7 @@
 
                         <!-- Trạng thái -->
                         <td>
-                            <span class="status" [class.status-success]="item.status === 'Đã ghi sổ'" [class.status-warning]="item.status === 'Chưa ghi sổ'">
-                                {{ item.status }}
-                            </span>
+                            <app-status-badge [label]="item.status" [variant]="item.status === 'Đã ghi sổ' ? 'success' : 'warning'" />
                         </td>
                     </tr>
                 }
@@ -195,9 +193,7 @@
                 @if (filteredReceipts.length === 0) {
                     <tr>
                         <td colspan="8" class="empty-data">
-                            <i class="pi pi-inbox"></i>
-
-                            <span> Không có dữ liệu </span>
+                            <app-empty-state icon="pi pi-inbox" title="Không có dữ liệu" />
                         </td>
                     </tr>
                 }
@@ -425,11 +421,11 @@
 
     <!-- ============================================================
          FORM ĐỊNH KHOẢN
-         
+
          QUAN TRỌNG:
          Form này nằm NGOÀI Detail Modal.
          Vì vậy khi:
-         
+
          Tick BC000001
          -> Bấm Định khoản
          -> accounting()
