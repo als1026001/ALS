@@ -1,0 +1,295 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card index-menu-page">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Index Menu Setup</h2>
+            <div class="page-subtitle">Manage menu items displayed under Index.</div>
+        </div>
+
+        <div class="header-actions">
+            <p-button label="New Menu" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+        </div>
+    </div>
+
+    <div class="toolbar-row">
+        <div class="search-area">
+            <div class="search-box">
+                <i class="pi pi-search search-icon"></i>
+
+                <input pInputText type="text" [(ngModel)]="search" placeholder="Search menu name, menu no, router link..." aria-label="Search menu" (keyup.enter)="searchData()" />
+            </div>
+
+            <p-button label="Search" icon="pi pi-search" (onClick)="searchData()"> </p-button>
+        </div>
+
+        <div class="result-summary">{{ totalRecords }} menu item{{ totalRecords === 1 ? '' : 's' }}</div>
+    </div>
+
+    <p-table
+        [value]="items"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="pageSize"
+        [totalRecords]="totalRecords"
+        [loading]="loading"
+        [rowsPerPageOptions]="[10, 20, 50, 100]"
+        [sortField]="sortField"
+        [sortOrder]="sortDirection === 'desc' ? -1 : 1"
+        [rowHover]="true"
+        styleClass="index-menu-table"
+        (onLazyLoad)="onLazyLoad($event)"
+    >
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="seqNo" class="seq-column">
+                    #
+                    <p-sortIcon field="seqNo"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="menuNo">
+                    Menu No
+                    <p-sortIcon field="menuNo"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="menuName">
+                    Menu Name
+                    <p-sortIcon field="menuName"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="routerLink">
+                    Router Link
+                    <p-sortIcon field="routerLink"></p-sortIcon>
+                </th>
+
+                <th class="icon-column">Icon</th>
+
+                <th class="status-column">Status</th>
+
+                <th class="action-column text-center">Action</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+            <tr>
+                <td>
+                    <span class="seq-badge"> {{ item.seqNo }} </span>
+                </td>
+
+                <td>
+                    <span class="font-medium"> {{ item.menuNo }} </span>
+                </td>
+
+                <td>
+                    <div class="menu-name">{{ item.menuName }}</div>
+
+                    <div *ngIf="item.note" class="menu-note">{{ item.note }}</div>
+                </td>
+
+                <td>
+                    <span class="router-code"> {{ item.routerLink }} </span>
+                </td>
+
+                <td>
+                    <div class="icon-cell">
+                        <i *ngIf="item.icon" [class]="item.icon"></i>
+
+                        <span> {{ item.icon || '-' }} </span>
+                    </div>
+                </td>
+
+                <td>
+                    <span *ngIf="item.isInactive" class="status-badge status-inactive">
+                        <i class="pi pi-ban"></i>
+                        Inactive
+                    </span>
+
+                    <span *ngIf="!item.isInactive && !item.isVisible" class="status-badge status-hidden">
+                        <i class="pi pi-eye-slash"></i>
+                        Hidden
+                    </span>
+
+                    <span *ngIf="!item.isInactive && item.isVisible" class="status-badge status-active">
+                        <i class="pi pi-check-circle"></i>
+                        Active
+                    </span>
+                </td>
+
+                <td class="text-center">
+                    <div class="row-actions">
+                        <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true" ariaLabel="Edit menu" title="Edit" (onClick)="edit(item)"> </p-button>
+
+                        <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" ariaLabel="Delete menu" title="Delete" (onClick)="delete(item)"> </p-button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="7" class="empty-cell">
+                    <i class="pi pi-inbox empty-icon"></i>
+
+                    <div>No Index Menu found.</div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    styleClass="index-menu-dialog"
+    [breakpoints]="{
+        '960px': '90vw',
+        '640px': '96vw'
+    }"
+    [draggable]="false"
+    [resizable]="false"
+    [header]="
+        editingId == null
+            ? 'New Index Menu'
+            : 'Edit Index Menu'
+    "
+>
+    <div class="dialog-section">
+        <div class="section-title">
+            <i class="pi pi-file"></i>
+            Basic Information
+        </div>
+
+        <div class="form-grid two-columns">
+            <div class="field-block">
+                <label for="menuNo">
+                    Menu No
+                    <span class="required">*</span>
+                </label>
+
+                <input id="menuNo" pInputText class="w-full" placeholder="mnuFinancialAccount" [(ngModel)]="form.menuNo" />
+
+                <small class="field-help"> Unique menu code. </small>
+
+                <small *ngIf="submitted && !form.menuNo.trim()" class="p-error"> Menu No is required. </small>
+            </div>
+
+            <div class="field-block">
+                <label for="menuName">
+                    Menu Name
+                    <span class="required">*</span>
+                </label>
+
+                <input id="menuName" pInputText class="w-full" placeholder="Financial Account" [(ngModel)]="form.menuName" />
+
+                <small class="field-help"> Display name in menu. </small>
+
+                <small *ngIf="submitted && !form.menuName.trim()" class="p-error"> Menu Name is required. </small>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog-section">
+        <div class="section-title">
+            <i class="pi pi-link"></i>
+            Navigation & Icon
+        </div>
+
+        <div class="form-grid two-columns">
+            <div class="field-block">
+                <label for="routerLink">
+                    Router Link
+                    <span class="required">*</span>
+                </label>
+
+                <input id="routerLink" pInputText class="w-full" placeholder="/financialAccount" [(ngModel)]="form.routerLink" />
+
+                <small class="field-help"> Application route. </small>
+
+                <small *ngIf="submitted && !form.routerLink.trim()" class="p-error"> Router Link is required. </small>
+            </div>
+
+            <div class="field-block">
+                <label for="icon"> Icon </label>
+
+                <div class="icon-input-row">
+                    <input id="icon" pInputText class="w-full" placeholder="pi pi-wallet" [(ngModel)]="form.icon" />
+
+                    <div class="icon-preview">
+                        <i *ngIf="form.icon" [class]="form.icon"></i>
+
+                        <i *ngIf="!form.icon" class="pi pi-image"></i>
+                    </div>
+                </div>
+
+                <small class="field-help"> PrimeNG icon class. </small>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog-section">
+        <div class="section-title">
+            <i class="pi pi-cog"></i>
+            Settings
+        </div>
+
+        <div class="settings-grid">
+            <div class="field-block">
+                <label for="seqNo"> Sequence </label>
+
+                <p-inputNumber inputId="seqNo" [(ngModel)]="form.seqNo" [min]="1" [useGrouping]="false" styleClass="w-full" inputStyleClass="w-full"> </p-inputNumber>
+
+                <small class="field-help"> Display order in menu. </small>
+            </div>
+
+            <div class="status-options">
+                <div>
+                    <div class="settings-label">Status</div>
+
+                    <div class="status-checkbox-row">
+                        <div class="checkbox-item">
+                            <p-checkbox [(ngModel)]="form.isVisible" [binary]="true" inputId="isVisible"> </p-checkbox>
+
+                            <div>
+                                <label for="isVisible"> Visible </label>
+
+                                <small> Show in menu </small>
+                            </div>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <p-checkbox [(ngModel)]="form.isInactive" [binary]="true" inputId="isInactive"> </p-checkbox>
+
+                            <div>
+                                <label for="isInactive"> Inactive </label>
+
+                                <small> Disable this menu </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog-section last-section">
+        <div class="section-title">
+            <i class="pi pi-book"></i>
+            Note
+        </div>
+
+        <textarea id="note" pInputText class="note-input" rows="3" maxlength="500" placeholder="Optional description..." [(ngModel)]="form.note"> </textarea>
+
+        <div class="note-count">{{ form.note.length }}/500</div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="dialogVisible = false"> </p-button>
+
+            <p-button label="Save" icon="pi pi-save" (onClick)="save()"> </p-button>
+        </div>
+    </ng-template>
+</p-dialog>

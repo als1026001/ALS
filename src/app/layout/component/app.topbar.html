@@ -1,122 +1,63 @@
 <div class="layout-topbar">
-
     <!-- ======================================================
          LOGO
          ====================================================== -->
 
     <div class="layout-topbar-logo-container">
-
-        <button
-            type="button"
-            class="layout-menu-button layout-topbar-action"
-            (click)="layoutService.onMenuToggle()">
-
+        <button type="button" class="layout-menu-button layout-topbar-action" aria-label="Toggle main menu" title="Toggle main menu" (click)="layoutService.onMenuToggle()">
             <i class="pi pi-bars"></i>
-
         </button>
 
-
-        <a
-            class="layout-topbar-logo"
-            routerLink="/">
-
-            <svg
-                viewBox="0 0 54 40"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-
+        <a class="layout-topbar-logo" routerLink="/">
+            <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                     fill-rule="evenodd"
                     clip-rule="evenodd"
                     d="M17.1637 19.2467C17.1566 19.4033 17.1529 19.561 17.1529 19.7194C17.1529 25.3503 21.7203 29.915 27.3546 29.915C32.9887 29.915 37.5561 25.3503 37.5561 19.7194C37.5561 19.5572 37.5524 19.3959 37.5449 19.2355C38.5617 19.0801 39.5759 18.9013 40.5867 18.6994L40.6926 18.6782C40.7191 19.0218 40.7326 19.369 40.7326 19.7194C40.7326 27.1036 34.743 33.0896 27.3546 33.0896C19.966 33.0896 13.9765 27.1036 13.9765 19.7194C13.9765 19.374 13.9896 19.0316 14.0154 18.6927L14.0486 18.6994C15.0837 18.9062 16.1223 19.0886 17.1637 19.2467Z"
-                    fill="var(--primary-color)" />
-
+                    fill="var(--primary-color)"
+                />
             </svg>
 
             <span>SAKAI</span>
-
         </a>
-
     </div>
-
 
     <!-- ======================================================
          HORIZONTAL MENU
          ====================================================== -->
 
     <div class="horizontal-menu-wrapper">
-
-
         <!-- LEFT -->
 
-        <button
-            *ngIf="canScrollLeft"
-            type="button"
-            class="horizontal-scroll-button horizontal-scroll-left"
-            (click)="scrollMenuLeft()">
-
+        <button *ngIf="canScrollLeft" type="button" class="horizontal-scroll-button horizontal-scroll-left" aria-label="Scroll menu left" title="Scroll menu left" (click)="scrollMenuLeft()">
             <i class="pi pi-chevron-left"></i>
-
         </button>
-
 
         <!-- SCROLL AREA -->
 
-        <div
-            #menuScroll
-            class="top-menu-scroll-area"
-            (scroll)="onMenuScroll()"
-            (wheel)="onMenuWheel($event)">
-
-
+        <div #menuScroll class="top-menu-scroll-area" (scroll)="onMenuScroll()" (wheel)="onMenuWheel($event)">
             <nav class="top-horizontal-menu">
-
-
-                <div
-                    *ngFor="let item of items"
-                    class="top-menu-container">
-
-
+                <div *ngFor="let item of items" class="top-menu-container">
                     <!-- ==========================================
                          NORMAL MENU
                          ========================================== -->
 
                     <a
                         *ngIf="(!item.items || item.items.length === 0) && !item.isExternal"
-
                         class="top-menu-item"
-
                         [routerLink]="item.routerLink"
-
                         routerLinkActive="active"
-
                         [routerLinkActiveOptions]="{
                             exact: item.routerLink === '/'
                         }"
+                        (click)="closeMenu()"
+                    >
+                        <i *ngIf="item.icon" [class]="item.icon"> </i>
 
-                        (click)="closeMenu()">
-
-
-                        <i
-                            *ngIf="item.icon"
-                            [class]="item.icon">
-                        </i>
-
-
-                        <span>
-                            {{ item.label }}
-                        </span>
-
+                        <span> {{ item.label }} </span>
                     </a>
 
-
-                    <a
-                        *ngIf="(!item.items || item.items.length === 0) && item.isExternal"
-                        class="top-menu-item"
-                        [href]="item.url"
-                        [target]="item.target || '_blank'"
-                        rel="noopener noreferrer"
-                        (click)="closeMenu()">
+                    <a *ngIf="(!item.items || item.items.length === 0) && item.isExternal" class="top-menu-item" [href]="item.url" [target]="item.target || '_blank'" rel="noopener noreferrer" (click)="closeMenu()">
                         <i *ngIf="item.icon" [class]="item.icon"></i>
                         <span>{{ item.label }}</span>
                     </a>
@@ -125,55 +66,31 @@
                          MENU WITH CHILDREN
                          ========================================== -->
 
-                    <button
-                        *ngIf="item.items && item.items.length > 0"
+                    <button *ngIf="item.items && item.items.length > 0" type="button" class="top-menu-item" [class.active]="openMenu === item" (click)="toggleMenu(item, $event)">
+                        <i *ngIf="item.icon" [class]="item.icon"> </i>
 
-                        type="button"
+                        <span> {{ item.label }} </span>
 
-                        class="top-menu-item"
-
-                        [class.active]="openMenu === item"
-
-                        (click)="toggleMenu(item, $event)">
-
-
-                        <i
-                            *ngIf="item.icon"
-                            [class]="item.icon">
-                        </i>
-
-
-                        <span>
-                            {{ item.label }}
-                        </span>
-
-
-                        <i class="pi pi-chevron-down menu-arrow">
-                        </i>
-
+                        <i class="pi pi-chevron-down menu-arrow"> </i>
                     </button>
-
                 </div>
 
+                <div class="top-menu-container">
+                    <a class="top-menu-item" routerLink="/indexMenuSetup" routerLinkActive="active" (click)="closeMenu()">
+                        <i class="pi pi-cog"></i>
+
+                        <span> Index Menu Setup </span>
+                    </a>
+                </div>
             </nav>
-
         </div>
-
 
         <!-- RIGHT -->
 
-        <button
-            *ngIf="canScrollRight"
-            type="button"
-            class="horizontal-scroll-button horizontal-scroll-right"
-            (click)="scrollMenuRight()">
-
+        <button *ngIf="canScrollRight" type="button" class="horizontal-scroll-button horizontal-scroll-right" aria-label="Scroll menu right" title="Scroll menu right" (click)="scrollMenuRight()">
             <i class="pi pi-chevron-right"></i>
-
         </button>
-
     </div>
-
 
     <!-- ======================================================
          DROPDOWN
@@ -183,182 +100,101 @@
          Therefore it won't be clipped by overflow-x.
          ====================================================== -->
 
-    <div
-        *ngIf="openMenu"
-        class="top-menu-dropdown"
+    <div *ngIf="openMenu" class="top-menu-dropdown" [style.top.px]="menuTop" [style.left.px]="menuLeft" (click)="$event.stopPropagation()">
+        <ng-container *ngFor="let child of openMenu.items">
+            <a *ngIf="!child.isExternal" class="top-menu-dropdown-item" [routerLink]="child.routerLink" (click)="closeMenu()">
+                <i *ngIf="child.icon" [class]="child.icon"> </i>
 
-        [style.top.px]="menuTop"
-        [style.left.px]="menuLeft"
-
-        (click)="$event.stopPropagation()">
-
-
-        <ng-container
-            *ngFor="let child of openMenu.items">
-
-
-            <a
-                *ngIf="!child.isExternal"
-
-                class="top-menu-dropdown-item"
-
-                [routerLink]="child.routerLink"
-
-                (click)="closeMenu()">
-
-
-                <i
-                    *ngIf="child.icon"
-                    [class]="child.icon">
-                </i>
-
-
-                <span>
-                    {{ child.label }}
-                </span>
-
+                <span> {{ child.label }} </span>
             </a>
 
-            <a
-                *ngIf="child.isExternal"
-                class="top-menu-dropdown-item"
-                [href]="child.url"
-                [target]="child.target || '_blank'"
-                rel="noopener noreferrer"
-                (click)="closeMenu()">
+            <a *ngIf="child.isExternal" class="top-menu-dropdown-item" [href]="child.url" [target]="child.target || '_blank'" rel="noopener noreferrer" (click)="closeMenu()">
                 <i *ngIf="child.icon" [class]="child.icon"></i>
                 <span>{{ child.label }}</span>
             </a>
-
         </ng-container>
-
     </div>
-
 
     <!-- ======================================================
          RIGHT SIDE
          ====================================================== -->
 
     <div class="layout-topbar-actions">
-
-
         <!-- DARK MODE -->
 
         <div class="layout-config-menu">
-
-            <button
-                type="button"
-                class="layout-topbar-action"
-                (click)="toggleDarkMode()">
-
+            <button type="button" class="layout-topbar-action" aria-label="Toggle dark mode" title="Toggle dark mode" (click)="toggleDarkMode()">
                 <i
                     class="pi"
                     [ngClass]="{
-                        'pi-moon': layoutService.isDarkTheme(),
-                        'pi-sun': !layoutService.isDarkTheme()
-                    }">
+            'pi-moon': layoutService.isDarkTheme(),
+            'pi-sun': !layoutService.isDarkTheme()
+        }"
+                >
                 </i>
-
             </button>
-
 
             <!-- PALETTE -->
 
             <div class="relative">
-
                 <button
                     type="button"
-
                     class="layout-topbar-action layout-topbar-action-highlight"
-
+                    aria-label="Open theme configurator"
+                    title="Open theme configurator"
                     pStyleClass="@next"
-
                     enterFromClass="hidden"
                     enterActiveClass="animate-scalein"
-
                     leaveToClass="hidden"
                     leaveActiveClass="animate-fadeout"
-
-                    [hideOnOutsideClick]="true">
-
+                    [hideOnOutsideClick]="true"
+                >
                     <i class="pi pi-palette"></i>
-
                 </button>
 
-
                 <app-configurator />
-
             </div>
-
         </div>
-
 
         <!-- MOBILE -->
 
         <button
             type="button"
-
             class="layout-topbar-menu-button layout-topbar-action"
-
+            aria-label="Open topbar menu"
+            title="Open topbar menu"
             pStyleClass="@next"
-
             enterFromClass="hidden"
-
             enterActiveClass="animate-scalein"
-
             leaveToClass="hidden"
-
             leaveActiveClass="animate-fadeout"
-
-            [hideOnOutsideClick]="true">
-
+            [hideOnOutsideClick]="true"
+        >
             <i class="pi pi-ellipsis-v"></i>
-
         </button>
-
 
         <!-- RIGHT MENU -->
 
         <div class="layout-topbar-menu hidden lg:block">
-
             <div class="layout-topbar-menu-content">
-
-                <button
-                    type="button"
-                    class="layout-topbar-action">
-
+                <button type="button" class="layout-topbar-action">
                     <i class="pi pi-calendar"></i>
 
                     <span>Calendar</span>
-
                 </button>
 
-
-                <button
-                    type="button"
-                    class="layout-topbar-action">
-
+                <button type="button" class="layout-topbar-action">
                     <i class="pi pi-inbox"></i>
 
                     <span>Messages</span>
-
                 </button>
 
-
-                <button
-                    type="button"
-                    class="layout-topbar-action">
-
+                <button type="button" class="layout-topbar-action">
                     <i class="pi pi-user"></i>
 
                     <span>Profile</span>
-
                 </button>
-
             </div>
-
         </div>
-
     </div>
-
 </div>

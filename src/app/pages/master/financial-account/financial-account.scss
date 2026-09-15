@@ -1,0 +1,116 @@
+:host ::ng-deep .financial-account-dialog {
+    width: 760px;
+    max-width: calc(100vw - 2rem);
+}
+
+:host ::ng-deep .financial-account-dialog .p-dialog-content {
+    overflow-x: hidden;
+    padding-top: 0.75rem;
+}
+
+/* =========================================================
+   FORM LAYOUT
+   ========================================================= */
+
+.financial-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.25rem;
+    row-gap: 1rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.4rem;
+}
+
+.form-field > label {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.required {
+    color: var(--p-red-500);
+}
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.form-field > input {
+    width: 100%;
+}
+
+:host ::ng-deep .financial-account-dialog .p-select {
+    width: 100%;
+}
+
+:host ::ng-deep .financial-account-dialog .p-inputnumber {
+    width: 100%;
+}
+
+:host ::ng-deep .financial-account-dialog .p-inputnumber-input {
+    width: 100%;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status-options {
+    display: flex;
+    align-items: center;
+    min-height: 2.6rem;
+    gap: 2rem;
+}
+
+.check-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.check-field label {
+    cursor: pointer;
+}
+
+/* =========================================================
+   FATHER ACCOUNT
+   ========================================================= */
+
+.father-option {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media screen and (max-width: 700px) {
+    :host ::ng-deep .financial-account-dialog {
+        width: calc(100vw - 2rem);
+    }
+
+    .financial-form {
+        grid-template-columns: 1fr;
+    }
+
+    .status-options {
+        flex-wrap: wrap;
+    }
+}

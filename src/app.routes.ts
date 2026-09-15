@@ -31,6 +31,36 @@ export const appRoutes: Routes = [
                 },
                 loadComponent: () => import('./app/pages/master/sale-channel/sale-channel').then((m) => m.SaleChannelPage)
             },
+            {
+                path: 'expenseCategory',
+                canActivate: [routePermissionGuard],
+                data: {
+                    permissionRoute: '/index'
+                },
+                loadComponent: () => import('./app/pages/master/expense-category/expense-category').then((m) => m.ExpenseCategoryPage)
+            },
+            {
+                path: 'financialAccount',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/index'
+                },
+
+                loadComponent: () => import('./app/pages/master/financial-account/financial-account').then((m) => m.FinancialAccountPage)
+            },
+            {
+                path: 'indexMenuSetup',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/index'
+                },
+
+                loadComponent: () => import('./app/pages/master/index-menu/index-menu').then((m) => m.IndexMenuPage)
+            },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },

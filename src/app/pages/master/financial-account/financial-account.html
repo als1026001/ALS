@@ -1,0 +1,241 @@
+<p-toast></p-toast>
+
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card">
+    <p-toolbar styleClass="mb-4">
+        <ng-template pTemplate="start">
+            <div class="flex gap-2">
+                <p-button label="New" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+
+                <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" (onClick)="refresh()"> </p-button>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="end">
+            <div class="flex gap-2">
+                <input pInputText type="text" aria-label="Search financial account" placeholder="Search account" [(ngModel)]="search" (keyup.enter)="searchData()" />
+
+                <p-button icon="pi pi-search" ariaLabel="Search" (onClick)="searchData()"> </p-button>
+            </div>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table
+        [value]="items"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="pageSize"
+        [totalRecords]="totalRecords"
+        [loading]="loading"
+        [rowsPerPageOptions]="[10, 20, 50, 100]"
+        [sortField]="sortField"
+        [sortOrder]="sortDirection === 'desc' ? -1 : 1"
+        (onLazyLoad)="onLazyLoad($event)"
+    >
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="accountNo">
+                    Account No
+                    <p-sortIcon field="accountNo"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="accountName">
+                    Account Name
+                    <p-sortIcon field="accountName"></p-sortIcon>
+                </th>
+
+                <th>Legal Name</th>
+
+                <th>Father Account</th>
+
+                <th>Currency ID</th>
+
+                <th>Account Type ID</th>
+
+                <th>Detail</th>
+
+                <th>Inactive</th>
+
+                <th>Note</th>
+
+                <th>Created At</th>
+
+                <th>Created By</th>
+
+                <th>Edited At</th>
+
+                <th>Edited By</th>
+
+                <th>Action</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+            <tr>
+                <td>{{ item.accountNo }}</td>
+
+                <td>{{ item.accountName }}</td>
+
+                <td>{{ item.accountNameLegal }}</td>
+
+                <td>
+                    <ng-container *ngIf="item.fatherAccountId; else noFather"> {{ getFatherAccountDisplay(item.fatherAccountId) }} </ng-container>
+
+                    <ng-template #noFather> - </ng-template>
+                </td>
+
+                <td>{{ item.currencyId }}</td>
+
+                <td>{{ item.accountTypeId }}</td>
+
+                <td>
+                    <i *ngIf="item.isDetail" class="pi pi-check"> </i>
+                </td>
+
+                <td>
+                    <i *ngIf="item.isInactive" class="pi pi-check"> </i>
+                </td>
+
+                <td>{{ item.note }}</td>
+
+                <td>{{ item.createdAt ? (item.createdAt | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+
+                <td>{{ item.createdBy }}</td>
+
+                <td>{{ item.editedAt ? (item.editedAt | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+
+                <td>{{ item.editedBy }}</td>
+
+                <td>
+                    <div class="flex gap-2">
+                        <p-button icon="pi pi-pencil" severity="success" [text]="true" ariaLabel="Edit" (onClick)="edit(item)"> </p-button>
+
+                        <p-button icon="pi pi-trash" severity="danger" [text]="true" ariaLabel="Delete" (onClick)="delete(item)"> </p-button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="14" class="text-center">No Financial Account found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    styleClass="financial-account-dialog"
+    [draggable]="false"
+    [resizable]="false"
+    [header]="
+        editingId == null
+            ? 'New Financial Account'
+            : 'Edit Financial Account'
+    "
+>
+    <div class="financial-form">
+        <!-- ROW 1 -->
+        <div class="form-field account-no-field">
+            <label for="accountNo"> Account No <span class="required">*</span> </label>
+
+            <input id="accountNo" pInputText [(ngModel)]="form.accountNo" />
+
+            <small *ngIf="submitted && !form.accountNo.trim()" class="p-error"> Account No is required. </small>
+        </div>
+
+        <div class="form-field account-name-field">
+            <label for="accountName"> Account Name </label>
+
+            <input id="accountName" pInputText [(ngModel)]="form.accountName" />
+        </div>
+
+        <!-- ROW 2 -->
+        <div class="form-field legal-name-field">
+            <label for="accountNameLegal"> Account Legal Name </label>
+
+            <input id="accountNameLegal" pInputText [(ngModel)]="form.accountNameLegal" />
+        </div>
+
+        <div class="form-field father-field">
+            <label for="fatherAccountId"> Father Account </label>
+
+            <p-select
+                inputId="fatherAccountId"
+                [(ngModel)]="form.fatherAccountId"
+                [options]="availableFatherAccounts"
+                optionValue="accountId"
+                placeholder="Select Father Account"
+                [showClear]="true"
+                [filter]="true"
+                filterBy="accountNo,accountName"
+                appendTo="body"
+                styleClass="w-full"
+            >
+                <ng-template pTemplate="selectedItem" let-account>
+                    <span *ngIf="account">
+                        {{ account.accountNo }}
+                        <span *ngIf="account.accountName"> - {{ account.accountName }} </span>
+                    </span>
+                </ng-template>
+
+                <ng-template pTemplate="item" let-account>
+                    <div class="father-option">
+                        <strong>{{ account.accountNo }}</strong>
+
+                        <span *ngIf="account.accountName"> - {{ account.accountName }} </span>
+                    </div>
+                </ng-template>
+            </p-select>
+        </div>
+
+        <!-- ROW 3 -->
+        <div class="form-field">
+            <label for="currencyId"> Currency ID </label>
+
+            <p-inputNumber inputId="currencyId" [(ngModel)]="form.currencyId" [useGrouping]="false" [min]="1" styleClass="w-full" inputStyleClass="w-full"> </p-inputNumber>
+        </div>
+
+        <div class="form-field">
+            <label for="accountTypeId"> Account Type ID </label>
+
+            <p-inputNumber inputId="accountTypeId" [(ngModel)]="form.accountTypeId" [useGrouping]="false" [min]="1" styleClass="w-full" inputStyleClass="w-full"> </p-inputNumber>
+        </div>
+
+        <!-- ROW 4 -->
+        <div class="form-field status-field">
+            <label>Status</label>
+
+            <div class="status-options">
+                <div class="check-field">
+                    <p-checkbox inputId="isDetail" [(ngModel)]="form.isDetail" [binary]="true"> </p-checkbox>
+
+                    <label for="isDetail"> Detail </label>
+                </div>
+
+                <div class="check-field">
+                    <p-checkbox inputId="isInactive" [(ngModel)]="form.isInactive" [binary]="true"> </p-checkbox>
+
+                    <label for="isInactive"> Inactive </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-field note-field">
+            <label for="note"> Note </label>
+
+            <input id="note" pInputText [(ngModel)]="form.note" />
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true" (onClick)="dialogVisible = false"> </p-button>
+
+            <p-button label="Save" icon="pi pi-save" (onClick)="save()"> </p-button>
+        </div>
+    </ng-template>
+</p-dialog>

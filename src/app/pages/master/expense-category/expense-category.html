@@ -1,0 +1,180 @@
+<p-toast />
+
+<p-confirmDialog />
+
+<div class="card">
+    <p-toolbar styleClass="mb-4">
+        <ng-template #start>
+            <div class="flex gap-2">
+                <p-button label="New" icon="pi pi-plus" [disabled]="!canCreate" (onClick)="openNew()" />
+
+                <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" (onClick)="refresh()" />
+            </div>
+        </ng-template>
+
+        <ng-template #end>
+            <div class="flex gap-2">
+                <input pInputText type="text" [(ngModel)]="search" placeholder="Search Expense No / Name" (keyup.enter)="onSearch()" />
+
+                <p-button icon="pi pi-search" (onClick)="onSearch()" />
+            </div>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table
+        [value]="items"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="first"
+        [totalRecords]="totalRecords"
+        [loading]="loading"
+        [rowsPerPageOptions]="[10, 20, 50, 100]"
+        [sortField]="sortField"
+        [sortOrder]="
+            sortDirection === 'desc'
+                ? -1
+                : 1
+        "
+        (onLazyLoad)="onLazyLoad($event)"
+        dataKey="expenseId"
+        [tableStyle]="{
+            'min-width': '85rem'
+        }"
+    >
+        <ng-template #header>
+            <tr>
+                <th pSortableColumn="expenseNo">
+                    Expense No
+
+                    <p-sortIcon field="expenseNo" />
+                </th>
+
+                <th pSortableColumn="expenseName">
+                    Expense Name
+
+                    <p-sortIcon field="expenseName" />
+                </th>
+
+                <th>Account</th>
+
+                <th>Note</th>
+
+                <th>Inactive</th>
+
+                <th pSortableColumn="createdAt">
+                    Created At
+
+                    <p-sortIcon field="createdAt" />
+                </th>
+
+                <th>Created By</th>
+
+                <th pSortableColumn="editedAt">
+                    Edited At
+
+                    <p-sortIcon field="editedAt" />
+                </th>
+
+                <th>Edited By</th>
+
+                <th style="width: 8rem">Action</th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-item>
+            <tr>
+                <td>{{ item.expenseNo }}</td>
+
+                <td>{{ item.expenseName }}</td>
+
+                <td>{{ getAccountDisplay( item.accountId ) }}</td>
+
+                <td>{{ item.note }}</td>
+
+                <td>
+                    <i *ngIf="item.isInactive" class="pi pi-check"> </i>
+                </td>
+
+                <td>{{ item.createdAt | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+
+                <td>{{ item.createdBy }}</td>
+
+                <td>{{ item.editedAt | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+
+                <td>{{ item.editedBy }}</td>
+
+                <td>
+                    <div class="flex gap-2">
+                        <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" [disabled]="!canUpdate" (onClick)="openEdit(item)" />
+
+                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" [disabled]="!canDelete" (onClick)="confirmDelete(item)" />
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template #emptymessage>
+            <tr>
+                <td colspan="10" class="text-center">No Expense Category found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [style]="{
+        width: '38rem'
+    }"
+    [header]="
+        editMode
+            ? 'Edit Expense Category'
+            : 'New Expense Category'
+    "
+>
+    <div class="flex flex-col gap-4">
+        <div>
+            <label for="expenseNo" class="block mb-2 font-medium"> Expense No * </label>
+
+            <input id="expenseNo" pInputText type="text" maxlength="50" class="w-full" [(ngModel)]="form.expenseNo" />
+        </div>
+
+        <div>
+            <label for="expenseName" class="block mb-2 font-medium"> Expense Name * </label>
+
+            <input id="expenseName" pInputText type="text" maxlength="250" class="w-full" [(ngModel)]="form.expenseName" />
+        </div>
+
+        <div>
+            <label for="accountId" class="block mb-2 font-medium"> Account </label>
+
+            <p-select inputId="accountId" class="w-full" [options]="accounts" optionValue="accountId" [(ngModel)]="form.accountId" [showClear]="true" placeholder="Select Account">
+                <ng-template #selectedItem let-account>
+                    <span *ngIf="account"> {{ account.accountNo }} - {{ account.accountName }} </span>
+                </ng-template>
+
+                <ng-template #item let-account> {{ account.accountNo }} - {{ account.accountName }} </ng-template>
+            </p-select>
+        </div>
+
+        <div>
+            <label for="note" class="block mb-2 font-medium"> Note </label>
+
+            <input id="note" pInputText type="text" maxlength="250" class="w-full" [(ngModel)]="form.note" />
+        </div>
+
+        <div class="flex items-center gap-2">
+            <p-checkbox inputId="isInactive" [(ngModel)]="form.isInactive" [binary]="true" />
+
+            <label for="isInactive"> Inactive </label>
+        </div>
+    </div>
+
+    <ng-template #footer>
+        <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="dialogVisible = false" />
+
+        <p-button label="Save" icon="pi pi-check" [loading]="saving" (onClick)="save()" />
+    </ng-template>
+</p-dialog>
