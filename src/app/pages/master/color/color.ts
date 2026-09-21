@@ -15,21 +15,13 @@ import { Color, CreateColorRequest, UpdateColorRequest } from '../../../core/mod
 import { RouteAccess } from '../../../core/models/permission.model';
 import { ColorService } from '../../../core/services/color.service';
 import { PermissionService } from '../../../core/services/permission.service';
+import { TooltipModule } from 'primeng/tooltip';
+import { ExcelExportButton } from '../../../shared/components/excel-export-button/excel-export-button';
 
 @Component({
     selector: 'app-color',
     standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        TableModule,
-        ButtonModule,
-        DialogModule,
-        InputTextModule,
-        ToolbarModule,
-        ToastModule,
-        ConfirmDialogModule
-    ],
+    imports: [CommonModule, FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, ToolbarModule, ToastModule, ConfirmDialogModule, TooltipModule, ExcelExportButton],
     providers: [MessageService, ConfirmationService],
     templateUrl: './color.html'
 })
@@ -69,7 +61,7 @@ export class ColorPage implements OnInit {
 
     ngOnInit(): void {
         this.permissionService.getRouteAccess(this.permissionRoute).subscribe({
-            next: (access) => this.access = access,
+            next: (access) => (this.access = access),
             error: () => this.showError('Unable to load Color permissions.')
         });
 
@@ -154,8 +146,9 @@ export class ColorPage implements OnInit {
         if (this.editing && this.editingColorId !== null) {
             const request: UpdateColorRequest = { colorNo, colorName };
 
-            this.colorService.update(this.editingColorId, request)
-                .pipe(finalize(() => this.saving = false))
+            this.colorService
+                .update(this.editingColorId, request)
+                .pipe(finalize(() => (this.saving = false)))
                 .subscribe({
                     next: () => {
                         this.dialogVisible = false;
@@ -170,8 +163,9 @@ export class ColorPage implements OnInit {
 
         const request: CreateColorRequest = { colorNo, colorName };
 
-        this.colorService.create(request)
-            .pipe(finalize(() => this.saving = false))
+        this.colorService
+            .create(request)
+            .pipe(finalize(() => (this.saving = false)))
             .subscribe({
                 next: () => {
                     this.dialogVisible = false;
@@ -209,26 +203,27 @@ export class ColorPage implements OnInit {
 
         const page = Math.floor(this.first / this.pageSize) + 1;
 
-        this.colorService.getPage({
-            page,
-            pageSize: this.pageSize,
-            search: this.search,
-            sortField: this.sortField,
-            sortDirection: this.sortDirection
-        })
-        .pipe(finalize(() => this.loading = false))
-        .subscribe({
-            next: (result) => {
-                this.colors = result.items ?? [];
-                this.totalRecords = result.totalCount ?? 0;
+        this.colorService
+            .getPage({
+                page,
+                pageSize: this.pageSize,
+                search: this.search,
+                sortField: this.sortField,
+                sortDirection: this.sortDirection
+            })
+            .pipe(finalize(() => (this.loading = false)))
+            .subscribe({
+                next: (result) => {
+                    this.colors = result.items ?? [];
+                    this.totalRecords = result.totalCount ?? 0;
 
-                if (this.colors.length === 0 && this.first > 0 && this.totalRecords > 0) {
-                    this.first = Math.max(0, this.first - this.pageSize);
-                    this.loadPage();
-                }
-            },
-            error: (error: HttpErrorResponse) => this.showError(this.getErrorMessage(error, 'Unable to load Colors.'))
-        });
+                    if (this.colors.length === 0 && this.first > 0 && this.totalRecords > 0) {
+                        this.first = Math.max(0, this.first - this.pageSize);
+                        this.loadPage();
+                    }
+                },
+                error: (error: HttpErrorResponse) => this.showError(this.getErrorMessage(error, 'Unable to load Colors.'))
+            });
     }
 
     private emptyForm(): CreateColorRequest {

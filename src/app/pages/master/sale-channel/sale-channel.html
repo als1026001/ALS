@@ -10,6 +10,10 @@
                 }
 
                 <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()" />
+
+                @if (access.canView) {
+                <app-excel-export-button endpoint="salechannel/export" fileName="SaleChannel" [search]="search" [sortField]="sortField" [sortDirection]="sortDirection" />
+                }
             </div>
         </ng-template>
 

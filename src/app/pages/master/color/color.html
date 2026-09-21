@@ -6,26 +6,21 @@
         <ng-template #start>
             <div class="flex flex-wrap gap-2">
                 @if (access.canCreate) {
-                    <p-button label="New" icon="pi pi-plus" (onClick)="openNew()" />
+                <p-button label="New" icon="pi pi-plus" (onClick)="openNew()" />
                 }
                 <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()" />
+                @if (access.canView) {
+                <app-excel-export-button endpoint="color/export" fileName="Color" [search]="search" [sortField]="sortField" [sortDirection]="sortDirection" />
+                }
             </div>
         </ng-template>
 
         <ng-template #end>
             <div class="flex gap-2 items-center">
-                <input
-                    pInputText
-                    type="text"
-                    [(ngModel)]="search"
-                    maxlength="250"
-                    placeholder="Search Color No / Name"
-                    (keyup.enter)="searchColors()"
-                    class="w-64"
-                />
+                <input pInputText type="text" [(ngModel)]="search" maxlength="250" placeholder="Search Color No / Name" (keyup.enter)="searchColors()" class="w-64" />
                 <p-button icon="pi pi-search" ariaLabel="Search" (onClick)="searchColors()" />
                 @if (search) {
-                    <p-button icon="pi pi-times" ariaLabel="Clear" severity="secondary" [outlined]="true" (onClick)="clearSearch()" />
+                <p-button icon="pi pi-times" ariaLabel="Clear" severity="secondary" [outlined]="true" (onClick)="clearSearch()" />
                 }
             </div>
         </ng-template>
@@ -72,10 +67,9 @@
                 <td>
                     <div class="flex justify-center gap-2">
                         @if (access.canUpdate) {
-                            <p-button icon="pi pi-pencil" severity="success" [rounded]="true" [outlined]="true" ariaLabel="Edit" (onClick)="editColor(color)" />
-                        }
-                        @if (access.canDelete) {
-                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" ariaLabel="Delete" (onClick)="deleteColor(color)" />
+                        <p-button icon="pi pi-pencil" severity="success" [rounded]="true" [outlined]="true" ariaLabel="Edit" (onClick)="editColor(color)" />
+                        } @if (access.canDelete) {
+                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" ariaLabel="Delete" (onClick)="deleteColor(color)" />
                         }
                     </div>
                 </td>
@@ -90,20 +84,13 @@
     </p-table>
 </div>
 
-<p-dialog
-    [(visible)]="dialogVisible"
-    [modal]="true"
-    [closable]="!saving"
-    [closeOnEscape]="!saving"
-    [style]="{ width: '32rem', maxWidth: '95vw' }"
-    [header]="editing ? 'Edit Color' : 'New Color'"
->
+<p-dialog [(visible)]="dialogVisible" [modal]="true" [closable]="!saving" [closeOnEscape]="!saving" [style]="{ width: '32rem', maxWidth: '95vw' }" [header]="editing ? 'Edit Color' : 'New Color'">
     <div class="flex flex-col gap-5 pt-2">
         <div>
             <label for="colorNo" class="block font-medium mb-2">Color No <span class="text-red-500">*</span></label>
             <input id="colorNo" pInputText [(ngModel)]="form.colorNo" maxlength="50" class="w-full" [disabled]="saving" />
             @if (submitted && !form.colorNo.trim()) {
-                <small class="text-red-500">Color No is required.</small>
+            <small class="text-red-500">Color No is required.</small>
             }
         </div>
 

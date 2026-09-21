@@ -21,10 +21,12 @@ import { RouteAccess } from '../../../core/models/permission.model';
 import { SaleChannelService } from '../../../core/services/sale-channel.service';
 import { PermissionService } from '../../../core/services/permission.service';
 
+import { ExcelExportButton } from '../../../shared/components/excel-export-button/excel-export-button';
+
 @Component({
     selector: 'app-sale-channel',
     standalone: true,
-    imports: [CommonModule, FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, ToolbarModule, ToastModule, ConfirmDialogModule],
+    imports: [CommonModule, FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, ToolbarModule, ToastModule, ConfirmDialogModule, ExcelExportButton],
     providers: [MessageService, ConfirmationService],
     templateUrl: './sale-channel.html'
 })
