@@ -9,6 +9,8 @@
                 <p-button label="New" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
 
                 <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" (onClick)="refresh()"> </p-button>
+
+                <app-excel-export-button endpoint="financialaccount/export" fileName="FinancialAccount" [search]="search" [sortField]="sortField" [sortDirection]="sortDirection" />
             </div>
         </ng-template>
 

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 import { StyleClassModule } from 'primeng/styleclass';
 
@@ -11,6 +11,8 @@ import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 
 import { MenuService } from '../../core/services/menu.service';
+
+import { AuthService } from '../../core/services/auth.service';
 
 import { AppMenuItem } from '../../core/models/app-menu-item';
 
@@ -33,6 +35,8 @@ export class AppTopbar implements OnInit {
 
     openMenu: AppMenuItem | null = null;
 
+    currentUserName = '';
+
     menuTop = 0;
 
     menuLeft = 0;
@@ -43,13 +47,17 @@ export class AppTopbar implements OnInit {
 
     constructor(
         public layoutService: LayoutService,
-
         private menuService: MenuService,
-
+        private authService: AuthService,
+        private router: Router,
         private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit(): void {
+        const currentUser = this.authService.getCurrentUser();
+
+        this.currentUserName = currentUser?.displayName || currentUser?.username || 'User';
+
         this.loadMenu();
     }
 
@@ -205,6 +213,14 @@ export class AppTopbar implements OnInit {
         this.canScrollLeft = element.scrollLeft > 2;
 
         this.canScrollRight = element.scrollLeft + element.clientWidth < element.scrollWidth - 2;
+    }
+
+    logout(): void {
+        this.closeMenu();
+
+        this.authService.logout();
+
+        this.router.navigateByUrl('/auth/login');
     }
 
     toggleDarkMode(): void {

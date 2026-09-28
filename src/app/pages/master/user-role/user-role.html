@@ -1,0 +1,330 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="user-role-page">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">User Role</h2>
+            <div class="page-subtitle">Manage system roles and role access settings</div>
+        </div>
+
+        <div class="page-actions">
+            <p-button label="New Role" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+        </div>
+    </div>
+
+    <div class="toolbar-row">
+        <div class="search-area">
+            <div class="search-box">
+                <i class="pi pi-search"></i>
+
+                <input pInputText type="text" [(ngModel)]="searchText" placeholder="Search role no, role name or note..." (keyup.enter)="search()" />
+
+                <button *ngIf="searchText" type="button" class="clear-search" (click)="clearSearch()">
+                    <i class="pi pi-times"></i>
+                </button>
+            </div>
+
+            <p-button label="Search" icon="pi pi-search" severity="secondary" (onClick)="search()"> </p-button>
+        </div>
+
+        <div class="result-summary">{{ totalRecords }} role{{ totalRecords === 1 ? '' : 's' }}</div>
+    </div>
+
+    <div class="table-card">
+        <p-table
+            [value]="roles"
+            [lazy]="true"
+            [loading]="loading"
+            [paginator]="true"
+            [rows]="rows"
+            [first]="first"
+            [totalRecords]="totalRecords"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            [sortField]="sortField"
+            [sortOrder]="sortOrder"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            (onLazyLoad)="loadRoles($event)"
+            styleClass="p-datatable-gridlines"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="roleNo" style="min-width: 11rem">
+                        Role No
+                        <p-sortIcon field="roleNo"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="roleName" style="min-width: 16rem">
+                        Role Name
+                        <p-sortIcon field="roleName"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="roleTypeId" style="width: 9rem">
+                        Type ID
+                        <p-sortIcon field="roleTypeId"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="isInactive" style="width: 10rem">
+                        Status
+                        <p-sortIcon field="isInactive"></p-sortIcon>
+                    </th>
+
+                    <th style="min-width: 14rem">Note</th>
+
+                    <th style="width: 12rem">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-role>
+                <tr>
+                    <td>
+                        <span class="role-code"> {{ role.roleNo }} </span>
+                    </td>
+
+                    <td>
+                        <span class="role-name"> {{ role.roleName }} </span>
+                    </td>
+
+                    <td>{{ role.roleTypeId ?? '-' }}</td>
+
+                    <td>
+                        <span class="status-badge" [class.status-active]="!role.isInactive" [class.status-inactive]="role.isInactive"> {{ role.isInactive ? 'Inactive' : 'Active' }} </span>
+                    </td>
+
+                    <td>{{ role.note || '-' }}</td>
+
+                    <td>
+                        <div class="row-actions">
+                            <p-button label="Edit" icon="pi pi-pencil" size="small" severity="secondary" [text]="true" (onClick)="editRole(role)"> </p-button>
+
+                            <p-button label="Delete" icon="pi pi-trash" size="small" severity="danger" [text]="true" (onClick)="confirmDelete(role)"> </p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="pi pi-shield"></i>
+                            <div>No user roles found.</div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [closable]="!saving"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{
+        width: '760px',
+        maxWidth: '95vw'
+    }"
+    [header]="
+        editingRoleId === null
+            ? 'New User Role'
+            : 'Edit User Role'
+    "
+    (onHide)="hideDialog()"
+>
+    <div class="dialog-content">
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-id-card"></i>
+                Role Information
+            </div>
+
+            <div class="form-grid">
+                <div class="field-block">
+                    <label for="roleNo">
+                        Role No
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        id="roleNo"
+                        pInputText
+                        type="text"
+                        maxlength="50"
+                        [(ngModel)]="form.roleNo"
+                        [class.ng-invalid]="
+                            submitted &&
+                            !form.roleNo.trim()
+                        "
+                        [class.ng-dirty]="submitted"
+                        autocomplete="off"
+                    />
+
+                    <small
+                        class="field-error"
+                        *ngIf="
+                            submitted &&
+                            !form.roleNo.trim()
+                        "
+                    >
+                        Role No is required.
+                    </small>
+                </div>
+
+                <div class="field-block">
+                    <label for="roleName">
+                        Role Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        id="roleName"
+                        pInputText
+                        type="text"
+                        maxlength="250"
+                        [(ngModel)]="form.roleName"
+                        [class.ng-invalid]="
+                            submitted &&
+                            !form.roleName.trim()
+                        "
+                        [class.ng-dirty]="submitted"
+                        autocomplete="off"
+                    />
+
+                    <small
+                        class="field-error"
+                        *ngIf="
+                            submitted &&
+                            !form.roleName.trim()
+                        "
+                    >
+                        Role Name is required.
+                    </small>
+                </div>
+
+                <div class="field-block">
+                    <label for="roleTypeId"> Role Type ID </label>
+
+                    <input id="roleTypeId" pInputText type="number" min="1" [(ngModel)]="form.roleTypeId" />
+
+                    <small class="field-help"> Currently uses the numeric Role Type ID. </small>
+                </div>
+            </div>
+
+            <div class="field-block note-block">
+                <label for="note"> Note </label>
+
+                <textarea id="note" pTextarea rows="3" class="note-input" [(ngModel)]="form.note"> </textarea>
+            </div>
+        </div>
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-shield"></i>
+                Role Settings
+            </div>
+
+            <div class="settings-list">
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Inactive</div>
+
+                        <div class="setting-help">Disable this role.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isInactive" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Single Sign-On Only</div>
+
+                        <div class="setting-help">Restrict this role to single sign-on authentication.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isSingleSignOnOnly" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Web Service Role Only</div>
+
+                        <div class="setting-help">Use this role only for web service access.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isWebServiceRoleOnly" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Restrict by Device ID</div>
+
+                        <div class="setting-help">Apply device ID restrictions to this role.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isRestrictRoleByDeviceId" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Restrict by IP Address</div>
+
+                        <div class="setting-help">Apply IP address restrictions to this role.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isRestrictRoleByIpAddress" [binary]="true"> </p-checkbox>
+                </div>
+            </div>
+        </div>
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-lock"></i>
+                Authentication Settings
+            </div>
+
+            <div class="form-grid">
+                <div class="field-block">
+                    <label for="twoFactorAuthenticationModeId"> Two-Factor Authentication Mode ID </label>
+
+                    <input
+                        id="twoFactorAuthenticationModeId"
+                        pInputText
+                        type="number"
+                        min="0"
+                        [(ngModel)]="
+                            form.twoFactorAuthenticationModeId
+                        "
+                    />
+                </div>
+
+                <div class="field-block">
+                    <label for="durationOfTrustedDeviceModeId"> Trusted Device Duration Mode ID </label>
+
+                    <input
+                        id="durationOfTrustedDeviceModeId"
+                        pInputText
+                        type="number"
+                        min="0"
+                        [(ngModel)]="
+                            form.durationOfTrustedDeviceModeId
+                        "
+                    />
+                </div>
+            </div>
+
+            <small class="field-help authentication-help"> These values are stored as IDs until their lookup tables are connected to this screen. </small>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="hideDialog()"> </p-button>
+
+        <p-button label="Save" icon="pi pi-check" [loading]="saving" (onClick)="save()"> </p-button>
+    </ng-template>
+</p-dialog>

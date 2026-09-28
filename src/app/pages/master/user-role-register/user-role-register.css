@@ -1,0 +1,395 @@
+.user-role-register-page {
+    margin: 1.5rem;
+    padding: 1.5rem;
+
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+}
+
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+
+    margin-bottom: 1.5rem;
+}
+
+.page-header h2 {
+    margin: 0 0 0.35rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.page-header p {
+    margin: 0;
+    color: var(--text-color-secondary);
+}
+
+.page-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.toolbar-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    padding: 0;
+    margin-bottom: 1rem;
+
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    min-width: 260px;
+    flex: 1 1 320px;
+    max-width: 430px;
+}
+
+.search-box > .pi-search {
+    position: absolute;
+    left: 0.85rem;
+    z-index: 1;
+
+    color: var(--text-color-secondary);
+}
+
+.search-box input {
+    width: 100%;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+
+.search-clear {
+    position: absolute;
+    right: 0.6rem;
+
+    width: 2rem;
+    height: 2rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: transparent;
+    color: var(--text-color-secondary);
+
+    cursor: pointer;
+}
+
+.search-clear:hover {
+    background: var(--surface-hover);
+    color: var(--text-color);
+}
+
+.filter-select {
+    width: 220px;
+}
+
+.result-summary {
+    margin-left: auto;
+
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+
+    white-space: nowrap;
+}
+
+.table-card {
+    overflow: hidden;
+}
+
+.primary-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.primary-code {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.secondary-text {
+    color: var(--text-color-secondary);
+    font-size: 0.85rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 0.25rem 0.65rem;
+
+    border-radius: 999px;
+
+    background: var(--green-100);
+    color: var(--green-700);
+
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.status-inactive {
+    background: var(--red-100);
+    color: var(--red-700);
+}
+
+.audit-column {
+    white-space: nowrap;
+}
+
+.audit-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.audit-cell small {
+    color: var(--text-color-secondary);
+}
+
+.action-column {
+    width: 160px;
+    white-space: nowrap;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+
+    color: var(--primary-color);
+    font: inherit;
+
+    cursor: pointer;
+}
+
+.action-link:hover {
+    text-decoration: underline;
+}
+
+.action-link.delete {
+    color: var(--red-500);
+}
+
+.empty-state {
+    min-height: 130px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 0.75rem;
+
+    color: var(--text-color-secondary);
+}
+
+.empty-state i {
+    font-size: 2rem;
+}
+
+.lookup-option {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.lookup-option span {
+    color: var(--text-color-secondary);
+    font-size: 0.85rem;
+}
+
+/* =========================================================
+   DIALOG
+   ========================================================= */
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+
+    gap: 1.25rem;
+}
+
+.dialog-section {
+    padding: 1rem;
+
+    border: 1px solid var(--surface-border);
+    border-radius: 10px;
+
+    background: var(--surface-ground);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+
+    gap: 0.5rem;
+
+    margin-bottom: 1rem;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    color: var(--text-color);
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 1rem;
+}
+
+.field-block {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.4rem;
+}
+
+.field-block label {
+    font-size: 0.9rem;
+    font-weight: 500;
+
+    color: var(--text-color);
+}
+
+:host ::ng-deep .field-block .p-select {
+    width: 100%;
+}
+
+.note-block {
+    margin-top: 1rem;
+}
+
+.note-input {
+    width: 100%;
+
+    resize: vertical;
+}
+
+.required {
+    color: var(--red-500);
+}
+
+.field-error {
+    color: var(--red-500);
+
+    font-size: 0.8rem;
+}
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+
+.settings-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 1rem;
+
+    padding: 0.85rem 0;
+
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.settings-row:first-child {
+    padding-top: 0;
+}
+
+.settings-row:last-child {
+    padding-bottom: 0;
+
+    border-bottom: 0;
+}
+
+.setting-label {
+    font-weight: 500;
+
+    color: var(--text-color);
+}
+
+.setting-help {
+    margin-top: 0.25rem;
+
+    color: var(--text-color-secondary);
+
+    font-size: 0.8rem;
+
+    line-height: 1.35;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+    .user-role-register-page {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+    }
+
+    .page-actions {
+        width: 100%;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    .result-summary {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .audit-column {
+        display: none;
+    }
+}

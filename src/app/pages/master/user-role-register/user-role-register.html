@@ -1,0 +1,342 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="user-role-register-page">
+    <div class="page-header">
+        <div>
+            <h2>User Role Register</h2>
+            <p>Assign application roles to users and manage user role registrations.</p>
+        </div>
+
+        <div class="page-actions">
+            <p-button label="New Register" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+        </div>
+    </div>
+
+    <div class="toolbar-row">
+        <div class="search-box">
+            <i class="pi pi-search"></i>
+
+            <input pInputText type="text" [(ngModel)]="searchText" placeholder="Search user or role..." (keyup.enter)="search()" />
+
+            @if (searchText) {
+            <button type="button" class="search-clear" title="Clear search" (click)="clearSearch()">
+                <i class="pi pi-times"></i>
+            </button>
+            }
+        </div>
+
+        <p-button label="Search" icon="pi pi-search" (onClick)="search()"> </p-button>
+
+        <p-select
+            class="filter-select"
+            [options]="users"
+            [(ngModel)]="filterUserId"
+            optionLabel="userName"
+            optionValue="userId"
+            placeholder="All Users"
+            [showClear]="true"
+            [filter]="true"
+            filterBy="userName,displayName"
+            [loading]="userLoading"
+            (onChange)="onFilterChange()"
+        >
+            <ng-template #selectedItem let-user>
+                @if (user) {
+                <span>{{ user.userName }}</span>
+                }
+            </ng-template>
+
+            <ng-template #item let-user>
+                <div class="lookup-option">
+                    <strong>{{ user.userName }}</strong>
+
+                    @if (user.displayName) {
+                    <span>{{ user.displayName }}</span>
+                    }
+                </div>
+            </ng-template>
+        </p-select>
+
+        <p-select
+            class="filter-select"
+            [options]="roles"
+            [(ngModel)]="filterRoleId"
+            optionLabel="roleNo"
+            optionValue="roleId"
+            placeholder="All Roles"
+            [showClear]="true"
+            [filter]="true"
+            filterBy="roleNo,roleName"
+            [loading]="roleLoading"
+            (onChange)="onFilterChange()"
+        >
+            <ng-template #selectedItem let-role>
+                @if (role) {
+                <span>{{ role.roleNo }}</span>
+                }
+            </ng-template>
+
+            <ng-template #item let-role>
+                <div class="lookup-option">
+                    <strong>{{ role.roleNo }}</strong>
+
+                    @if (role.roleName) {
+                    <span>{{ role.roleName }}</span>
+                    }
+                </div>
+            </ng-template>
+        </p-select>
+
+        <div class="result-summary">{{ totalRecords }} {{ totalRecords === 1 ? 'registration' : 'registrations' }}</div>
+    </div>
+
+    <div class="table-card">
+        <p-table
+            [value]="items"
+            [lazy]="true"
+            [paginator]="true"
+            [rows]="rows"
+            [first]="first"
+            [totalRecords]="totalRecords"
+            [loading]="loading"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            [sortField]="sortField"
+            [sortOrder]="sortOrder"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            styleClass="p-datatable-gridlines"
+            (onLazyLoad)="loadData($event)"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="userName">
+                        User
+                        <p-sortIcon field="userName"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="roleNo">
+                        Role
+                        <p-sortIcon field="roleNo"></p-sortIcon>
+                    </th>
+
+                    <th>Status</th>
+
+                    <th>Note</th>
+
+                    <th class="audit-column">Created</th>
+
+                    <th class="audit-column">Edited</th>
+
+                    <th class="action-column">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item>
+                <tr>
+                    <td>
+                        <div class="primary-cell">
+                            <span class="primary-code"> {{ item.userName || item.userId }} </span>
+
+                            @if (item.displayName) {
+                            <span class="secondary-text"> {{ item.displayName }} </span>
+                            }
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="primary-cell">
+                            <span class="primary-code"> {{ item.roleNo || item.roleId }} </span>
+
+                            @if (item.roleName) {
+                            <span class="secondary-text"> {{ item.roleName }} </span>
+                            }
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="status-badge" [class.status-inactive]="item.isInactive"> {{ item.isInactive ? 'Inactive' : 'Active' }} </span>
+                    </td>
+
+                    <td>{{ item.note || '-' }}</td>
+
+                    <td class="audit-column">
+                        <div class="audit-cell">
+                            <span> {{ item.createdAt ? (item.createdAt | date:'yyyy-MM-dd HH:mm') : '-' }} </span>
+
+                            @if (item.createdBy != null) {
+                            <small> By {{ item.createdBy }} </small>
+                            }
+                        </div>
+                    </td>
+
+                    <td class="audit-column">
+                        <div class="audit-cell">
+                            <span> {{ item.editedAt ? (item.editedAt | date:'yyyy-MM-dd HH:mm') : '-' }} </span>
+
+                            @if (item.editedBy != null) {
+                            <small> By {{ item.editedBy }} </small>
+                            }
+                        </div>
+                    </td>
+
+                    <td class="action-column">
+                        <div class="action-buttons">
+                            <button type="button" class="action-link" (click)="edit(item)">
+                                <i class="pi pi-pencil"></i>
+                                Edit
+                            </button>
+
+                            <button type="button" class="action-link delete" (click)="confirmDelete(item)">
+                                <i class="pi pi-trash"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class="pi pi-users"></i>
+
+                            <span> No user role registrations found. </span>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [closable]="!saving"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{
+        width: '760px',
+        maxWidth: '95vw'
+    }"
+    [header]="
+        editingUserRoleId === null
+            ? 'New User Role Register'
+            : 'Edit User Role Register'
+    "
+    (onHide)="hideDialog()"
+>
+    <div class="dialog-content">
+        <!-- User Role Assignment -->
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-users"></i>
+                User Role Assignment
+            </div>
+
+            <div class="form-grid">
+                <!-- User -->
+                <div class="field-block">
+                    <label>
+                        User
+                        <span class="required">*</span>
+                    </label>
+
+                    <p-select
+                        [(ngModel)]="form.userId"
+                        [options]="users"
+                        optionLabel="userName"
+                        optionValue="userId"
+                        placeholder="Select User"
+                        [filter]="true"
+                        filterBy="userName,displayName"
+                        [loading]="userLoading"
+                        appendTo="body"
+                        styleClass="w-full"
+                    >
+                        <ng-template #selectedItem let-user>
+                            <span *ngIf="user">
+                                {{ user.userName }}
+                                <span *ngIf="user.displayName"> - {{ user.displayName }} </span>
+                            </span>
+                        </ng-template>
+
+                        <ng-template #item let-user>
+                            <div class="lookup-option">
+                                <strong> {{ user.userName }} </strong>
+
+                                <span *ngIf="user.displayName"> {{ user.displayName }} </span>
+                            </div>
+                        </ng-template>
+                    </p-select>
+
+                    <small class="field-error" *ngIf="submitted && !form.userId"> User is required. </small>
+                </div>
+
+                <!-- Role -->
+                <div class="field-block">
+                    <label>
+                        Role
+                        <span class="required">*</span>
+                    </label>
+
+                    <p-select [(ngModel)]="form.roleId" [options]="roles" optionLabel="roleNo" optionValue="roleId" placeholder="Select Role" [filter]="true" filterBy="roleNo,roleName" [loading]="roleLoading" appendTo="body" styleClass="w-full">
+                        <ng-template #selectedItem let-role>
+                            <span *ngIf="role">
+                                {{ role.roleNo }}
+                                <span *ngIf="role.roleName"> - {{ role.roleName }} </span>
+                            </span>
+                        </ng-template>
+
+                        <ng-template #item let-role>
+                            <div class="lookup-option">
+                                <strong> {{ role.roleNo }} </strong>
+
+                                <span *ngIf="role.roleName"> {{ role.roleName }} </span>
+                            </div>
+                        </ng-template>
+                    </p-select>
+
+                    <small class="field-error" *ngIf="submitted && !form.roleId"> Role is required. </small>
+                </div>
+            </div>
+
+            <!-- Note -->
+            <div class="field-block note-block">
+                <label>Note</label>
+
+                <textarea pTextarea rows="3" class="note-input" [(ngModel)]="form.note"></textarea>
+            </div>
+        </div>
+
+        <!-- Registration Settings -->
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-cog"></i>
+                Registration Settings
+            </div>
+
+            <div class="settings-list">
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Inactive</div>
+
+                        <div class="setting-help">Disable this user role registration without deleting it.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isInactive" [binary]="true"> </p-checkbox>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="hideDialog()"> </p-button>
+
+        <p-button label="Save" icon="pi pi-check" [loading]="saving" (onClick)="save()"> </p-button>
+    </ng-template>
+</p-dialog>

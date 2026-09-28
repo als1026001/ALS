@@ -1,0 +1,250 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="menu-type-page">
+    <!-- ===================================================== -->
+    <!-- Page Header -->
+    <!-- ===================================================== -->
+
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Menu Type</h2>
+
+            <div class="page-subtitle">Manage application menu types.</div>
+        </div>
+
+        <div class="page-actions">
+            <p-button label="New Type" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- Toolbar -->
+    <!-- ===================================================== -->
+
+    <div class="toolbar-row">
+        <div class="search-area">
+            <div class="search-box">
+                <i class="pi pi-search"></i>
+
+                <input pInputText type="text" [(ngModel)]="searchText" placeholder="Search type no, name or note..." (keyup.enter)="search()" />
+
+                @if (searchText) {
+                <button type="button" class="clear-search" (click)="clearSearch()" pTooltip="Clear">
+                    <i class="pi pi-times"></i>
+                </button>
+                }
+            </div>
+
+            <p-button label="Search" icon="pi pi-search" [outlined]="true" (onClick)="search()"> </p-button>
+        </div>
+
+        <div class="result-summary">{{ totalRecords }} result{{ totalRecords === 1 ? '' : 's' }}</div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- Table -->
+    <!-- ===================================================== -->
+
+    <div class="table-card">
+        <p-table
+            [value]="items"
+            [lazy]="true"
+            (onLazyLoad)="loadData($event)"
+            [paginator]="true"
+            [rows]="pageSize"
+            [totalRecords]="totalRecords"
+            [loading]="loading"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            [sortField]="sortField"
+            [sortOrder]="sortDirection === 'asc' ? 1 : -1"
+            [tableStyle]="{ 'min-width': '70rem' }"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="menuTypeNo" style="width: 15rem">
+                        Type No
+                        <p-sortIcon field="menuTypeNo"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="menuTypeName" style="width: 20rem">
+                        Type Name
+                        <p-sortIcon field="menuTypeName"></p-sortIcon>
+                    </th>
+
+                    <th>Note</th>
+
+                    <th pSortableColumn="isInactive" style="width: 9rem">
+                        Status
+                        <p-sortIcon field="isInactive"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="createdAt" style="width: 12rem">
+                        Created At
+                        <p-sortIcon field="createdAt"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="editedAt" style="width: 12rem">
+                        Edited At
+                        <p-sortIcon field="editedAt"></p-sortIcon>
+                    </th>
+
+                    <th style="width: 10rem; text-align: center">Action</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item>
+                <tr>
+                    <td>
+                        <span class="type-code"> {{ item.menuTypeNo }} </span>
+                    </td>
+
+                    <td>
+                        <span class="type-name"> {{ item.menuTypeName || '-' }} </span>
+                    </td>
+
+                    <td>{{ item.note || '-' }}</td>
+
+                    <td>
+                        <span class="status-badge" [class.status-active]="!item.isInactive" [class.status-inactive]="item.isInactive"> {{ item.isInactive ? 'Inactive' : 'Active' }} </span>
+                    </td>
+
+                    <td>{{ item.createdAt ? (item.createdAt | date:'yyyy-MM-dd HH:mm') : '-' }}</td>
+
+                    <td>{{ item.editedAt ? (item.editedAt | date:'yyyy-MM-dd HH:mm') : '-' }}</td>
+
+                    <td>
+                        <div class="row-actions">
+                            <p-button icon="pi pi-pencil" label="Edit" [rounded]="true" [text]="true" size="small" (onClick)="edit(item)"> </p-button>
+
+                            <p-button icon="pi pi-trash" label="Delete" severity="danger" [rounded]="true" [text]="true" size="small" (onClick)="confirmDelete(item)"> </p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class="pi pi-folder"></i>
+
+                            <div class="empty-title">No menu types found</div>
+
+                            <div class="empty-description">Create a menu type or change your search criteria.</div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- Edit Dialog -->
+<!-- ========================================================= -->
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{
+        width: '760px',
+        maxWidth: '95vw'
+    }"
+    [header]="editingMenuTypeId == null
+        ? 'New Menu Type'
+        : 'Edit Menu Type'"
+    (onHide)="hideDialog()"
+>
+    <div class="dialog-content">
+        <!-- Basic Information -->
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-info-circle"></i>
+                Basic Information
+            </div>
+
+            <div class="form-grid">
+                <div class="field-block">
+                    <label for="menuTypeNo">
+                        Type No
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        id="menuTypeNo"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.menuTypeNo"
+                        maxlength="50"
+                        autocomplete="off"
+                        placeholder="e.g. MENU"
+                        [class.ng-invalid]="
+                            submitted &&
+                            !form.menuTypeNo.trim()
+                        "
+                    />
+
+                    @if ( submitted && !form.menuTypeNo.trim() ) {
+                    <small class="field-error"> Type No is required. </small>
+                    }
+
+                    <small class="field-help"> Unique code for this menu type. </small>
+                </div>
+
+                <div class="field-block">
+                    <label for="menuTypeName"> Type Name </label>
+
+                    <input id="menuTypeName" pInputText type="text" [(ngModel)]="form.menuTypeName" maxlength="250" autocomplete="off" placeholder="e.g. Menu" />
+
+                    <small class="field-help"> Display name for this menu type. </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-file-edit"></i>
+                Additional Information
+            </div>
+
+            <div class="field-block">
+                <label for="note"> Note </label>
+
+                <textarea id="note" class="note-input" [(ngModel)]="form.note" rows="4" placeholder="Optional note..."> </textarea>
+            </div>
+        </div>
+
+        <!-- Settings -->
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-cog"></i>
+                Settings
+            </div>
+
+            <div class="settings-row">
+                <p-checkbox inputId="isInactive" [(ngModel)]="form.isInactive" [binary]="true"> </p-checkbox>
+
+                <label for="isInactive"> Inactive </label>
+
+                <span class="setting-help"> Inactive menu types are retained but disabled. </span>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="hideDialog()"> </p-button>
+
+        <p-button [label]="editingMenuTypeId == null ? 'Create' : 'Save'" icon="pi pi-check" [loading]="saving" (onClick)="save()"> </p-button>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,262 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="user-page">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">User</h2>
+            <div class="page-subtitle">Manage system users and access settings</div>
+        </div>
+
+        <div class="page-actions">
+            <p-button label="New User" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+        </div>
+    </div>
+
+    <div class="toolbar-row">
+        <div class="search-area">
+            <div class="search-box">
+                <i class="pi pi-search"></i>
+
+                <input pInputText type="text" [(ngModel)]="searchText" placeholder="Search user name, display name or note..." (keyup.enter)="search()" />
+
+                <button *ngIf="searchText" type="button" class="clear-search" (click)="clearSearch()">
+                    <i class="pi pi-times"></i>
+                </button>
+            </div>
+
+            <p-button label="Search" icon="pi pi-search" severity="secondary" (onClick)="search()"> </p-button>
+        </div>
+
+        <div class="result-summary">{{ totalRecords }} user{{ totalRecords === 1 ? '' : 's' }}</div>
+    </div>
+
+    <div class="table-card">
+        <p-table
+            [value]="users"
+            [lazy]="true"
+            [loading]="loading"
+            [paginator]="true"
+            [rows]="rows"
+            [first]="first"
+            [totalRecords]="totalRecords"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            [sortField]="sortField"
+            [sortOrder]="sortOrder"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            (onLazyLoad)="loadUsers($event)"
+            styleClass="p-datatable-gridlines"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="userName" style="min-width: 12rem">
+                        User Name
+                        <p-sortIcon field="userName"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="displayName" style="min-width: 14rem">
+                        Display Name
+                        <p-sortIcon field="displayName"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="isAllowAccess" style="width: 10rem">
+                        Access
+                        <p-sortIcon field="isAllowAccess"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="isInactive" style="width: 10rem">
+                        Status
+                        <p-sortIcon field="isInactive"></p-sortIcon>
+                    </th>
+
+                    <th style="min-width: 14rem">Note</th>
+
+                    <th style="width: 12rem">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-user>
+                <tr>
+                    <td>
+                        <span class="user-code"> {{ user.userName }} </span>
+                    </td>
+
+                    <td>
+                        <span class="user-name"> {{ user.displayName || '-' }} </span>
+                    </td>
+
+                    <td>
+                        <span class="status-badge" [class.status-active]="user.isAllowAccess" [class.status-inactive]="!user.isAllowAccess"> {{ user.isAllowAccess ? 'Allowed' : 'Denied' }} </span>
+                    </td>
+
+                    <td>
+                        <span class="status-badge" [class.status-active]="!user.isInactive" [class.status-inactive]="user.isInactive"> {{ user.isInactive ? 'Inactive' : 'Active' }} </span>
+                    </td>
+
+                    <td>{{ user.note || '-' }}</td>
+
+                    <td>
+                        <div class="row-actions">
+                            <p-button label="Edit" icon="pi pi-pencil" size="small" severity="secondary" [text]="true" (onClick)="editUser(user)"> </p-button>
+
+                            <p-button label="Delete" icon="pi pi-trash" size="small" severity="danger" [text]="true" (onClick)="confirmDelete(user)"> </p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="pi pi-users"></i>
+                            <div>No users found.</div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog [(visible)]="dialogVisible" [modal]="true" [closable]="!saving" [draggable]="false" [resizable]="false" [style]="{ width: '760px', maxWidth: '95vw' }" [header]="editingUserId === null ? 'New User' : 'Edit User'" (onHide)="hideDialog()">
+    <div class="dialog-content">
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-user"></i>
+                User Information
+            </div>
+
+            <div class="form-grid">
+                <div class="field-block">
+                    <label for="userName">
+                        User Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <input id="userName" pInputText type="text" maxlength="100" [(ngModel)]="form.userName" [class.ng-invalid]="submitted && !form.userName.trim()" [class.ng-dirty]="submitted" autocomplete="off" />
+
+                    <small class="field-error" *ngIf="submitted && !form.userName.trim()"> User Name is required. </small>
+                </div>
+
+                <div class="field-block">
+                    <label for="displayName"> Display Name </label>
+
+                    <input id="displayName" pInputText type="text" maxlength="150" [(ngModel)]="form.displayName" autocomplete="off" />
+                </div>
+
+                <div class="field-block">
+                    <label for="password">
+                        Password
+                        <span class="required" *ngIf="editingUserId === null"> * </span>
+                    </label>
+
+                    <input
+                        id="password"
+                        pInputText
+                        type="password"
+                        maxlength="100"
+                        [(ngModel)]="form.password"
+                        [class.ng-invalid]="
+                            submitted &&
+                            editingUserId === null &&
+                            !form.password.trim()
+                        "
+                        [class.ng-dirty]="submitted"
+                        autocomplete="new-password"
+                    />
+
+                    <small
+                        class="field-error"
+                        *ngIf="
+                            submitted &&
+                            editingUserId === null &&
+                            !form.password.trim()
+                        "
+                    >
+                        Password is required.
+                    </small>
+
+                    <small class="field-help" *ngIf="editingUserId !== null"> Leave blank to keep the current password. </small>
+                </div>
+
+                <div class="field-block">
+                    <label for="passwordRenewDayInterval"> Password Renewal Days </label>
+
+                    <input id="passwordRenewDayInterval" pInputText type="number" min="0" [(ngModel)]="form.passwordRenewDayInterval" [disabled]="!form.isPasswordRenewByDayInterval" />
+
+                    <small class="field-help"> Used only when password renewal by day is enabled. </small>
+                </div>
+            </div>
+
+            <div class="field-block note-block">
+                <label for="note"> Note </label>
+
+                <textarea id="note" pTextarea rows="3" maxlength="250" class="note-input" [(ngModel)]="form.note"> </textarea>
+            </div>
+        </div>
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-shield"></i>
+                Access Settings
+            </div>
+
+            <div class="settings-list">
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Allow Access</div>
+                        <div class="setting-help">Allow this user to sign in to the application.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isAllowAccess" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Inactive</div>
+                        <div class="setting-help">Disable this user account.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isInactive" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Inherit IP Rule</div>
+                        <div class="setting-help">Apply inherited IP access rules to this user.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isInheritIpRule" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Password Renewal by Day</div>
+                        <div class="setting-help">Require password renewal after the configured number of days.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isPasswordRenewByDayInterval" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Send Access Notification Email</div>
+                        <div class="setting-help">Enable access notification email for this user.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isSendAccessNotificationEmail" [binary]="true"> </p-checkbox>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="hideDialog()"> </p-button>
+
+        <p-button label="Save" icon="pi pi-check" [loading]="saving" (onClick)="save()"> </p-button>
+    </ng-template>
+</p-dialog>

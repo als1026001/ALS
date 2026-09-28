@@ -1,11 +1,11 @@
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<div class="card index-menu-page">
+<div class="card menu-setup-page">
     <div class="page-header">
         <div>
-            <h2 class="page-title">Index Menu Setup</h2>
-            <div class="page-subtitle">Manage menu items displayed under Index.</div>
+            <h2 class="page-title">Menu Setup</h2>
+            <div class="page-subtitle">Manage application menus and menu hierarchy.</div>
         </div>
 
         <div class="header-actions">
@@ -40,7 +40,7 @@
         [sortField]="sortField"
         [sortOrder]="sortDirection === 'desc' ? -1 : 1"
         [rowHover]="true"
-        styleClass="index-menu-table"
+        styleClass="menu-setup-table"
         (onLazyLoad)="onLazyLoad($event)"
     >
         <ng-template pTemplate="header">
@@ -59,6 +59,8 @@
                     Menu Name
                     <p-sortIcon field="menuName"></p-sortIcon>
                 </th>
+
+                <th>Parent Menu</th>
 
                 <th pSortableColumn="routerLink">
                     Router Link
@@ -90,12 +92,18 @@
                 </td>
 
                 <td>
-                    <span class="router-code"> {{ item.routerLink }} </span>
+                    <span *ngIf="item.parentMenuId" class="parent-menu"> {{ getParentName(item) }} </span>
+
+                    <span *ngIf="!item.parentMenuId" class="root-menu"> Root </span>
+                </td>
+
+                <td>
+                    <span class="router-code"> {{ item.routerLink || '-' }} </span>
                 </td>
 
                 <td>
                     <div class="icon-cell">
-                        <i *ngIf="item.icon" [class]="item.icon"></i>
+                        <i *ngIf="item.icon" [class]="item.icon"> </i>
 
                         <span> {{ item.icon || '-' }} </span>
                     </div>
@@ -130,10 +138,10 @@
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="7" class="empty-cell">
+                <td colspan="8" class="empty-cell">
                     <i class="pi pi-inbox empty-icon"></i>
 
-                    <div>No Index Menu found.</div>
+                    <div>No Menu found.</div>
                 </td>
             </tr>
         </ng-template>
@@ -143,19 +151,23 @@
 <p-dialog
     [(visible)]="dialogVisible"
     [modal]="true"
-    styleClass="index-menu-dialog"
+    styleClass="menu-setup-dialog"
     [breakpoints]="{
-        '960px': '90vw',
+        '1100px': '90vw',
         '640px': '96vw'
     }"
     [draggable]="false"
     [resizable]="false"
     [header]="
         editingId == null
-            ? 'New Index Menu'
-            : 'Edit Index Menu'
+            ? 'New Menu'
+            : 'Edit Menu'
     "
 >
+    <!-- ===================================================== -->
+    <!-- BASIC INFORMATION -->
+    <!-- ===================================================== -->
+
     <div class="dialog-section">
         <div class="section-title">
             <i class="pi pi-file"></i>
@@ -184,12 +196,53 @@
 
                 <input id="menuName" pInputText class="w-full" placeholder="Financial Account" [(ngModel)]="form.menuName" />
 
-                <small class="field-help"> Display name in menu. </small>
+                <small class="field-help"> Display name in application menu. </small>
 
                 <small *ngIf="submitted && !form.menuName.trim()" class="p-error"> Menu Name is required. </small>
             </div>
+
+            <div class="field-block">
+                <label for="parentMenuId"> Parent Menu </label>
+
+                <p-select
+                    inputId="parentMenuId"
+                    [(ngModel)]="form.parentMenuId"
+                    [options]="parentMenus"
+                    optionLabel="menuName"
+                    optionValue="menuId"
+                    placeholder="Root Menu"
+                    [showClear]="true"
+                    [filter]="true"
+                    filterBy="menuName,menuNo"
+                    [loading]="parentLoading"
+                    appendTo="body"
+                    styleClass="w-full"
+                >
+                    <ng-template pTemplate="item" let-parent>
+                        <div class="parent-option">
+                            <span> {{ parent.menuName }} </span>
+
+                            <small> {{ parent.menuNo }} </small>
+                        </div>
+                    </ng-template>
+                </p-select>
+
+                <small class="field-help"> Leave empty for a root menu. </small>
+            </div>
+
+            <div class="field-block">
+                <label for="menuTypeId"> Menu Type ID </label>
+
+                <p-inputNumber inputId="menuTypeId" [(ngModel)]="form.menuTypeId" [min]="1" [useGrouping]="false" styleClass="w-full" inputStyleClass="w-full"> </p-inputNumber>
+
+                <small class="field-help"> Menu type identifier. </small>
+            </div>
         </div>
     </div>
+
+    <!-- ===================================================== -->
+    <!-- NAVIGATION -->
+    <!-- ===================================================== -->
 
     <div class="dialog-section">
         <div class="section-title">
@@ -199,16 +252,19 @@
 
         <div class="form-grid two-columns">
             <div class="field-block">
-                <label for="routerLink">
-                    Router Link
-                    <span class="required">*</span>
-                </label>
+                <label for="routerLink"> Router Link </label>
 
                 <input id="routerLink" pInputText class="w-full" placeholder="/financialAccount" [(ngModel)]="form.routerLink" />
 
-                <small class="field-help"> Application route. </small>
+                <small class="field-help"> Angular route. May be empty for a container menu. </small>
+            </div>
 
-                <small *ngIf="submitted && !form.routerLink.trim()" class="p-error"> Router Link is required. </small>
+            <div class="field-block">
+                <label for="menuUrl"> Menu URL </label>
+
+                <input id="menuUrl" pInputText class="w-full" placeholder="Optional URL" [(ngModel)]="form.menuUrl" />
+
+                <small class="field-help"> Optional URL for external navigation. </small>
             </div>
 
             <div class="field-block">
@@ -218,16 +274,28 @@
                     <input id="icon" pInputText class="w-full" placeholder="pi pi-wallet" [(ngModel)]="form.icon" />
 
                     <div class="icon-preview">
-                        <i *ngIf="form.icon" [class]="form.icon"></i>
+                        <i *ngIf="form.icon" [class]="form.icon"> </i>
 
-                        <i *ngIf="!form.icon" class="pi pi-image"></i>
+                        <i *ngIf="!form.icon" class="pi pi-image"> </i>
                     </div>
                 </div>
 
                 <small class="field-help"> PrimeNG icon class. </small>
             </div>
+
+            <div class="field-block">
+                <label for="target"> Target </label>
+
+                <input id="target" pInputText class="w-full" placeholder="_blank" [(ngModel)]="form.target" />
+
+                <small class="field-help"> Optional navigation target. </small>
+            </div>
         </div>
     </div>
+
+    <!-- ===================================================== -->
+    <!-- SETTINGS -->
+    <!-- ===================================================== -->
 
     <div class="dialog-section">
         <div class="section-title">
@@ -235,44 +303,74 @@
             Settings
         </div>
 
-        <div class="settings-grid">
+        <div class="form-grid two-columns">
             <div class="field-block">
                 <label for="seqNo"> Sequence </label>
 
                 <p-inputNumber inputId="seqNo" [(ngModel)]="form.seqNo" [min]="1" [useGrouping]="false" styleClass="w-full" inputStyleClass="w-full"> </p-inputNumber>
 
-                <small class="field-help"> Display order in menu. </small>
+                <small class="field-help"> Display order under the parent menu. </small>
             </div>
 
-            <div class="status-options">
-                <div>
-                    <div class="settings-label">Status</div>
+            <div class="field-block">
+                <label for="permissionCode"> Permission Code </label>
 
-                    <div class="status-checkbox-row">
-                        <div class="checkbox-item">
-                            <p-checkbox [(ngModel)]="form.isVisible" [binary]="true" inputId="isVisible"> </p-checkbox>
+                <input id="permissionCode" pInputText class="w-full" placeholder="Optional permission code" [(ngModel)]="form.permissionCode" />
 
-                            <div>
-                                <label for="isVisible"> Visible </label>
+                <small class="field-help"> Optional permission identifier. </small>
+            </div>
+        </div>
 
-                                <small> Show in menu </small>
-                            </div>
-                        </div>
+        <div class="status-area">
+            <div class="settings-label">Menu Status</div>
 
-                        <div class="checkbox-item">
-                            <p-checkbox [(ngModel)]="form.isInactive" [binary]="true" inputId="isInactive"> </p-checkbox>
+            <div class="status-checkbox-grid">
+                <div class="checkbox-item">
+                    <p-checkbox [(ngModel)]="form.isVisible" [binary]="true" inputId="isVisible"> </p-checkbox>
 
-                            <div>
-                                <label for="isInactive"> Inactive </label>
+                    <div>
+                        <label for="isVisible"> Visible </label>
 
-                                <small> Disable this menu </small>
-                            </div>
-                        </div>
+                        <small> Show this menu. </small>
+                    </div>
+                </div>
+
+                <div class="checkbox-item">
+                    <p-checkbox [(ngModel)]="form.isInactive" [binary]="true" inputId="isInactive"> </p-checkbox>
+
+                    <div>
+                        <label for="isInactive"> Inactive </label>
+
+                        <small> Disable this menu. </small>
+                    </div>
+                </div>
+
+                <div class="checkbox-item">
+                    <p-checkbox [(ngModel)]="form.isSecurity" [binary]="true" inputId="isSecurity"> </p-checkbox>
+
+                    <div>
+                        <label for="isSecurity"> Security </label>
+
+                        <small> Apply permission control. </small>
+                    </div>
+                </div>
+
+                <div class="checkbox-item">
+                    <p-checkbox [(ngModel)]="form.isExternal" [binary]="true" inputId="isExternal"> </p-checkbox>
+
+                    <div>
+                        <label for="isExternal"> External </label>
+
+                        <small> Open as external navigation. </small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- ===================================================== -->
+    <!-- NOTE -->
+    <!-- ===================================================== -->
 
     <div class="dialog-section last-section">
         <div class="section-title">

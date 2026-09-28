@@ -74,14 +74,6 @@
                         <i class="pi pi-chevron-down menu-arrow"> </i>
                     </button>
                 </div>
-
-                <div class="top-menu-container">
-                    <a class="top-menu-item" routerLink="/indexMenuSetup" routerLinkActive="active" (click)="closeMenu()">
-                        <i class="pi pi-cog"></i>
-
-                        <span> Index Menu Setup </span>
-                    </a>
-                </div>
             </nav>
         </div>
 
@@ -94,7 +86,7 @@
 
     <!-- ======================================================
          DROPDOWN
-         
+
          IMPORTANT:
          This is outside the scroll area.
          Therefore it won't be clipped by overflow-x.
@@ -189,10 +181,14 @@
                     <span>Messages</span>
                 </button>
 
-                <button type="button" class="layout-topbar-action">
+                <button type="button" class="layout-topbar-action" title="Current user">
                     <i class="pi pi-user"></i>
+                    <span>{{ currentUserName }}</span>
+                </button>
 
-                    <span>Profile</span>
+                <button type="button" class="layout-topbar-action" title="Logout" (click)="logout()">
+                    <i class="pi pi-sign-out"></i>
+                    <span>Logout</span>
                 </button>
             </div>
         </div>

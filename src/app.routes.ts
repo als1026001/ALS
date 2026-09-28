@@ -51,15 +51,88 @@ export const appRoutes: Routes = [
                 loadComponent: () => import('./app/pages/master/financial-account/financial-account').then((m) => m.FinancialAccountPage)
             },
             {
-                path: 'indexMenuSetup',
+                path: 'menuSetup',
 
                 canActivate: [routePermissionGuard],
 
                 data: {
-                    permissionRoute: '/index'
+                    permissionRoute: '/menuSetup'
                 },
 
-                loadComponent: () => import('./app/pages/master/index-menu/index-menu').then((m) => m.IndexMenuPage)
+                loadComponent: () => import('./app/pages/master/menu-setup/menu-setup').then((m) => m.MenuSetupPage)
+            },
+            {
+                path: 'menuField',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/menuField'
+                },
+
+                loadComponent: () => import('./app/pages/master/menu-field/menu-field').then((m) => m.MenuFieldComponent)
+            },
+            {
+                path: 'menuGroup',
+
+                canActivate: [routePermissionGuard],
+
+                data: { permissionRoute: '/menuGroup' },
+
+                loadComponent: () => import('./app/pages/master/menu-group/menu-group').then((m) => m.MenuGroupComponent)
+            },
+            {
+                path: 'menuType',
+
+                canActivate: [routePermissionGuard],
+
+                data: { permissionRoute: '/menuType' },
+
+                loadComponent: () => import('./app/pages/master/menu-type/menu-type').then((m) => m.MenuTypeComponent)
+            },
+            {
+                path: 'user',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/user'
+                },
+
+                loadComponent: () => import('./app/pages/master/user/user').then((m) => m.UserComponent)
+            },
+            {
+                path: 'userRole',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/userRole'
+                },
+
+                loadComponent: () => import('./app/pages/master/user-role/user-role').then((m) => m.UserRoleComponent)
+            },
+            {
+                path: 'userRolePermission',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/userRolePermission'
+                },
+
+                loadComponent: () => import('./app/pages/master/user-role-permission/user-role-permission').then((m) => m.UserRolePermissionComponent)
+            },
+            {
+                path: 'userRoleRegister',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/userRoleRegister'
+                },
+
+                loadComponent: () => import('./app/pages/master/user-role-register/user-role-register').then((m) => m.UserRoleRegisterComponent)
             },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]

@@ -5,10 +5,14 @@
 <div class="card">
     <p-toolbar styleClass="mb-4">
         <ng-template #start>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
                 <p-button label="New" icon="pi pi-plus" [disabled]="!canCreate" (onClick)="openNew()" />
 
                 <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" (onClick)="refresh()" />
+
+                @if (canView) {
+                <app-excel-export-button endpoint="expensecategory/export" fileName="ExpenseCategory" [search]="search" [sortField]="sortField" [sortDirection]="sortDirection" />
+                }
             </div>
         </ng-template>
 

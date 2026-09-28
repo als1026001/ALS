@@ -18,7 +18,7 @@ import { CreateExpenseCategoryRequest, ExpenseCategory, FinancialAccountLookup, 
 
 import { ExpenseCategoryService } from '../../../core/services/expense-category.service';
 import { PermissionService } from '../../../core/services/permission.service';
-
+import { ExcelExportButton } from '../../../shared/components/excel-export-button/excel-export-button';
 interface ExpenseCategoryForm {
     expenseNo: string;
     expenseName: string;
@@ -32,7 +32,7 @@ interface ExpenseCategoryForm {
 
     standalone: true,
 
-    imports: [CommonModule, FormsModule, ButtonModule, CheckboxModule, ConfirmDialogModule, DialogModule, InputTextModule, SelectModule, TableModule, ToastModule, ToolbarModule],
+    imports: [CommonModule, FormsModule, ButtonModule, CheckboxModule, ConfirmDialogModule, DialogModule, InputTextModule, SelectModule, TableModule, ToastModule, ToolbarModule, ExcelExportButton],
 
     providers: [MessageService, ConfirmationService],
 

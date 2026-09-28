@@ -1,0 +1,349 @@
+.menu-group-page {
+    margin: 1.5rem;
+    padding: 1.5rem;
+
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+}
+
+/* =========================================================
+   Page header
+   ========================================================= */
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.page-subtitle {
+    margin-top: 0.3rem;
+    color: var(--text-color-secondary);
+    font-size: 0.95rem;
+}
+
+.page-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+/* =========================================================
+   Toolbar
+   ========================================================= */
+
+.toolbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.search-area {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex: 1;
+}
+
+.search-box {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+}
+
+.search-box > i {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color-secondary);
+    z-index: 1;
+}
+
+.search-box input {
+    width: 100%;
+    padding-left: 2.4rem;
+    padding-right: 2.4rem;
+}
+
+.clear-search {
+    position: absolute;
+    right: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 1.7rem;
+    height: 1.7rem;
+
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+
+    color: var(--text-color-secondary);
+    cursor: pointer;
+}
+
+.clear-search:hover {
+    background: var(--surface-hover);
+    color: var(--text-color);
+}
+
+.result-summary {
+    white-space: nowrap;
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+}
+
+/* =========================================================
+   Table
+   ========================================================= */
+
+.table-card {
+    overflow: hidden;
+}
+
+.group-code {
+    font-weight: 600;
+}
+
+.group-name {
+    font-weight: 500;
+}
+
+.row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+}
+
+/* =========================================================
+   Status
+   ========================================================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: var(--green-100);
+    color: var(--green-700);
+}
+
+.status-inactive {
+    background: var(--red-100);
+    color: var(--red-700);
+}
+
+/* =========================================================
+   Empty state
+   ========================================================= */
+
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--text-color-secondary);
+}
+
+.empty-state > i {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-size: 2rem;
+}
+
+.empty-title {
+    margin-bottom: 0.3rem;
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.empty-description {
+    font-size: 0.9rem;
+}
+
+/* =========================================================
+   Dialog
+   ========================================================= */
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.dialog-section {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.dialog-section:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    margin-bottom: 1rem;
+
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+/* =========================================================
+   Form
+   ========================================================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.field-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.field-block label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.field-block input,
+.note-input {
+    width: 100%;
+}
+
+.note-input {
+    resize: vertical;
+
+    padding: 0.75rem;
+
+    color: var(--text-color);
+    background: var(--surface-0);
+
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
+
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.note-input:focus {
+    outline: 0;
+    border-color: var(--primary-color);
+}
+
+.required {
+    color: var(--red-500);
+}
+
+.field-error {
+    color: var(--red-500);
+}
+
+.field-help {
+    color: var(--text-color-secondary);
+    font-size: 0.78rem;
+}
+
+/* =========================================================
+   Settings
+   ========================================================= */
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.settings-row label {
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.setting-help {
+    margin-left: 0.4rem;
+    color: var(--text-color-secondary);
+    font-size: 0.8rem;
+}
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .menu-group-page {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .page-actions {
+        width: 100%;
+    }
+
+    .toolbar-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .search-area {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .search-box {
+        max-width: none;
+    }
+
+    .result-summary {
+        text-align: right;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+}

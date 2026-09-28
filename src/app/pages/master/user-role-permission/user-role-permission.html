@@ -1,0 +1,358 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="user-role-permission-page">
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">User Role Permission</h2>
+
+            <div class="page-subtitle">Manage menu access and permission levels for user roles</div>
+        </div>
+
+        <div class="page-actions">
+            <p-button label="New Permission" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         SEARCH / FILTER
+         ===================================================== -->
+    <div class="toolbar-row">
+        <div class="search-area">
+            <div class="search-box">
+                <i class="pi pi-search"></i>
+
+                <input pInputText type="text" [(ngModel)]="searchText" placeholder="Search role, menu or note..." (keyup.enter)="search()" />
+
+                <button *ngIf="searchText" type="button" class="clear-search" (click)="clearSearch()">
+                    <i class="pi pi-times"></i>
+                </button>
+            </div>
+
+            <p-button label="Search" icon="pi pi-search" severity="secondary" (onClick)="search()"> </p-button>
+
+            <p-select
+                [(ngModel)]="filterRoleId"
+                [options]="roles"
+                optionLabel="roleName"
+                optionValue="roleId"
+                placeholder="All Roles"
+                [showClear]="true"
+                [filter]="true"
+                filterBy="roleNo,roleName"
+                [loading]="roleLoading"
+                appendTo="body"
+                styleClass="filter-select"
+                (onChange)="onFilterChange()"
+            >
+                <ng-template #selectedItem let-role>
+                    <span *ngIf="role"> {{ role.roleNo }} - {{ role.roleName }} </span>
+                </ng-template>
+
+                <ng-template #item let-role>
+                    <div class="lookup-option">
+                        <strong>{{ role.roleNo }}</strong>
+                        <span>{{ role.roleName }}</span>
+                    </div>
+                </ng-template>
+            </p-select>
+
+            <p-select
+                [(ngModel)]="filterMenuId"
+                [options]="menus"
+                optionLabel="menuName"
+                optionValue="menuId"
+                placeholder="All Menus"
+                [showClear]="true"
+                [filter]="true"
+                filterBy="menuNo,menuName,routerLink"
+                [loading]="menuLoading"
+                appendTo="body"
+                styleClass="filter-select"
+                (onChange)="onFilterChange()"
+            >
+                <ng-template #selectedItem let-menu>
+                    <span *ngIf="menu"> {{ menu.menuNo }} - {{ menu.menuName }} </span>
+                </ng-template>
+
+                <ng-template #item let-menu>
+                    <div class="lookup-option">
+                        <strong>{{ menu.menuNo }}</strong>
+                        <span>{{ menu.menuName }}</span>
+
+                        <small *ngIf="menu.routerLink"> {{ menu.routerLink }} </small>
+                    </div>
+                </ng-template>
+            </p-select>
+        </div>
+
+        <div class="result-summary">{{ totalRecords }} permission{{ totalRecords === 1 ? '' : 's' }}</div>
+    </div>
+
+    <!-- =====================================================
+         TABLE
+         ===================================================== -->
+    <div class="table-card">
+        <p-table
+            [value]="items"
+            [lazy]="true"
+            [loading]="loading"
+            [paginator]="true"
+            [rows]="rows"
+            [first]="first"
+            [totalRecords]="totalRecords"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            [sortField]="sortField"
+            [sortOrder]="sortOrder"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            (onLazyLoad)="loadData($event)"
+            styleClass="p-datatable-gridlines"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="roleNo" style="min-width: 11rem">
+                        Role
+                        <p-sortIcon field="roleNo"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="menuName" style="min-width: 14rem">
+                        Menu
+                        <p-sortIcon field="menuName"></p-sortIcon>
+                    </th>
+
+                    <th style="min-width: 11rem">Router Link</th>
+
+                    <th pSortableColumn="levelId" style="min-width: 15rem">
+                        Permission Level
+                        <p-sortIcon field="levelId"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="isInactive" style="width: 10rem">
+                        Status
+                        <p-sortIcon field="isInactive"></p-sortIcon>
+                    </th>
+
+                    <th style="min-width: 14rem">Note</th>
+
+                    <th style="width: 12rem">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item>
+                <tr>
+                    <td>
+                        <div class="permission-code">{{ item.roleNo || item.roleId }}</div>
+
+                        <div class="cell-sub" *ngIf="item.roleName">{{ item.roleName }}</div>
+                    </td>
+
+                    <td>
+                        <div class="menu-code">{{ item.menuNo || item.menuId }}</div>
+
+                        <div class="cell-sub" *ngIf="item.menuName">{{ item.menuName }}</div>
+                    </td>
+
+                    <td>{{ item.routerLink || '-' }}</td>
+
+                    <td>
+                        <span class="level-badge"> {{ getPermissionLevelLabel(item.levelId) }} </span>
+                    </td>
+
+                    <td>
+                        <span class="status-badge" [class.status-active]="!item.isInactive" [class.status-inactive]="item.isInactive"> {{ item.isInactive ? 'Inactive' : 'Active' }} </span>
+                    </td>
+
+                    <td>{{ item.note || '-' }}</td>
+
+                    <td>
+                        <div class="row-actions">
+                            <p-button label="Edit" icon="pi pi-pencil" size="small" severity="secondary" [text]="true" (onClick)="edit(item)"> </p-button>
+
+                            <p-button label="Delete" icon="pi pi-trash" size="small" severity="danger" [text]="true" (onClick)="confirmDelete(item)"> </p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class="pi pi-shield"></i>
+
+                            <div>No user role permissions found.</div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- =========================================================
+     EDIT DIALOG
+     ========================================================= -->
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [closable]="!saving"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{
+        width: '760px',
+        maxWidth: '95vw'
+    }"
+    [header]="
+        editingPermissionId === null
+            ? 'New User Role Permission'
+            : 'Edit User Role Permission'
+    "
+    (onHide)="hideDialog()"
+>
+    <div class="dialog-content">
+        <!-- Permission assignment -->
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-key"></i>
+                Permission Assignment
+            </div>
+
+            <div class="form-grid">
+                <div class="field-block">
+                    <label>
+                        Role
+                        <span class="required">*</span>
+                    </label>
+
+                    <p-select [(ngModel)]="form.roleId" [options]="roles" optionLabel="roleName" optionValue="roleId" placeholder="Select Role" [filter]="true" filterBy="roleNo,roleName" [loading]="roleLoading" appendTo="body" styleClass="w-full">
+                        <ng-template #selectedItem let-role>
+                            <span *ngIf="role"> {{ role.roleNo }} - {{ role.roleName }} </span>
+                        </ng-template>
+
+                        <ng-template #item let-role>
+                            <div class="lookup-option">
+                                <strong> {{ role.roleNo }} </strong>
+
+                                <span> {{ role.roleName }} </span>
+                            </div>
+                        </ng-template>
+                    </p-select>
+
+                    <small
+                        class="field-error"
+                        *ngIf="
+                            submitted &&
+                            !form.roleId
+                        "
+                    >
+                        Role is required.
+                    </small>
+                </div>
+
+                <div class="field-block">
+                    <label>
+                        Menu
+                        <span class="required">*</span>
+                    </label>
+
+                    <p-select
+                        [(ngModel)]="form.menuId"
+                        [options]="menus"
+                        optionLabel="menuName"
+                        optionValue="menuId"
+                        placeholder="Select Menu"
+                        [filter]="true"
+                        filterBy="menuNo,menuName,routerLink"
+                        [loading]="menuLoading"
+                        appendTo="body"
+                        styleClass="w-full"
+                    >
+                        <ng-template #selectedItem let-menu>
+                            <span *ngIf="menu"> {{ menu.menuNo }} - {{ menu.menuName }} </span>
+                        </ng-template>
+
+                        <ng-template #item let-menu>
+                            <div class="lookup-option">
+                                <strong> {{ menu.menuNo }} </strong>
+
+                                <span> {{ menu.menuName }} </span>
+
+                                <small *ngIf="menu.routerLink"> {{ menu.routerLink }} </small>
+                            </div>
+                        </ng-template>
+                    </p-select>
+
+                    <small
+                        class="field-error"
+                        *ngIf="
+                            submitted &&
+                            !form.menuId
+                        "
+                    >
+                        Menu is required.
+                    </small>
+                </div>
+
+                <div class="field-block">
+                    <label>
+                        Permission Level
+                        <span class="required">*</span>
+                    </label>
+
+                    <p-select [(ngModel)]="form.levelId" [options]="permissionLevels" optionLabel="label" optionValue="value" placeholder="Select Permission Level" appendTo="body" styleClass="w-full"> </p-select>
+
+                    <small class="field-help"> Higher levels include the permissions granted by lower levels. </small>
+
+                    <small
+                        class="field-error"
+                        *ngIf="
+                            submitted &&
+                            !form.levelId
+                        "
+                    >
+                        Permission Level is required.
+                    </small>
+                </div>
+            </div>
+
+            <div class="field-block note-block">
+                <label>Note</label>
+
+                <textarea pTextarea rows="3" class="note-input" [(ngModel)]="form.note"> </textarea>
+            </div>
+        </div>
+
+        <!-- Permission settings -->
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-cog"></i>
+                Permission Settings
+            </div>
+
+            <div class="settings-list">
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Inactive</div>
+
+                        <div class="setting-help">Disable this role permission without deleting it.</div>
+                    </div>
+
+                    <p-checkbox [(ngModel)]="form.isInactive" [binary]="true"> </p-checkbox>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="hideDialog()"> </p-button>
+
+        <p-button label="Save" icon="pi pi-check" [loading]="saving" (onClick)="save()"> </p-button>
+    </ng-template>
+</p-dialog>

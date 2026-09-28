@@ -1,0 +1,345 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card menu-field-page">
+    <!-- ===================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ===================================================== -->
+
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Menu Field</h2>
+
+            <div class="page-subtitle">Manage fields assigned to application menus.</div>
+        </div>
+
+        <div class="header-actions">
+            <p-button label="New Field" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TOOLBAR / SEARCH -->
+    <!-- ===================================================== -->
+
+    <div class="toolbar-row">
+        <div class="search-area">
+            <!-- Menu Filter -->
+            <div class="menu-filter-box">
+                <p-select
+                    [(ngModel)]="selectedMenuId"
+                    [options]="menus"
+                    optionLabel="menuName"
+                    optionValue="menuId"
+                    placeholder="All Menus"
+                    [showClear]="true"
+                    [filter]="true"
+                    filterBy="menuName,menuNo"
+                    appendTo="body"
+                    styleClass="w-full"
+                    (onChange)="menuChanged()"
+                >
+                    <ng-template pTemplate="item" let-menu>
+                        <div class="menu-option">
+                            <span>{{ menu.menuName }}</span>
+                            <small>{{ menu.menuNo }}</small>
+                        </div>
+                    </ng-template>
+                </p-select>
+            </div>
+
+            <!-- Search -->
+            <div class="search-box">
+                <i class="pi pi-search search-icon"></i>
+
+                <input pInputText type="text" [(ngModel)]="searchText" placeholder="Search field code, field name, database field..." aria-label="Search menu field" (keyup.enter)="search()" />
+            </div>
+
+            <p-button label="Search" icon="pi pi-search" (onClick)="search()"> </p-button>
+        </div>
+
+        <div class="result-summary">{{ totalRecords }} field{{ totalRecords === 1 ? '' : 's' }}</div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TABLE -->
+    <!-- ===================================================== -->
+
+    <p-table
+        [value]="items"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="pageSize"
+        [totalRecords]="totalRecords"
+        [loading]="loading"
+        [rowsPerPageOptions]="[10, 20, 50, 100]"
+        [sortField]="sortField"
+        [sortOrder]="sortDirection === 'desc' ? -1 : 1"
+        [rowHover]="true"
+        styleClass="menu-field-table"
+        (onLazyLoad)="loadData($event)"
+    >
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="menuName">
+                    Menu
+                    <p-sortIcon field="menuName"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="fieldCode">
+                    Field Code
+                    <p-sortIcon field="fieldCode"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="fieldName">
+                    Field Name
+                    <p-sortIcon field="fieldName"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="dataType">
+                    Data Type
+                    <p-sortIcon field="dataType"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="databaseField">
+                    Database Field
+                    <p-sortIcon field="databaseField"></p-sortIcon>
+                </th>
+
+                <th>Default Label</th>
+
+                <th class="status-column">Status</th>
+
+                <th class="action-column text-center">Action</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+            <tr>
+                <!-- Menu -->
+                <td>
+                    <div class="menu-name">{{ item.menuName }}</div>
+
+                    <div class="menu-no">{{ item.menuNo }}</div>
+                </td>
+
+                <!-- Field Code -->
+                <td>
+                    <span class="field-code"> {{ item.fieldCode }} </span>
+                </td>
+
+                <!-- Field Name -->
+                <td>
+                    <span class="field-name"> {{ item.fieldName }} </span>
+                </td>
+
+                <!-- Data Type -->
+                <td>
+                    <span class="data-type"> {{ item.dataType || '-' }} </span>
+                </td>
+
+                <!-- Database Field -->
+                <td>
+                    <span class="database-field"> {{ item.databaseField || '-' }} </span>
+                </td>
+
+                <!-- Default Label -->
+                <td>{{ item.defaultLabel || '-' }}</td>
+
+                <!-- Status -->
+                <td>
+                    <span *ngIf="item.isAvailable" class="status-badge status-active">
+                        <i class="pi pi-check-circle"></i>
+
+                        Available
+                    </span>
+
+                    <span *ngIf="!item.isAvailable" class="status-badge status-inactive">
+                        <i class="pi pi-ban"></i>
+
+                        Unavailable
+                    </span>
+                </td>
+
+                <!-- Action -->
+                <td class="text-center">
+                    <div class="row-actions">
+                        <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true" ariaLabel="Edit field" title="Edit" (onClick)="edit(item)"> </p-button>
+
+                        <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" ariaLabel="Delete field" title="Delete" (onClick)="confirmDelete(item)"> </p-button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="8" class="empty-cell">
+                    <i class="pi pi-inbox empty-icon"></i>
+
+                    <div>No Menu Field found.</div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- ========================================================= -->
+<!-- ADD / EDIT DIALOG -->
+<!-- ========================================================= -->
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    styleClass="menu-field-dialog"
+    [breakpoints]="{
+        '1100px': '90vw',
+        '640px': '96vw'
+    }"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="!saving"
+    [header]="
+        editingFieldId == null
+            ? 'New Menu Field'
+            : 'Edit Menu Field'
+    "
+    (onHide)="hideDialog()"
+>
+    <!-- ===================================================== -->
+    <!-- BASIC INFORMATION -->
+    <!-- ===================================================== -->
+
+    <div class="dialog-section">
+        <div class="section-title">
+            <i class="pi pi-file"></i>
+            Basic Information
+        </div>
+
+        <div class="form-grid two-columns">
+            <!-- Menu -->
+            <div class="field-block">
+                <label for="menuId">
+                    Menu
+                    <span class="required">*</span>
+                </label>
+
+                <p-select inputId="menuId" [(ngModel)]="form.menuId" [options]="menus" optionLabel="menuName" optionValue="menuId" placeholder="Select Menu" [filter]="true" filterBy="menuName,menuNo" appendTo="body" styleClass="w-full">
+                    <ng-template pTemplate="item" let-menu>
+                        <div class="menu-option">
+                            <span>{{ menu.menuName }}</span>
+                            <small>{{ menu.menuNo }}</small>
+                        </div>
+                    </ng-template>
+                </p-select>
+
+                <small class="field-help"> Application menu that owns this field. </small>
+
+                <small *ngIf="submitted && !form.menuId" class="p-error"> Menu is required. </small>
+            </div>
+
+            <!-- Field Code -->
+            <div class="field-block">
+                <label for="fieldCode">
+                    Field Code
+                    <span class="required">*</span>
+                </label>
+
+                <input id="fieldCode" pInputText class="w-full" maxlength="50" placeholder="colorNo" [(ngModel)]="form.fieldCode" />
+
+                <small class="field-help"> Unique field code within the selected menu. </small>
+
+                <small *ngIf="submitted && !form.fieldCode.trim()" class="p-error"> Field Code is required. </small>
+            </div>
+
+            <!-- Field Name -->
+            <div class="field-block">
+                <label for="fieldName">
+                    Field Name
+                    <span class="required">*</span>
+                </label>
+
+                <input id="fieldName" pInputText class="w-full" maxlength="100" placeholder="Color Number" [(ngModel)]="form.fieldName" />
+
+                <small class="field-help"> Display name of this field. </small>
+
+                <small *ngIf="submitted && !form.fieldName.trim()" class="p-error"> Field Name is required. </small>
+            </div>
+
+            <!-- Default Label -->
+            <div class="field-block">
+                <label for="defaultLabel"> Default Label </label>
+
+                <input id="defaultLabel" pInputText class="w-full" maxlength="150" placeholder="Color Number" [(ngModel)]="form.defaultLabel" />
+
+                <small class="field-help"> Default label displayed to the user. </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- DATA MAPPING -->
+    <!-- ===================================================== -->
+
+    <div class="dialog-section">
+        <div class="section-title">
+            <i class="pi pi-database"></i>
+            Data Mapping
+        </div>
+
+        <div class="form-grid two-columns">
+            <!-- Data Type -->
+            <div class="field-block">
+                <label for="dataType"> Data Type </label>
+
+                <input id="dataType" pInputText class="w-full" maxlength="50" placeholder="string" [(ngModel)]="form.dataType" />
+
+                <small class="field-help"> Application data type. </small>
+            </div>
+
+            <!-- Database Field -->
+            <div class="field-block">
+                <label for="databaseField"> Database Field </label>
+
+                <input id="databaseField" pInputText class="w-full" maxlength="50" placeholder="color_no" [(ngModel)]="form.databaseField" />
+
+                <small class="field-help"> Physical database column name. </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- SETTINGS -->
+    <!-- ===================================================== -->
+
+    <div class="dialog-section last-section">
+        <div class="section-title">
+            <i class="pi pi-cog"></i>
+            Settings
+        </div>
+
+        <div class="checkbox-item">
+            <p-checkbox [(ngModel)]="form.isAvailable" [binary]="true" inputId="isAvailable"> </p-checkbox>
+
+            <div>
+                <label for="isAvailable"> Available </label>
+
+                <small> Allow this field to be used by the menu. </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- FOOTER -->
+    <!-- ===================================================== -->
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="dialogVisible = false"> </p-button>
+
+            <p-button label="Save" icon="pi pi-save" [loading]="saving" (onClick)="save()"> </p-button>
+        </div>
+    </ng-template>
+</p-dialog>

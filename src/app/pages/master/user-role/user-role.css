@@ -1,0 +1,364 @@
+.user-role-page {
+    margin: 1.5rem;
+    padding: 1.5rem;
+
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.page-subtitle {
+    margin-top: 0.35rem;
+    color: var(--text-color-secondary);
+    font-size: 0.95rem;
+}
+
+.page-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* =========================================================
+   SEARCH / TOOLBAR
+   ========================================================= */
+
+.toolbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.search-area {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.search-box {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+}
+
+.search-box > i {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+
+    color: var(--text-color-secondary);
+    z-index: 1;
+}
+
+.search-box input {
+    width: 100%;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+
+.clear-search {
+    position: absolute;
+    right: 0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 1.8rem;
+    height: 1.8rem;
+
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+
+    color: var(--text-color-secondary);
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.clear-search:hover {
+    background: var(--surface-hover);
+    color: var(--text-color);
+}
+
+.result-summary {
+    white-space: nowrap;
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.table-card {
+    overflow: hidden;
+}
+
+.role-code {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.role-name {
+    font-weight: 500;
+}
+
+.row-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 72px;
+
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: color-mix(in srgb, var(--green-500) 15%, transparent);
+
+    color: var(--green-600);
+}
+
+.status-inactive {
+    background: color-mix(in srgb, var(--red-500) 15%, transparent);
+
+    color: var(--red-600);
+}
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.empty-state {
+    min-height: 180px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 0.75rem;
+
+    color: var(--text-color-secondary);
+}
+
+.empty-state i {
+    font-size: 2rem;
+    opacity: 0.65;
+}
+
+/* =========================================================
+   DIALOG
+   ========================================================= */
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.dialog-section {
+    padding: 1rem;
+
+    border: 1px solid var(--surface-border);
+    border-radius: 10px;
+
+    background: var(--surface-ground);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    margin-bottom: 1rem;
+
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.field-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.field-block label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.field-block input,
+.field-block textarea {
+    width: 100%;
+}
+
+.note-block {
+    margin-top: 1rem;
+}
+
+.note-input {
+    width: 100%;
+    resize: vertical;
+}
+
+.required {
+    color: var(--red-500);
+}
+
+.field-error {
+    color: var(--red-500);
+    font-size: 0.8rem;
+}
+
+.field-help {
+    color: var(--text-color-secondary);
+    font-size: 0.8rem;
+    line-height: 1.35;
+}
+
+.authentication-help {
+    display: block;
+    margin-top: 0.75rem;
+}
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+
+.settings-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 1rem;
+
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.settings-row:first-child {
+    padding-top: 0;
+}
+
+.settings-row:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.setting-label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.setting-help {
+    margin-top: 0.25rem;
+
+    color: var(--text-color-secondary);
+    font-size: 0.8rem;
+    line-height: 1.35;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .user-role-page {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-actions {
+        justify-content: flex-end;
+    }
+
+    .toolbar-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-area {
+        width: 100%;
+    }
+
+    .search-box {
+        max-width: none;
+    }
+
+    .result-summary {
+        text-align: right;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-row {
+        align-items: flex-start;
+    }
+
+    .row-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

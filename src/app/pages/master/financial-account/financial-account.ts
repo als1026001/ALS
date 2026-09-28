@@ -20,10 +20,12 @@ import { FinancialAccountService } from '../../../core/services/financial-accoun
 
 import { SelectModule } from 'primeng/select';
 
+import { ExcelExportButton } from '../../../shared/components/excel-export-button/excel-export-button';
+
 @Component({
     selector: 'app-financial-account',
     standalone: true,
-    imports: [CommonModule, FormsModule, ButtonModule, CheckboxModule, ConfirmDialogModule, DialogModule, InputNumberModule, InputTextModule, SelectModule, TableModule, ToastModule, ToolbarModule],
+    imports: [CommonModule, FormsModule, ButtonModule, CheckboxModule, ConfirmDialogModule, DialogModule, InputNumberModule, InputTextModule, SelectModule, TableModule, ToastModule, ToolbarModule, ExcelExportButton],
     providers: [MessageService, ConfirmationService],
     templateUrl: './financial-account.html',
     styleUrl: './financial-account.scss'
