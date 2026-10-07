@@ -17,6 +17,7 @@ import { User, CreateUserRequest, UpdateUserRequest } from '../../../core/models
 
 import { UserService } from '../../../core/services/user.service';
 
+import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     selector: 'app-user',
     standalone: true,
@@ -27,6 +28,8 @@ import { UserService } from '../../../core/services/user.service';
 })
 export class UserComponent implements OnInit {
     private readonly userService = inject(UserService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
     private readonly messageService = inject(MessageService);
     private readonly confirmationService = inject(ConfirmationService);
 
@@ -53,6 +56,30 @@ export class UserComponent implements OnInit {
 
     ngOnInit(): void {
         // p-table lazy event will load the data.
+        this.openUserFromCenterSearch();
+    }
+
+    private openUserFromCenterSearch(): void {
+        const idParam = this.route.snapshot.queryParamMap.get('id');
+
+        if (!idParam) {
+            return;
+        }
+
+        const userId = Number(idParam);
+
+        if (!Number.isInteger(userId) || userId <= 0) {
+            return;
+        }
+
+        this.userService.getById(userId).subscribe({
+            next: (user) => {
+                this.editUser(user);
+            },
+            error: (error) => {
+                this.showError(this.getErrorMessage(error, 'Unable to load user.'));
+            }
+        });
     }
 
     loadUsers(event?: TableLazyLoadEvent): void {
@@ -157,6 +184,8 @@ export class UserComponent implements OnInit {
 
         this.dialogVisible = false;
         this.submitted = false;
+
+        this.clearCenterSearchId();
     }
 
     save(): void {
@@ -248,6 +277,9 @@ export class UserComponent implements OnInit {
             next: () => {
                 this.saving = false;
                 this.dialogVisible = false;
+                this.submitted = false;
+
+                this.clearCenterSearchId();
 
                 this.messageService.add({
                     severity: 'success',
@@ -339,5 +371,20 @@ export class UserComponent implements OnInit {
 
     private getErrorMessage(error: any, fallback: string): string {
         return error?.error?.message || error?.error?.detail || error?.message || fallback;
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {
+                id: null
+            },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+        });
     }
 }

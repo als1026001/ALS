@@ -1,0 +1,875 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="company-page">
+
+    <!-- ===================================================== -->
+    <!-- Page Header -->
+    <!-- ===================================================== -->
+
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Company</h2>
+
+            <div class="page-subtitle">
+                Manage companies and company settings.
+            </div>
+        </div>
+
+        <div class="page-actions">
+            <p-button
+                label="New Company"
+                icon="pi pi-plus"
+                (onClick)="openNew()">
+            </p-button>
+
+            <p-button
+                label="Refresh"
+                icon="pi pi-refresh"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="refresh()">
+            </p-button>
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- Toolbar -->
+    <!-- ===================================================== -->
+
+    <div class="toolbar-row">
+
+        <div class="search-area">
+
+            <div class="search-box">
+
+                <i class="pi pi-search"></i>
+
+                <input
+                    pInputText
+                    type="text"
+                    [(ngModel)]="searchText"
+                    placeholder="Search company no, name, legal name or tax code..."
+                    (keyup.enter)="search()"
+                />
+
+                @if (searchText) {
+                    <button
+                        type="button"
+                        class="clear-search"
+                        (click)="clearSearch()"
+                        pTooltip="Clear">
+
+                        <i class="pi pi-times"></i>
+
+                    </button>
+                }
+
+            </div>
+
+            <p-button
+                label="Search"
+                icon="pi pi-search"
+                [outlined]="true"
+                (onClick)="search()">
+            </p-button>
+
+        </div>
+
+        <div class="result-summary">
+            {{ totalRecords }}
+            result{{ totalRecords === 1 ? '' : 's' }}
+        </div>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- Table -->
+    <!-- ===================================================== -->
+
+    <div class="table-card">
+
+        <p-table
+            [value]="items"
+            [lazy]="true"
+            (onLazyLoad)="loadData($event)"
+            [paginator]="true"
+            [rows]="pageSize"
+            [totalRecords]="totalRecords"
+            [loading]="loading"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            [sortField]="sortField"
+            [sortOrder]="sortDirection === 'asc' ? 1 : -1"
+            [tableStyle]="{ 'min-width': '70rem' }"
+        >
+
+            <ng-template pTemplate="header">
+
+                <tr>
+
+                    <th
+                        pSortableColumn="companyNo"
+                        style="width: 10rem">
+
+                        Company No
+
+                        <p-sortIcon field="companyNo">
+                        </p-sortIcon>
+
+                    </th>
+
+                    <th
+                        pSortableColumn="companyName"
+                        style="width: 18rem">
+
+                        Company Name
+
+                        <p-sortIcon field="companyName">
+                        </p-sortIcon>
+
+                    </th>
+
+                    <th style="width: 18rem">
+                        Legal Name
+                    </th>
+
+                    <th style="width: 11rem">
+                        Tax Code
+                    </th>
+
+                    <th
+                        pSortableColumn="isActive"
+                        style="width: 9rem">
+
+                        Status
+
+                        <p-sortIcon field="isActive">
+                        </p-sortIcon>
+
+                    </th>
+
+                    <th style="width: 18rem">
+                        Note
+                    </th>
+
+                    <th style="width: 10rem; text-align: center">
+                        Action
+                    </th>
+
+                </tr>
+
+            </ng-template>
+
+            <!-- Body -->
+
+            <ng-template
+                pTemplate="body"
+                let-item>
+
+                <tr>
+
+                    <td>
+                        <span class="company-no">
+                            {{ item.companyNo || '-' }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="company-name">
+                            {{ item.companyName || '-' }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ item.legalName || '-' }}
+                    </td>
+
+                    <td>
+                        {{ item.taxCode || '-' }}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="status-badge"
+                            [class.status-active]="item.isActive"
+                            [class.status-inactive]="!item.isActive">
+
+                            {{
+                                item.isActive
+                                    ? 'Active'
+                                    : 'Inactive'
+                            }}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+                        {{ item.note || '-' }}
+                    </td>
+
+                    <td>
+
+                        <div class="row-actions">
+
+                            <p-button
+                                icon="pi pi-pencil"
+                                label="Edit"
+                                [rounded]="true"
+                                [text]="true"
+                                size="small"
+                                (onClick)="edit(item)">
+                            </p-button>
+
+                            <p-button
+                                icon="pi pi-trash"
+                                label="Delete"
+                                severity="danger"
+                                [rounded]="true"
+                                [text]="true"
+                                size="small"
+                                (onClick)="confirmDelete(item)">
+                            </p-button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            </ng-template>
+
+            <!-- Empty -->
+
+            <ng-template pTemplate="emptymessage">
+
+                <tr>
+
+                    <td colspan="7">
+
+                        <div class="empty-state">
+
+                            <i class="pi pi-building"></i>
+
+                            <div class="empty-title">
+                                No companies found
+                            </div>
+
+                            <div class="empty-description">
+                                Create a company or change your search criteria.
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            </ng-template>
+
+        </p-table>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- Dialog -->
+<!-- ========================================================= -->
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{
+        width: '800px',
+        maxWidth: '95vw'
+    }"
+    [header]="
+        editingCompanyId == null
+            ? 'New Company'
+            : 'Edit Company'
+    "
+    (onHide)="hideDialog()"
+>
+
+    <div class="dialog-content">
+
+        <!-- ================================================= -->
+        <!-- Basic Information -->
+        <!-- ================================================= -->
+
+        <div class="dialog-section">
+
+            <div class="section-title">
+                <i class="pi pi-info-circle"></i>
+                Basic Information
+            </div>
+
+            <div class="form-grid">
+
+                <div class="field-block">
+
+                    <label for="companyNo">
+                        Company No
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        id="companyNo"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.companyNo"
+                        maxlength="50"
+                        autocomplete="off"
+                        placeholder="e.g. ALS"
+                    />
+
+                    @if (
+                        submitted &&
+                        !form.companyNo.trim()
+                    ) {
+                        <small class="field-error">
+                            Company No is required.
+                        </small>
+                    }
+
+                    <small class="field-help">
+                        Unique company reference number.
+                    </small>
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="companyName">
+                        Company Name
+                    </label>
+
+                    <input
+                        id="companyName"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.companyName"
+                        maxlength="250"
+                        autocomplete="off"
+                        placeholder="Company name"
+                    />
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="legalName">
+                        Legal Name
+                    </label>
+
+                    <input
+                        id="legalName"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.legalName"
+                        maxlength="200"
+                        autocomplete="off"
+                    />
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="taxCode">
+                        Tax Code
+                    </label>
+
+                    <input
+                        id="taxCode"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.taxCode"
+                        maxlength="50"
+                        autocomplete="off"
+                    />
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="accountId">
+                        Account ID
+                    </label>
+
+                    <p-inputNumber
+                        inputId="accountId"
+                        [(ngModel)]="form.accountId"
+                        [useGrouping]="false">
+                    </p-inputNumber>
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="website">
+                        Website
+                    </label>
+
+                    <input
+                        id="website"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.website"
+                        maxlength="100"
+                        autocomplete="off"
+                    />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- Address -->
+        <!-- ================================================= -->
+
+        <div class="dialog-section">
+
+            <div class="section-title">
+                <i class="pi pi-map-marker"></i>
+                Address
+            </div>
+
+            <div class="field-block full-width-field">
+
+                <label for="address">
+                    Address
+                </label>
+
+                <input
+                    id="address"
+                    pInputText
+                    type="text"
+                    [(ngModel)]="form.address"
+                    maxlength="200"
+                />
+
+            </div>
+
+            <div class="form-grid address-secondary-grid">
+
+                <div class="field-block">
+
+                    <label for="addressShipping">
+                        Shipping Address
+                    </label>
+
+                    <input
+                        id="addressShipping"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.addressShipping"
+                        maxlength="200"
+                    />
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="addressReturn">
+                        Return Address
+                    </label>
+
+                    <input
+                        id="addressReturn"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.addressReturn"
+                        maxlength="200"
+                    />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- Regional Settings -->
+        <!-- ================================================= -->
+
+        <div class="dialog-section">
+
+            <div class="section-title">
+                <i class="pi pi-globe"></i>
+                Regional Settings
+            </div>
+
+            <div class="form-grid">
+
+                <div class="field-block">
+
+                    <label for="countryId">
+                        Country ID
+                    </label>
+
+                    <p-inputNumber
+                        inputId="countryId"
+                        [(ngModel)]="form.countryId"
+                        [useGrouping]="false">
+                    </p-inputNumber>
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="timeZoneId">
+                        Time Zone ID
+                    </label>
+
+                    <p-inputNumber
+                        inputId="timeZoneId"
+                        [(ngModel)]="form.timeZoneId"
+                        [useGrouping]="false">
+                    </p-inputNumber>
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="currencyId">
+                        Currency ID
+                    </label>
+
+                    <p-inputNumber
+                        inputId="currencyId"
+                        [(ngModel)]="form.currencyId"
+                        [useGrouping]="false">
+                    </p-inputNumber>
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="firstFiscalMonth">
+                        First Fiscal Month
+                    </label>
+
+                    <input
+                        id="firstFiscalMonth"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.firstFiscalMonth"
+                        maxlength="50"
+                    />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- Communication / Access -->
+        <!-- ================================================= -->
+
+        <div class="dialog-section">
+
+            <div class="section-title">
+                <i class="pi pi-envelope"></i>
+                Communication & Access
+            </div>
+
+            <div class="form-grid">
+
+                <div class="field-block">
+
+                    <label for="emailReturnAddress">
+                        Email Return Address
+                    </label>
+
+                    <input
+                        id="emailReturnAddress"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.emailReturnAddress"
+                        maxlength="100"
+                    />
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="allowIpAddress">
+                        Allow IP Address
+                    </label>
+
+                    <input
+                        id="allowIpAddress"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.allowIpAddress"
+                        maxlength="250"
+                    />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- Data Center -->
+        <!-- ================================================= -->
+
+        <div class="dialog-section">
+
+            <div class="section-title">
+                <i class="pi pi-server"></i>
+                Data Center
+            </div>
+
+            <div class="form-grid">
+
+                <div class="field-block">
+
+                    <label for="primaryDataCenterId">
+                        Primary Data Center ID
+                    </label>
+
+                    <input
+                        id="primaryDataCenterId"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.primaryDataCenterId"
+                        maxlength="100"
+                    />
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="recoveryDataCenterId">
+                        Recovery Data Center ID
+                    </label>
+
+                    <input
+                        id="recoveryDataCenterId"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.recoveryDataCenterId"
+                        maxlength="100"
+                    />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- System URLs -->
+        <!-- ================================================= -->
+
+        <div class="dialog-section">
+
+            <div class="section-title">
+                <i class="pi pi-link"></i>
+                System URLs
+            </div>
+
+            <div class="form-grid">
+
+                <div class="field-block">
+
+                    <label for="companyLoginUrl">
+                        Company Login URL
+                    </label>
+
+                    <input
+                        id="companyLoginUrl"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.companyLoginUrl"
+                        maxlength="100"
+                    />
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="companyUiUrl">
+                        Company UI URL
+                    </label>
+
+                    <input
+                        id="companyUiUrl"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.companyUiUrl"
+                        maxlength="100"
+                    />
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="restWebServiceUrl">
+                        REST Web Service URL
+                    </label>
+
+                    <input
+                        id="restWebServiceUrl"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.restWebServiceUrl"
+                        maxlength="100"
+                    />
+
+                </div>
+
+
+                <div class="field-block">
+
+                    <label for="restletsUrl">
+                        RESTlets URL
+                    </label>
+
+                    <input
+                        id="restletsUrl"
+                        pInputText
+                        type="text"
+                        [(ngModel)]="form.restletsUrl"
+                        maxlength="100"
+                    />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- Additional Information -->
+        <!-- ================================================= -->
+
+        <div class="dialog-section">
+
+            <div class="section-title">
+                <i class="pi pi-file-edit"></i>
+                Additional Information
+            </div>
+
+            <div class="field-block">
+
+                <label for="note">
+                    Note
+                </label>
+
+                <textarea
+                    id="note"
+                    class="note-input"
+                    [(ngModel)]="form.note"
+                    maxlength="250"
+                    rows="3"
+                    placeholder="Optional note...">
+                </textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- Settings -->
+        <!-- ================================================= -->
+
+        <div class="dialog-section">
+
+            <div class="section-title">
+                <i class="pi pi-cog"></i>
+                Settings
+            </div>
+
+            <div class="settings-list">
+
+                <div class="settings-row">
+
+                    <div class="setting-text">
+
+                        <div class="setting-label">
+                            Active
+                        </div>
+
+                        <div class="setting-help">
+                            Allow this company to remain active in the system.
+                        </div>
+
+                    </div>
+
+                    <p-checkbox
+                        inputId="isActive"
+                        [(ngModel)]="form.isActive"
+                        [binary]="true">
+                    </p-checkbox>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- Footer -->
+    <!-- ===================================================== -->
+
+    <ng-template pTemplate="footer">
+
+        <p-button
+            label="Cancel"
+            icon="pi pi-times"
+            severity="secondary"
+            [outlined]="true"
+            [disabled]="saving"
+            (onClick)="hideDialog()">
+        </p-button>
+
+        <p-button
+            [label]="
+                editingCompanyId == null
+                    ? 'Create'
+                    : 'Save'
+            "
+            icon="pi pi-check"
+            [loading]="saving"
+            (onClick)="save()">
+        </p-button>
+
+    </ng-template>
+
+</p-dialog>

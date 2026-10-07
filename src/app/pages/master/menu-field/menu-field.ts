@@ -21,6 +21,8 @@ import { MenuParentLookup } from '../../../core/models/menu-setup.model';
 import { MenuFieldService } from '../../../core/services/menu-field.service';
 import { MenuSetupService } from '../../../core/services/menu-setup.service';
 
+import { ActivatedRoute, Router } from '@angular/router';
+
 @Component({
     selector: 'app-menu-field',
     standalone: true,
@@ -31,6 +33,8 @@ import { MenuSetupService } from '../../../core/services/menu-setup.service';
 })
 export class MenuFieldComponent implements OnInit {
     private readonly menuFieldService = inject(MenuFieldService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
     private readonly menuSetupService = inject(MenuSetupService);
     private readonly messageService = inject(MessageService);
     private readonly confirmationService = inject(ConfirmationService);
@@ -60,6 +64,16 @@ export class MenuFieldComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadMenus();
+
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openMenuFieldFromCenterSearch(id);
+        });
     }
 
     // =========================================================
@@ -174,6 +188,27 @@ export class MenuFieldComponent implements OnInit {
         }
 
         this.dialogVisible = true;
+    }
+
+    private openMenuFieldFromCenterSearch(fieldId: number): void {
+        this.menuFieldService.getById(fieldId).subscribe({
+            next: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                this.edit(item);
+            },
+            error: (error) => {
+                console.error('Unable to load Menu Field from Center Search.', error);
+
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Unable to load Menu Field.'
+                });
+            }
+        });
     }
 
     // =========================================================
@@ -308,6 +343,21 @@ export class MenuFieldComponent implements OnInit {
         this.dialogVisible = false;
         this.submitted = false;
         this.saving = false;
+
+        this.clearCenterSearchId();
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+        });
     }
 
     // =========================================================

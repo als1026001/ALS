@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -25,8 +26,11 @@ import { MenuTypeService } from '../../../core/services/menu-type.service';
     templateUrl: './menu-type.html',
     styleUrl: './menu-type.css'
 })
-export class MenuTypeComponent {
+export class MenuTypeComponent implements OnInit {
     private readonly menuTypeService = inject(MenuTypeService);
+
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
     private readonly messageService = inject(MessageService);
 
@@ -53,6 +57,18 @@ export class MenuTypeComponent {
     sortDirection: 'asc' | 'desc' = 'asc';
 
     form = this.createEmptyForm();
+
+    ngOnInit(): void {
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openMenuTypeFromCenterSearch(id);
+        });
+    }
 
     loadData(event?: TableLazyLoadEvent): void {
         if (event) {
@@ -122,6 +138,27 @@ export class MenuTypeComponent {
         this.dialogVisible = true;
     }
 
+    private openMenuTypeFromCenterSearch(menuTypeId: number): void {
+        this.menuTypeService.getById(menuTypeId).subscribe({
+            next: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                this.edit(item);
+            },
+            error: (error) => {
+                console.error('Unable to load Menu Type from Center Search.', error);
+
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Unable to load Menu Type.'
+                });
+            }
+        });
+    }
+
     edit(item: MenuType): void {
         this.editingMenuTypeId = item.menuTypeId;
 
@@ -147,6 +184,21 @@ export class MenuTypeComponent {
 
         this.dialogVisible = false;
         this.submitted = false;
+
+        this.clearCenterSearchId();
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+        });
     }
 
     save(): void {

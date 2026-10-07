@@ -1,0 +1,333 @@
+<p-toast></p-toast>
+
+<p-confirmDialog></p-confirmDialog>
+
+<div class="list-view-filter-page">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">List View Filter</h2>
+
+            <div class="page-subtitle">Configure filters available in reusable ERP list views.</div>
+        </div>
+
+        <div class="page-actions">
+            <p-button label="New List View Filter" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+
+    <div class="toolbar-row">
+        <div class="search-area">
+            <div class="search-box">
+                <i class="pi pi-search"></i>
+
+                <input pInputText type="text" [(ngModel)]="searchText" placeholder="Search view, field or default value..." (keyup.enter)="search()" />
+
+                @if (searchText) {
+                <button type="button" class="clear-search" (click)="clearSearch()" pTooltip="Clear">
+                    <i class="pi pi-times"></i>
+                </button>
+                }
+            </div>
+
+            <p-button label="Search" icon="pi pi-search" [outlined]="true" (onClick)="search()"> </p-button>
+        </div>
+
+        <div class="result-summary">{{ totalRecords }} result{{ totalRecords === 1 ? '' : 's' }}</div>
+    </div>
+
+    <!-- Table -->
+
+    <div class="table-card">
+        <p-table
+            [value]="items"
+            [lazy]="true"
+            (onLazyLoad)="loadData($event)"
+            [paginator]="true"
+            [rows]="pageSize"
+            [totalRecords]="totalRecords"
+            [loading]="loading"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            [sortField]="sortField"
+            [sortOrder]="sortDirection === 'asc' ? 1 : -1"
+            [tableStyle]="{ 'min-width': '78rem' }"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 20rem">List View</th>
+
+                    <th style="width: 20rem">Field</th>
+
+                    <th pSortableColumn="filterType" style="width: 11rem">
+                        Filter Type
+                        <p-sortIcon field="filterType"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="filterOrder" style="width: 8rem">
+                        Order
+                        <p-sortIcon field="filterOrder"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="defaultValue" style="width: 14rem">
+                        Default Value
+                        <p-sortIcon field="defaultValue"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="isVisible" style="width: 8rem">
+                        Visible
+                        <p-sortIcon field="isVisible"></p-sortIcon>
+                    </th>
+
+                    <th style="width: 10rem; text-align: center">Action</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item>
+                <tr>
+                    <td>
+                        <span class="view-name"> {{ getViewDisplay(item) }} </span>
+                    </td>
+
+                    <td>
+                        <span class="field-name"> {{ getFieldDisplay(item) }} </span>
+                    </td>
+
+                    <td>{{ getFilterTypeDisplay(item.filterType) || '-' }}</td>
+
+                    <td>{{ item.filterOrder }}</td>
+
+                    <td>{{ item.defaultValue || '-' }}</td>
+
+                    <td>{{ item.isVisible ? 'Yes' : 'No' }}</td>
+
+                    <td>
+                        <div class="row-actions">
+                            <p-button icon="pi pi-pencil" label="Edit" [rounded]="true" [text]="true" size="small" (onClick)="edit(item)"> </p-button>
+
+                            <p-button icon="pi pi-trash" label="Delete" severity="danger" [rounded]="true" [text]="true" size="small" (onClick)="confirmDelete(item)"> </p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class="pi pi-filter"></i>
+
+                            <div class="empty-title">No list view filters found</div>
+
+                            <div class="empty-description">Create a list view filter or change your search criteria.</div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- Dialog -->
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{
+        width: '850px',
+        maxWidth: '95vw'
+    }"
+    [header]="
+        editingViewFilterId == null
+            ? 'New List View Filter'
+            : 'Edit List View Filter'
+    "
+    (onHide)="hideDialog()"
+>
+    <div class="dialog-content">
+        <!-- Basic Information -->
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-info-circle"></i>
+                Basic Information
+            </div>
+
+            <div class="form-grid">
+                <!-- List View -->
+
+                <div class="field-block">
+                    <label for="viewId">
+                        List View
+                        <span class="required">*</span>
+                    </label>
+
+                    <p-select
+                        inputId="viewId"
+                        [options]="listViews"
+                        [(ngModel)]="form.viewId"
+                        optionLabel="viewName"
+                        optionValue="viewId"
+                        placeholder="Select List View"
+                        [filter]="true"
+                        filterBy="viewCode,viewName"
+                        [showClear]="true"
+                        [loading]="loadingListViews"
+                        appendTo="body"
+                        styleClass="w-full"
+                        (ngModelChange)="onViewChange($event)"
+                    >
+                        <ng-template #item let-view>
+                            <div>
+                                <strong> {{ view.viewName }} </strong>
+
+                                <span class="option-code"> ({{ view.viewCode }}) </span>
+                            </div>
+                        </ng-template>
+
+                        <ng-template #selectedItem let-view>
+                            <div>
+                                {{ view.viewName }}
+
+                                <span class="option-code"> ({{ view.viewCode }}) </span>
+                            </div>
+                        </ng-template>
+                    </p-select>
+
+                    @if ( submitted && (form.viewId == null || form.viewId <= 0) ) {
+                    <small class="field-error"> List View is required. </small>
+                    }
+
+                    <small class="field-help"> List view that this filter belongs to. </small>
+                </div>
+
+                <!-- Field -->
+
+                <div class="field-block">
+                    <label for="fieldId">
+                        Field
+                        <span class="required">*</span>
+                    </label>
+
+                    <p-select
+                        inputId="fieldId"
+                        [options]="fields"
+                        [(ngModel)]="form.fieldId"
+                        optionLabel="fieldName"
+                        optionValue="fieldId"
+                        placeholder="Select Field"
+                        [filter]="true"
+                        filterBy="fieldCode,fieldName,databaseField"
+                        [showClear]="true"
+                        [loading]="loadingFields"
+                        [disabled]="form.viewId == null"
+                        appendTo="body"
+                        styleClass="w-full"
+                    >
+                        <ng-template #item let-field>
+                            <div>
+                                <strong> {{ field.fieldName }} </strong>
+
+                                <span class="option-code"> ({{ field.fieldCode }}) </span>
+                            </div>
+                        </ng-template>
+
+                        <ng-template #selectedItem let-field>
+                            <div>
+                                {{ field.fieldName }}
+
+                                <span class="option-code"> ({{ field.fieldCode }}) </span>
+                            </div>
+                        </ng-template>
+                    </p-select>
+
+                    @if ( submitted && (form.fieldId == null || form.fieldId <= 0) ) {
+                    <small class="field-error"> Field is required. </small>
+                    }
+
+                    <small class="field-help"> Available field from the menu used by the selected list view. </small>
+                </div>
+
+                <!-- Filter Type -->
+
+                <div class="field-block">
+                    <label for="filterType"> Filter Type </label>
+
+                    <p-select inputId="filterType" [options]="filterTypes" [(ngModel)]="form.filterType" optionLabel="label" optionValue="value" placeholder="Select Filter Type" [showClear]="true" appendTo="body" styleClass="w-full"> </p-select>
+
+                    <small class="field-help"> Controls how users enter the filter value. </small>
+                </div>
+
+                <!-- Filter Order -->
+
+                <div class="field-block">
+                    <label for="filterOrder">
+                        Filter Order
+                        <span class="required">*</span>
+                    </label>
+
+                    <input id="filterOrder" pInputText type="number" [(ngModel)]="form.filterOrder" min="1" autocomplete="off" placeholder="e.g. 1" />
+
+                    @if ( submitted && (form.filterOrder == null || form.filterOrder <= 0) ) {
+                    <small class="field-error"> Filter Order must be greater than 0. </small>
+                    }
+
+                    <small class="field-help"> Display position of this filter. </small>
+                </div>
+
+                <!-- Default Value -->
+
+                <div class="field-block">
+                    <label for="defaultValue"> Default Value </label>
+
+                    <input id="defaultValue" pInputText type="text" [(ngModel)]="form.defaultValue" maxlength="100" autocomplete="off" placeholder="Optional default value" />
+
+                    <small class="field-help"> Optional initial value for this filter. </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings -->
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-cog"></i>
+                Settings
+            </div>
+
+            <div class="settings-list">
+                <div class="settings-row">
+                    <div class="setting-text">
+                        <div class="setting-label">Visible</div>
+
+                        <div class="setting-help">Display this filter in the list view filter area.</div>
+                    </div>
+
+                    <p-checkbox inputId="isVisible" [(ngModel)]="form.isVisible" [binary]="true"> </p-checkbox>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="hideDialog()"> </p-button>
+
+        <p-button
+            [label]="
+                editingViewFilterId == null
+                    ? 'Create'
+                    : 'Save'
+            "
+            icon="pi pi-check"
+            [loading]="saving"
+            (onClick)="save()"
+        >
+        </p-button>
+    </ng-template>
+</p-dialog>

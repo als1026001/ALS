@@ -85,6 +85,47 @@
     </div>
 
     <!-- ======================================================
+     CENTER SEARCH
+     ====================================================== -->
+
+    <div class="center-search" (click)="$event.stopPropagation()">
+        <div class="center-search-input-wrapper">
+            <i class="pi pi-search center-search-icon"></i>
+
+            <input type="text" class="center-search-input" placeholder="Search ERP..." autocomplete="off" [value]="searchText" (input)="onSearchInput($event)" (focus)="onSearchFocus()" (keydown)="onSearchKeyDown($event)" />
+
+            <i *ngIf="searchLoading" class="pi pi-spin pi-spinner center-search-loading"></i>
+        </div>
+
+        <div *ngIf="searchOpen" class="center-search-dropdown">
+            <!-- RESULTS -->
+
+            <ng-container *ngIf="!searchLoading && searchResults.length > 0">
+                <button *ngFor="let result of searchResults; let i = index" type="button" class="center-search-result" [class.selected]="i === selectedSearchIndex" (mouseenter)="selectedSearchIndex = i" (click)="selectSearchResult(result)">
+                    <div class="center-search-result-main">
+                        <span class="center-search-result-code"> {{ result.code }} </span>
+
+                        <span *ngIf="result.name" class="center-search-result-name"> {{ result.name }} </span>
+                    </div>
+
+                    <div class="center-search-result-meta">
+                        <span>{{ result.group }}</span>
+                        <span>{{ result.type }}</span>
+                    </div>
+                </button>
+            </ng-container>
+
+            <!-- NO RESULTS -->
+
+            <div *ngIf="!searchLoading && searchResults.length === 0" class="center-search-empty">No results found</div>
+
+            <!-- LOADING -->
+
+            <div *ngIf="searchLoading" class="center-search-empty">Searching...</div>
+        </div>
+    </div>
+
+    <!-- ======================================================
          DROPDOWN
 
          IMPORTANT:

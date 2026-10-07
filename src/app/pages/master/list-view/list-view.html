@@ -1,0 +1,337 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="list-view-page">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">List View</h2>
+
+            <div class="page-subtitle">Manage reusable list views for ERP menus.</div>
+        </div>
+
+        <div class="page-actions">
+            <p-button label="New List View" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+
+    <div class="toolbar-row">
+        <div class="search-area">
+            <div class="search-box">
+                <i class="pi pi-search"></i>
+
+                <input pInputText type="text" [(ngModel)]="searchText" placeholder="Search view code, name or note..." (keyup.enter)="search()" />
+
+                @if (searchText) {
+                <button type="button" class="clear-search" (click)="clearSearch()" pTooltip="Clear">
+                    <i class="pi pi-times"></i>
+                </button>
+                }
+            </div>
+
+            <p-button label="Search" icon="pi pi-search" [outlined]="true" (onClick)="search()"> </p-button>
+        </div>
+
+        <div class="result-summary">{{ totalRecords }} result{{ totalRecords === 1 ? '' : 's' }}</div>
+    </div>
+
+    <!-- Table -->
+
+    <div class="table-card">
+        <p-table
+            [value]="items"
+            [lazy]="true"
+            (onLazyLoad)="loadData($event)"
+            [paginator]="true"
+            [rows]="pageSize"
+            [totalRecords]="totalRecords"
+            [loading]="loading"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            [sortField]="sortField"
+            [sortOrder]="sortDirection === 'asc' ? 1 : -1"
+            [tableStyle]="{ 'min-width': '78rem' }"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="viewCode" style="width: 12rem">
+                        View Code
+                        <p-sortIcon field="viewCode"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="viewName" style="width: 18rem">
+                        View Name
+                        <p-sortIcon field="viewName"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="menuId" style="width: 14rem">
+                        Menu
+                        <p-sortIcon field="menuId"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="isDefault" style="width: 8rem">
+                        Default
+                        <p-sortIcon field="isDefault"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="isSystem" style="width: 8rem">
+                        System
+                        <p-sortIcon field="isSystem"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="isPublic" style="width: 8rem">
+                        Public
+                        <p-sortIcon field="isPublic"></p-sortIcon>
+                    </th>
+
+                    <th pSortableColumn="isActive" style="width: 9rem">
+                        Status
+                        <p-sortIcon field="isActive"></p-sortIcon>
+                    </th>
+
+                    <th style="width: 18rem">Note</th>
+
+                    <th style="width: 10rem; text-align: center">Action</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item>
+                <tr>
+                    <td>
+                        <span class="view-code"> {{ item.viewCode }} </span>
+                    </td>
+
+                    <td>
+                        <span class="view-name"> {{ item.viewName }} </span>
+                    </td>
+
+                    <td>{{ getMenuDisplay(item.menuId) }}</td>
+
+                    <td>{{ item.isDefault ? 'Yes' : 'No' }}</td>
+
+                    <td>{{ item.isSystem ? 'Yes' : 'No' }}</td>
+
+                    <td>{{ item.isPublic ? 'Yes' : 'No' }}</td>
+
+                    <td>
+                        <span class="status-badge" [class.status-active]="item.isActive" [class.status-inactive]="!item.isActive"> {{ item.isActive ? 'Active' : 'Inactive' }} </span>
+                    </td>
+
+                    <td>{{ item.note || '-' }}</td>
+
+                    <td>
+                        <div class="row-actions">
+                            <p-button icon="pi pi-pencil" label="Edit" [rounded]="true" [text]="true" size="small" (onClick)="edit(item)"> </p-button>
+
+                            <p-button icon="pi pi-trash" label="Delete" severity="danger" [rounded]="true" [text]="true" size="small" (onClick)="confirmDelete(item)"> </p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="9">
+                        <div class="empty-state">
+                            <i class="pi pi-table"></i>
+
+                            <div class="empty-title">No list views found</div>
+
+                            <div class="empty-description">Create a list view or change your search criteria.</div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- Dialog -->
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{
+        width: '800px',
+        maxWidth: '95vw'
+    }"
+    [header]="
+        editingViewId == null
+            ? 'New List View'
+            : 'Edit List View'
+    "
+    (onHide)="hideDialog()"
+>
+    <div class="dialog-content">
+        <!-- Basic Information -->
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-info-circle"></i>
+                Basic Information
+            </div>
+
+            <div class="form-grid">
+                <div class="field-block">
+                    <label for="menuId">
+                        Menu
+                        <span class="required">*</span>
+                    </label>
+
+                    <p-select
+                        inputId="menuId"
+                        [options]="menus"
+                        [(ngModel)]="form.menuId"
+                        optionLabel="menuName"
+                        optionValue="menuId"
+                        placeholder="Select Menu"
+                        [filter]="true"
+                        filterBy="menuNo,menuName"
+                        [showClear]="true"
+                        [loading]="loadingMenus"
+                        appendTo="body"
+                        styleClass="w-full"
+                    >
+                        <ng-template #item let-menu>
+                            <div>
+                                <strong>{{ menu.menuName }}</strong>
+                                <span class="menu-option-code"> ({{ menu.menuNo }}) </span>
+                            </div>
+                        </ng-template>
+
+                        <ng-template #selectedItem let-menu>
+                            <div>
+                                {{ menu.menuName }}
+                                <span class="menu-option-code"> ({{ menu.menuNo }}) </span>
+                            </div>
+                        </ng-template>
+                    </p-select>
+
+                    @if ( submitted && ( form.menuId == null || form.menuId <= 0 ) ) {
+                    <small class="field-error"> Menu is required. </small>
+                    }
+
+                    <small class="field-help"> ERP menu this list view belongs to. </small>
+                </div>
+
+                <div class="field-block">
+                    <label for="viewCode">
+                        View Code
+                        <span class="required">*</span>
+                    </label>
+
+                    <input id="viewCode" pInputText type="text" [(ngModel)]="form.viewCode" maxlength="50" autocomplete="off" placeholder="e.g. DEFAULT" />
+
+                    @if ( submitted && !form.viewCode.trim() ) {
+                    <small class="field-error"> View Code is required. </small>
+                    }
+
+                    <small class="field-help"> Unique code within the selected menu. </small>
+                </div>
+
+                <div class="field-block">
+                    <label for="viewName">
+                        View Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <input id="viewName" pInputText type="text" [(ngModel)]="form.viewName" maxlength="150" autocomplete="off" placeholder="e.g. Default List View" />
+
+                    @if ( submitted && !form.viewName.trim() ) {
+                    <small class="field-error"> View Name is required. </small>
+                    }
+
+                    <small class="field-help"> Name displayed to users. </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-file-edit"></i>
+                Additional Information
+            </div>
+
+            <div class="field-block">
+                <label for="note"> Note </label>
+
+                <textarea id="note" class="note-input" [(ngModel)]="form.note" maxlength="250" rows="3" placeholder="Optional note..."> </textarea>
+            </div>
+        </div>
+
+        <!-- Settings -->
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-cog"></i>
+                Settings
+            </div>
+
+            <div class="settings-list">
+                <div class="settings-row">
+                    <div class="setting-text">
+                        <div class="setting-label">Default View</div>
+
+                        <div class="setting-help">Use this as the default view for the selected menu.</div>
+                    </div>
+
+                    <p-checkbox inputId="isDefault" [(ngModel)]="form.isDefault" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-text">
+                        <div class="setting-label">System View</div>
+
+                        <div class="setting-help">Marks this view as a system-defined ERP view.</div>
+                    </div>
+
+                    <p-checkbox inputId="isSystem" [(ngModel)]="form.isSystem" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-text">
+                        <div class="setting-label">Public</div>
+
+                        <div class="setting-help">Make this view available as a public list view.</div>
+                    </div>
+
+                    <p-checkbox inputId="isPublic" [(ngModel)]="form.isPublic" [binary]="true"> </p-checkbox>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-text">
+                        <div class="setting-label">Active</div>
+
+                        <div class="setting-help">Allow this list view to be used in the ERP.</div>
+                    </div>
+
+                    <p-checkbox inputId="isActive" [(ngModel)]="form.isActive" [binary]="true"> </p-checkbox>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="hideDialog()"> </p-button>
+
+        <p-button
+            [label]="
+                editingViewId == null
+                    ? 'Create'
+                    : 'Save'
+            "
+            icon="pi pi-check"
+            [loading]="saving"
+            (onClick)="save()"
+        >
+        </p-button>
+    </ng-template>
+</p-dialog>

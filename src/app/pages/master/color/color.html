@@ -25,32 +25,29 @@
             </div>
         </ng-template>
     </p-toolbar>
-
     <p-table
         [value]="colors"
-        [lazy]="true"
-        (onLazyLoad)="onLazyLoad($event)"
-        [paginator]="true"
+        [paginator]="false"
         [rows]="pageSize"
         [first]="first"
         [totalRecords]="totalRecords"
         [rowsPerPageOptions]="[10, 20, 50, 100]"
-        [loading]="loading"
         [rowHover]="true"
         [showGridlines]="true"
-        [sortField]="sortField"
-        [sortOrder]="sortDirection === 'asc' ? 1 : -1"
         dataKey="colorId"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} colors"
         [showCurrentPageReport]="true"
     >
         <ng-template #header>
             <tr>
-                <th pSortableColumn="colorNo">Color No <p-sortIcon field="colorNo" /></th>
-                <th pSortableColumn="colorName">Color Name <p-sortIcon field="colorName" /></th>
-                <th pSortableColumn="createdAt">Created At <p-sortIcon field="createdAt" /></th>
+                @if (showColorNo) {
+                <th>Color No</th>
+                }
+
+                <th>Color Name</th>
+                <th>Created At</th>
                 <th>Created By</th>
-                <th pSortableColumn="editedAt">Edited At <p-sortIcon field="editedAt" /></th>
+                <th>Edited At</th>
                 <th>Edited By</th>
                 <th class="text-center" style="width: 9rem">Action</th>
             </tr>
@@ -58,7 +55,9 @@
 
         <ng-template #body let-color>
             <tr>
+                @if (showColorNo) {
                 <td class="font-medium">{{ color.colorNo }}</td>
+                }
                 <td>{{ color.colorName || '-' }}</td>
                 <td>{{ color.createdAt ? (color.createdAt | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
                 <td>{{ color.createdBy ?? '-' }}</td>

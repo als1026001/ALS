@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -28,6 +29,9 @@ import { UserRoleService } from '../../../core/services/user-role.service';
 export class UserRoleComponent implements OnInit {
     private readonly userRoleService = inject(UserRoleService);
 
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+
     private readonly messageService = inject(MessageService);
 
     private readonly confirmationService = inject(ConfirmationService);
@@ -54,7 +58,15 @@ export class UserRoleComponent implements OnInit {
     form = this.createEmptyForm();
 
     ngOnInit(): void {
-        // p-table lazy event will load the data.
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openUserRoleFromCenterSearch(id);
+        });
     }
 
     loadRoles(event?: TableLazyLoadEvent): void {
@@ -127,6 +139,23 @@ export class UserRoleComponent implements OnInit {
         this.dialogVisible = true;
     }
 
+    private openUserRoleFromCenterSearch(roleId: number): void {
+        this.userRoleService.getById(roleId).subscribe({
+            next: (role) => {
+                if (!role) {
+                    return;
+                }
+
+                this.editRole(role);
+            },
+            error: (error) => {
+                console.error('Unable to load User Role from Center Search.', error);
+
+                this.showError(this.getErrorMessage(error, 'Unable to load User Role.'));
+            }
+        });
+    }
+
     editRole(role: UserRole): void {
         this.submitted = false;
         this.editingRoleId = role.roleId;
@@ -164,6 +193,21 @@ export class UserRoleComponent implements OnInit {
 
         this.dialogVisible = false;
         this.submitted = false;
+
+        this.clearCenterSearchId();
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+        });
     }
 
     save(): void {

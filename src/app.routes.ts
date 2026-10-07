@@ -134,6 +134,59 @@ export const appRoutes: Routes = [
 
                 loadComponent: () => import('./app/pages/master/user-role-register/user-role-register').then((m) => m.UserRoleRegisterComponent)
             },
+            {
+                path: 'autoGenerateNumber',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/autoGenerateNumber'
+                },
+
+                loadComponent: () => import('./app/pages/master/auto-generate-number/auto-generate-number').then((m) => m.AutoGenerateNumberComponent)
+            },
+            {
+                path: 'company',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/company'
+                },
+
+                loadComponent: () => import('./app/pages/master/company/company').then((m) => m.CompanyComponent)
+            },
+            {
+                path: 'listView',
+
+                canActivate: [routePermissionGuard],
+
+                data: { permissionRoute: '/listView' },
+
+                loadComponent: () => import('./app/pages/master/list-view/list-view').then((m) => m.ListViewComponent)
+            },
+            {
+                path: 'listViewColumn',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/listViewColumn'
+                },
+
+                loadComponent: () => import('./app/pages/master/list-view-column/list-view-column').then((m) => m.ListViewColumnComponent)
+            },
+            {
+                path: 'listViewFilter',
+
+                canActivate: [routePermissionGuard],
+
+                data: {
+                    permissionRoute: '/listViewFilter'
+                },
+
+                loadComponent: () => import('./app/pages/master/list-view-filter/list-view-filter').then((m) => m.ListViewFilterComponent)
+            },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },

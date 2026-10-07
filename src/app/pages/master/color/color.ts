@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -17,6 +17,11 @@ import { ColorService } from '../../../core/services/color.service';
 import { PermissionService } from '../../../core/services/permission.service';
 import { TooltipModule } from 'primeng/tooltip';
 import { ExcelExportButton } from '../../../shared/components/excel-export-button/excel-export-button';
+import { ListView } from '../../../core/models/list-view.model';
+import { ListViewService } from '../../../core/services/list-view.service';
+import { ListViewColumn } from '../../../core/models/list-view-column.model';
+import { ListViewColumnService } from '../../../core/services/list-view-column.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-color',
@@ -27,13 +32,19 @@ import { ExcelExportButton } from '../../../shared/components/excel-export-butto
 })
 export class ColorPage implements OnInit {
     private readonly colorService = inject(ColorService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly listViewService = inject(ListViewService);
     private readonly permissionService = inject(PermissionService);
     private readonly messageService = inject(MessageService);
     private readonly confirmationService = inject(ConfirmationService);
+    private readonly listViewColumnService = inject(ListViewColumnService);
+    private readonly cdr = inject(ChangeDetectorRef);
 
     readonly permissionRoute = '/color';
 
     colors: Color[] = [];
+    defaultListView: ListView | null = null;
     totalRecords = 0;
     loading = false;
     saving = false;
@@ -56,16 +67,56 @@ export class ColorPage implements OnInit {
         canDelete: false
     };
 
+    listViewColumns: ListViewColumn[] = [];
+    showColorNo = true;
+    listViewReady = false;
+
     form: CreateColorRequest = this.emptyForm();
     editingColorId: number | null = null;
 
     ngOnInit(): void {
         this.permissionService.getRouteAccess(this.permissionRoute).subscribe({
-            next: (access) => (this.access = access),
-            error: () => this.showError('Unable to load Color permissions.')
+            next: (access) => {
+                this.access = access;
+
+                // Permission đã load xong mới xử lý deep-link.
+                this.openColorFromCenterSearch();
+            },
+            error: () => {
+                this.showError('Unable to load Color permissions.');
+            }
         });
 
-        this.loadPage();
+        this.loadDefaultListView();
+    }
+
+    private openColorFromCenterSearch(): void {
+        const idParam = this.route.snapshot.queryParamMap.get('id');
+
+        if (!idParam) {
+            return;
+        }
+
+        const colorId = Number(idParam);
+
+        if (!Number.isInteger(colorId) || colorId <= 0) {
+            return;
+        }
+
+        // Center Search có thể mở record chỉ khi user có Update permission.
+        if (!this.access.canUpdate) {
+            return;
+        }
+
+        this.colorService.getById(colorId).subscribe({
+            next: (color) => {
+                this.editColor(color);
+                this.cdr.markForCheck();
+            },
+            error: (error: HttpErrorResponse) => {
+                this.showError(this.getErrorMessage(error, 'Unable to load Color.'));
+            }
+        });
     }
 
     onLazyLoad(event: TableLazyLoadEvent): void {
@@ -75,17 +126,22 @@ export class ColorPage implements OnInit {
         this.first = first;
         this.pageSize = rows;
 
+        // Chỉ thay sort khi PrimeNG thực sự gửi sortField
         if (typeof event.sortField === 'string' && event.sortField) {
             this.sortField = event.sortField;
+
+            if (event.sortOrder === -1) {
+                this.sortDirection = 'desc';
+            } else if (event.sortOrder === 1) {
+                this.sortDirection = 'asc';
+            }
         }
 
-        if (event.sortOrder === -1) {
-            this.sortDirection = 'desc';
-        } else if (event.sortOrder === 1) {
-            this.sortDirection = 'asc';
+        // Không load ở đây trong lần khởi tạo.
+        // Initial load đang được thực hiện sau khi List View config load xong.
+        if (this.listViewReady) {
+            this.loadPage();
         }
-
-        this.loadPage();
     }
 
     searchColors(): void {
@@ -128,8 +184,11 @@ export class ColorPage implements OnInit {
 
     hideDialog(): void {
         if (this.saving) return;
+
         this.dialogVisible = false;
         this.submitted = false;
+
+        this.clearCenterSearchId();
     }
 
     saveColor(): void {
@@ -152,6 +211,10 @@ export class ColorPage implements OnInit {
                 .subscribe({
                     next: () => {
                         this.dialogVisible = false;
+                        this.submitted = false;
+
+                        this.clearCenterSearchId();
+
                         this.showSuccess('Color updated successfully.');
                         this.loadPage();
                     },
@@ -198,6 +261,42 @@ export class ColorPage implements OnInit {
         });
     }
 
+    private loadDefaultListView(): void {
+        this.listViewService
+            .getPage({
+                page: 1,
+                pageSize: 200,
+                sortField: 'viewName',
+                sortDirection: 'asc'
+            })
+            .subscribe({
+                next: (result) => {
+                    this.defaultListView = (result.items ?? []).find((view) => view.menuId === 13 && view.isDefault === true && view.isActive !== false) ?? null;
+
+                    console.log('Color Default List View:', this.defaultListView);
+
+                    if (this.defaultListView) {
+                        this.loadListViewColumns(this.defaultListView.viewId, true);
+                    } else {
+                        this.listViewReady = true;
+                        this.loadPage();
+                    }
+                },
+
+                error: (error: HttpErrorResponse) => {
+                    console.error('Unable to load Color default list view.', error);
+
+                    // Không có List View vẫn phải cho Color hoạt động
+                    this.defaultListView = null;
+                    this.listViewColumns = [];
+                    this.showColorNo = true;
+                    this.listViewReady = true;
+
+                    this.loadPage();
+                }
+            });
+    }
+
     private loadPage(): void {
         this.loading = true;
 
@@ -217,12 +316,19 @@ export class ColorPage implements OnInit {
                     this.colors = result.items ?? [];
                     this.totalRecords = result.totalCount ?? 0;
 
+                    this.cdr.detectChanges();
+
                     if (this.colors.length === 0 && this.first > 0 && this.totalRecords > 0) {
                         this.first = Math.max(0, this.first - this.pageSize);
                         this.loadPage();
                     }
                 },
-                error: (error: HttpErrorResponse) => this.showError(this.getErrorMessage(error, 'Unable to load Colors.'))
+
+                error: (error: HttpErrorResponse) => {
+                    setTimeout(() => {
+                        this.showError(this.getErrorMessage(error, 'Unable to load Colors.'));
+                    }, 0);
+                }
             });
     }
 
@@ -246,5 +352,69 @@ export class ColorPage implements OnInit {
         if (error.status === 403) return 'You do not have permission for this action.';
         if (error.status === 409) return 'Color No already exists.';
         return fallback;
+    }
+
+    private loadListViewColumns(viewId: number, loadColorsAfter = false): void {
+        this.listViewColumnService
+            .getPage({
+                page: 1,
+                pageSize: 200,
+                viewId,
+                sortField: 'columnOrder',
+                sortDirection: 'asc'
+            })
+            .subscribe({
+                next: (result) => {
+                    const columns = result.items ?? [];
+
+                    const colorNoColumn = columns.find((x) => x.fieldCode?.toLowerCase() === 'colorno');
+
+                    this.listViewColumns = columns;
+
+                    this.showColorNo = colorNoColumn ? colorNoColumn.isVisible !== false : true;
+
+                    this.cdr.detectChanges();
+
+                    console.log('Color List View Columns:', this.listViewColumns);
+                    console.log('showColorNo:', this.showColorNo);
+
+                    if (loadColorsAfter) {
+                        this.loadPage();
+                    } else {
+                        this.listViewReady = true;
+                    }
+                },
+
+                error: (error: HttpErrorResponse) => {
+                    this.listViewColumns = [];
+                    this.showColorNo = true;
+                    this.listViewReady = true;
+
+                    this.showError(this.getErrorMessage(error, 'Unable to load List View Columns.'));
+
+                    if (loadColorsAfter) {
+                        this.loadPage();
+                    }
+                }
+            });
+    }
+
+    getListViewColumn(fieldCode: string) {
+        return this.listViewColumns.find((x) => x.fieldCode?.toLowerCase() === fieldCode.toLowerCase());
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {
+                id: null
+            },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+        });
     }
 }

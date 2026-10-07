@@ -150,6 +150,7 @@
 
 <p-dialog
     [(visible)]="dialogVisible"
+    (onHide)="onDialogHide()"
     [modal]="true"
     styleClass="menu-setup-dialog"
     [breakpoints]="{

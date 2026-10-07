@@ -17,6 +17,7 @@ import { CreateMenuSetupRequest, MenuParentLookup, MenuSetup, UpdateMenuSetupReq
 
 import { MenuSetupService } from '../../../core/services/menu-setup.service';
 
+import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     selector: 'app-menu-setup',
 
@@ -31,6 +32,9 @@ import { MenuSetupService } from '../../../core/services/menu-setup.service';
 })
 export class MenuSetupPage implements OnInit {
     private readonly service = inject(MenuSetupService);
+
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
     private readonly messageService = inject(MessageService);
 
@@ -66,6 +70,16 @@ export class MenuSetupPage implements OnInit {
 
     ngOnInit(): void {
         this.loadData();
+
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openMenuFromCenterSearch(id);
+        });
     }
 
     loadData(): void {
@@ -180,6 +194,27 @@ export class MenuSetupPage implements OnInit {
         this.loadParentMenus();
 
         this.dialogVisible = true;
+    }
+
+    private openMenuFromCenterSearch(menuId: number): void {
+        this.service.getById(menuId).subscribe({
+            next: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                this.edit(item);
+            },
+            error: (error) => {
+                console.error('Unable to load Menu Setup from Center Search.', error);
+
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Unable to load Menu Setup.'
+                });
+            }
+        });
     }
 
     edit(item: MenuSetup): void {
@@ -323,6 +358,8 @@ export class MenuSetupPage implements OnInit {
             next: () => {
                 this.dialogVisible = false;
 
+                this.clearCenterSearchId();
+
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',
@@ -342,6 +379,8 @@ export class MenuSetupPage implements OnInit {
         this.service.update(menuId, request).subscribe({
             next: () => {
                 this.dialogVisible = false;
+
+                this.clearCenterSearchId();
 
                 this.messageService.add({
                     severity: 'success',
@@ -411,5 +450,22 @@ export class MenuSetupPage implements OnInit {
         const result = value?.trim();
 
         return result ? result : null;
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+        });
+    }
+
+    onDialogHide(): void {
+        this.clearCenterSearchId();
     }
 }

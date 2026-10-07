@@ -4,6 +4,8 @@ import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChi
 
 import { Router, RouterModule } from '@angular/router';
 
+import { Subject, debounceTime, distinctUntilChanged, switchMap, of, catchError } from 'rxjs';
+
 import { StyleClassModule } from 'primeng/styleclass';
 
 import { AppConfigurator } from './app.configurator';
@@ -14,7 +16,11 @@ import { MenuService } from '../../core/services/menu.service';
 
 import { AuthService } from '../../core/services/auth.service';
 
+import { CenterSearchService } from '../../core/services/center-search.service';
+
 import { AppMenuItem } from '../../core/models/app-menu-item';
+
+import { CenterSearchItem } from '../../core/models/center-search.model';
 
 @Component({
     selector: 'app-topbar',
@@ -37,6 +43,18 @@ export class AppTopbar implements OnInit {
 
     currentUserName = '';
 
+    searchText = '';
+
+    searchResults: CenterSearchItem[] = [];
+
+    searchLoading = false;
+
+    searchOpen = false;
+
+    selectedSearchIndex = -1;
+
+    private readonly searchSubject = new Subject<string>();
+
     menuTop = 0;
 
     menuLeft = 0;
@@ -49,6 +67,7 @@ export class AppTopbar implements OnInit {
         public layoutService: LayoutService,
         private menuService: MenuService,
         private authService: AuthService,
+        private centerSearchService: CenterSearchService,
         private router: Router,
         private cdr: ChangeDetectorRef
     ) {}
@@ -59,6 +78,8 @@ export class AppTopbar implements OnInit {
         this.currentUserName = currentUser?.displayName || currentUser?.username || 'User';
 
         this.loadMenu();
+
+        this.initializeCenterSearch();
     }
 
     private loadMenu(): void {
@@ -90,6 +111,147 @@ export class AppTopbar implements OnInit {
                 this.cdr.detectChanges();
             }
         });
+    }
+
+    private initializeCenterSearch(): void {
+        this.searchSubject
+            .pipe(
+                debounceTime(300),
+
+                distinctUntilChanged(),
+
+                switchMap((search) => {
+                    const value = search.trim();
+
+                    if (value.length < 1) {
+                        this.searchLoading = false;
+                        this.searchResults = [];
+                        this.searchOpen = false;
+
+                        this.cdr.markForCheck();
+
+                        return of([] as CenterSearchItem[]);
+                    }
+
+                    this.searchLoading = true;
+                    this.searchOpen = true;
+
+                    this.cdr.markForCheck();
+
+                    return this.centerSearchService.search(value, 10).pipe(
+                        catchError((error) => {
+                            console.error('Center search failed.', error);
+
+                            return of([] as CenterSearchItem[]);
+                        })
+                    );
+                })
+            )
+            .subscribe((results) => {
+                this.searchResults = results;
+
+                this.searchLoading = false;
+
+                this.searchOpen = true;
+
+                this.selectedSearchIndex = results.length > 0 ? 0 : -1;
+
+                this.cdr.markForCheck();
+            });
+    }
+
+    onSearchInput(event: Event): void {
+        const input = event.target as HTMLInputElement;
+
+        this.searchText = input.value;
+
+        if (this.searchText.trim().length < 1) {
+            this.searchResults = [];
+            this.searchLoading = false;
+            this.searchOpen = false;
+            this.selectedSearchIndex = -1;
+
+            this.cdr.markForCheck();
+        }
+
+        this.searchSubject.next(this.searchText);
+    }
+
+    onSearchFocus(): void {
+        if (this.searchText.trim().length >= 1 && (this.searchResults.length > 0 || this.searchLoading)) {
+            this.searchOpen = true;
+
+            this.cdr.markForCheck();
+        }
+    }
+
+    onSearchKeyDown(event: KeyboardEvent): void {
+        if (event.key === 'Escape') {
+            this.closeSearch();
+            return;
+        }
+
+        if (!this.searchOpen || this.searchResults.length === 0) {
+            return;
+        }
+
+        if (event.key === 'ArrowDown') {
+            event.preventDefault();
+
+            this.selectedSearchIndex = (this.selectedSearchIndex + 1) % this.searchResults.length;
+
+            this.cdr.markForCheck();
+
+            return;
+        }
+
+        if (event.key === 'ArrowUp') {
+            event.preventDefault();
+
+            this.selectedSearchIndex = this.selectedSearchIndex <= 0 ? this.searchResults.length - 1 : this.selectedSearchIndex - 1;
+
+            this.cdr.markForCheck();
+
+            return;
+        }
+
+        if (event.key === 'Enter') {
+            event.preventDefault();
+
+            const item = this.searchResults[this.selectedSearchIndex];
+
+            if (item) {
+                this.selectSearchResult(item);
+            }
+        }
+    }
+
+    selectSearchResult(item: CenterSearchItem): void {
+        this.searchOpen = false;
+        this.searchText = '';
+        this.searchResults = [];
+        this.selectedSearchIndex = -1;
+        this.cdr.markForCheck();
+
+        if (!item.routerLink) {
+            return;
+        }
+
+        this.router.navigate([item.routerLink], {
+            queryParams: {
+                id: item.id
+            }
+        });
+    }
+
+    closeSearch(): void {
+        if (!this.searchOpen) {
+            return;
+        }
+
+        this.searchOpen = false;
+
+        this.cdr.markForCheck();
     }
 
     toggleMenu(item: AppMenuItem, event: MouseEvent): void {
@@ -130,6 +292,7 @@ export class AppTopbar implements OnInit {
     @HostListener('document:click')
     onDocumentClick(): void {
         this.closeMenu();
+        this.closeSearch();
     }
 
     @HostListener('window:resize')
