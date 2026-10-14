@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -31,8 +32,10 @@ import { MenuFieldService } from '../../../core/services/menu-field.service';
     templateUrl: './list-view-filter.html',
     styleUrl: './list-view-filter.css'
 })
-export class ListViewFilterComponent {
+export class ListViewFilterComponent implements OnInit {
     private readonly service = inject(ListViewFilterService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
     private readonly listViewService = inject(ListViewService);
     private readonly menuFieldService = inject(MenuFieldService);
 
@@ -41,6 +44,18 @@ export class ListViewFilterComponent {
 
     constructor() {
         this.loadListViews();
+    }
+
+    ngOnInit(): void {
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openListViewFilterFromCenterSearch(id);
+        });
     }
 
     items: ListViewFilter[] = [];
@@ -153,6 +168,24 @@ export class ListViewFilterComponent {
         this.dialogVisible = true;
     }
 
+    private openListViewFilterFromCenterSearch(viewFilterId: number): void {
+        this.service.getById(viewFilterId).subscribe({
+            next: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                this.edit(item);
+            },
+
+            error: (error) => {
+                console.error('Unable to load List View Filter from Center Search.', error);
+
+                this.showApiError(error, 'Unable to load List View Filter.');
+            }
+        });
+    }
+
     edit(item: ListViewFilter): void {
         this.editingViewFilterId = item.viewFilterId;
         this.submitted = false;
@@ -193,6 +226,8 @@ export class ListViewFilterComponent {
 
         this.dialogVisible = false;
         this.submitted = false;
+
+        this.clearCenterSearchId();
     }
 
     onViewChange(viewId: number | null): void {
@@ -444,6 +479,19 @@ export class ListViewFilterComponent {
             severity: 'error',
             summary: 'Error',
             detail
+        });
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
         });
     }
 }

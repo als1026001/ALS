@@ -51,7 +51,7 @@ export const VON_BANG_TIEN_MENU: AppMenuItem =
                         routerLink: ['/pages/nghiep-vu/von-bang-tien/so-quy-tien-mat']
                     },
                     {
-                        label: 'Sổ quỹ tiền mặt',
+                        label: 'Sổ tiền gửi ngân hàng',
                         icon: 'pi pi-fw pi-building',
                         routerLink: ['/pages/nghiep-vu/von-bang-tien/so-tien-gui-ngan-hang']
                     },

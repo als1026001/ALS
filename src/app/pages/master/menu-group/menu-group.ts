@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -27,6 +28,9 @@ import { MenuGroupService } from '../../../core/services/menu-group.service';
 })
 export class MenuGroupComponent implements OnInit {
     private readonly menuGroupService = inject(MenuGroupService);
+
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
     private readonly messageService = inject(MessageService);
 
@@ -56,6 +60,16 @@ export class MenuGroupComponent implements OnInit {
 
     ngOnInit(): void {
         // p-table lazy event performs the initial load.
+
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openMenuGroupFromCenterSearch(id);
+        });
     }
 
     // =========================================================
@@ -148,6 +162,24 @@ export class MenuGroupComponent implements OnInit {
         this.form = this.createEmptyForm();
 
         this.dialogVisible = true;
+    }
+
+    private openMenuGroupFromCenterSearch(menuGroupId: number): void {
+        this.menuGroupService.getById(menuGroupId).subscribe({
+            next: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                this.edit(item);
+            },
+
+            error: (error) => {
+                console.error('Unable to load Menu Group from Center Search.', error);
+
+                this.showApiError(error);
+            }
+        });
     }
 
     // =========================================================
@@ -288,6 +320,8 @@ export class MenuGroupComponent implements OnInit {
         this.dialogVisible = false;
         this.submitted = false;
         this.saving = false;
+
+        this.clearCenterSearchId();
     }
 
     // =========================================================
@@ -318,6 +352,19 @@ export class MenuGroupComponent implements OnInit {
             severity: 'error',
             summary: 'Error',
             detail
+        });
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
         });
     }
 }

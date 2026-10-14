@@ -13,7 +13,7 @@ export const BAN_HANG_MENU: AppMenuItem =
             {
                 label: 'Nghiệp vụ',
                 icon: 'pi pi-fw pi-file-edit',
-                path: '/pages/nghiep-vu/ban-hang',
+                path: '/pages/nghiep-vu/ban-hang/nghiep-vu',
 
                 items: [
                     {

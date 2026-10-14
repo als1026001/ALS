@@ -539,7 +539,7 @@
     transition:
         border-color 0.15s ease,
         box-shadow 0.15s ease,
-        background 0.15s ease;
+        background-color 0.15s ease;
 }
 
 .center-search-input::placeholder {
@@ -678,4 +678,76 @@
 
 .center-search-result.selected {
     background: var(--surface-hover);
+}
+
+.erp-language-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.erp-language-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: auto;
+    padding: 0 0.6rem;
+    border-radius: 0.6rem;
+}
+
+.erp-language-code {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.erp-language-chevron {
+    font-size: 0.6rem;
+    opacity: 0.65;
+}
+
+.erp-language-panel {
+    width: 245px;
+    padding: 0.25rem;
+}
+
+.erp-language-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    padding: 0.65rem;
+}
+
+.erp-language-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin: 0.5rem 0;
+}
+
+.erp-language-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.65rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--text-color);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &.active {
+        background: var(--surface-hover);
+    }
+}
+
+.erp-language-flag {
+    font-size: 1.2rem;
+}
+
+.erp-language-check {
+    margin-left: auto;
+    color: var(--primary-color);
 }

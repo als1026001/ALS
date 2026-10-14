@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -28,14 +29,28 @@ import { MenuSetupService } from '../../../core/services/menu-setup.service';
     templateUrl: './list-view.html',
     styleUrl: './list-view.css'
 })
-export class ListViewComponent {
+export class ListViewComponent implements OnInit {
     private readonly service = inject(ListViewService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
     private readonly menuSetupService = inject(MenuSetupService);
     private readonly messageService = inject(MessageService);
     private readonly confirmationService = inject(ConfirmationService);
 
     constructor() {
         this.loadMenus();
+    }
+
+    ngOnInit(): void {
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openListViewFromCenterSearch(id);
+        });
     }
 
     items: ListView[] = [];
@@ -134,6 +149,24 @@ export class ListViewComponent {
         this.dialogVisible = true;
     }
 
+    private openListViewFromCenterSearch(viewId: number): void {
+        this.service.getById(viewId).subscribe({
+            next: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                this.edit(item);
+            },
+
+            error: (error) => {
+                console.error('Unable to load List View from Center Search.', error);
+
+                this.showApiError(error, 'Unable to load List View.');
+            }
+        });
+    }
+
     edit(item: ListView): void {
         // Load menu list for dropdown if it has not been loaded yet
         if (this.menus.length === 0) {
@@ -164,6 +197,8 @@ export class ListViewComponent {
 
         this.dialogVisible = false;
         this.submitted = false;
+
+        this.clearCenterSearchId();
     }
 
     save(): void {
@@ -352,5 +387,18 @@ export class ListViewComponent {
         }
 
         return `${menu.menuName} (${menu.menuNo})`;
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+        });
     }
 }

@@ -5,17 +5,21 @@ import { MenuService } from '@/app/core/services/menu.service';
 import { APP_MENU } from '../config/menu.config';
 import { SIDEBAR_MENU_CONFIG, SidebarMenuMode } from '../config/sidebar-menu.config';
 import { AppMenuItem } from '../menu.types';
-
+import { toObservable } from '@angular/core/rxjs-interop';
+import { combineLatest } from 'rxjs';
+import { LanguageService } from '@/app/core/services/language.service';
 @Injectable({ providedIn: 'root' })
 export class SidebarMenuService {
     private readonly apiMenuService = inject(MenuService);
+
+    private readonly languageService = inject(LanguageService);
 
     private readonly modeSubject = new BehaviorSubject<SidebarMenuMode>(this.readInitialMode());
 
     readonly mode$ = this.modeSubject.asObservable();
 
-    readonly menu$: Observable<AppMenuItem[]> = this.mode$.pipe(
-        switchMap((mode) => this.loadByMode(mode)),
+    readonly menu$: Observable<AppMenuItem[]> = combineLatest([this.mode$, toObservable(this.languageService.selectedLanguage)]).pipe(
+        switchMap(([mode, language]) => this.loadByMode(mode, language)),
         shareReplay({ bufferSize: 1, refCount: true })
     );
 
@@ -48,12 +52,12 @@ export class SidebarMenuService {
         this.modeSubject.next(SIDEBAR_MENU_CONFIG.defaultMode);
     }
 
-    private loadByMode(mode: SidebarMenuMode): Observable<AppMenuItem[]> {
+    private loadByMode(mode: SidebarMenuMode, language: 'vi' | 'en' | 'cn'): Observable<AppMenuItem[]> {
         if (mode === 'fixed') {
             return of(this.cloneMenu(APP_MENU));
         }
 
-        return this.apiMenuService.getMenu().pipe(
+        return this.apiMenuService.getMenu(language).pipe(
             map((apiMenu) => this.mapApiMenu(apiMenu ?? [])),
             map((apiMenu) => {
                 if (mode === 'api') {
@@ -90,6 +94,7 @@ export class SidebarMenuService {
 
             return {
                 label: item.label,
+                skipTranslation: true,
                 icon: item.icon ?? undefined,
                 routerLink: routerLink && !item.isExternal ? [routerLink] : undefined,
                 url: externalUrl || (item.isExternal ? routerLink || undefined : undefined),

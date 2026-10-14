@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -13,7 +13,9 @@ export class MenuService {
 
     private readonly menuApiUrl = `${API_BASE_URL}/menu`;
 
-    getMenu(): Observable<AppMenuItem[]> {
-        return this.http.get<AppMenuItem[]>(this.menuApiUrl);
+    getMenu(language?: 'vi' | 'en' | 'cn'): Observable<AppMenuItem[]> {
+        return this.http.get<AppMenuItem[]>(this.menuApiUrl, {
+            params: language ? { lang: language } : {}
+        });
     }
 }

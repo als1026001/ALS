@@ -27,7 +27,7 @@ export interface SidebarMenuConfig {
 }
 
 export const SIDEBAR_MENU_CONFIG: SidebarMenuConfig = {
-    defaultMode: 'fixed',
+    defaultMode: 'api',
     persistMode: true,
     storageKey: 'als.erp.sidebar.menu-mode',
     fallbackToFixedOnApiError: true,

@@ -4,14 +4,14 @@
 <div class="card menu-setup-page">
     <div class="page-header">
         <div>
-            <h2 class="page-title">Menu Setup</h2>
-            <div class="page-subtitle">Manage application menus and menu hierarchy.</div>
+            <h2 class="page-title">{{ 'menuSetup.title' | transloco }}</h2>
+            <div class="page-subtitle">{{ 'menuSetup.subtitle' | transloco }}</div>
         </div>
 
         <div class="header-actions">
-            <p-button label="New Menu" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+            <p-button [label]="'menuSetup.newMenu' | transloco" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
 
-            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+            <p-button [label]="'common.refresh' | transloco" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
         </div>
     </div>
 
@@ -20,13 +20,13 @@
             <div class="search-box">
                 <i class="pi pi-search search-icon"></i>
 
-                <input pInputText type="text" [(ngModel)]="search" placeholder="Search menu name, menu no, router link..." aria-label="Search menu" (keyup.enter)="searchData()" />
+                <input pInputText type="text" [(ngModel)]="search" [placeholder]="'menuSetup.searchPlaceholder' | transloco" [attr.aria-label]="'common.search' | transloco" (keyup.enter)="searchData()" />
             </div>
 
-            <p-button label="Search" icon="pi pi-search" (onClick)="searchData()"> </p-button>
+            <p-button [label]="'common.search' | transloco" icon="pi pi-search" (onClick)="searchData()"> </p-button>
         </div>
 
-        <div class="result-summary">{{ totalRecords }} menu item{{ totalRecords === 1 ? '' : 's' }}</div>
+        <div class="result-summary">{{ totalRecords }} {{ 'menuSetup.itemCount' | transloco }}</div>
     </div>
 
     <p-table
@@ -40,6 +40,10 @@
         [sortField]="sortField"
         [sortOrder]="sortDirection === 'desc' ? -1 : 1"
         [rowHover]="true"
+        [scrollable]="true"
+        scrollDirection="horizontal"
+        [scrollHeight]="'500px'"
+        [tableStyle]="{ 'min-width': '1450px' }"
         styleClass="menu-setup-table"
         (onLazyLoad)="onLazyLoad($event)"
     >
@@ -51,27 +55,31 @@
                 </th>
 
                 <th pSortableColumn="menuNo">
-                    Menu No
+                    {{ 'menuSetup.menuNo' | transloco }}
                     <p-sortIcon field="menuNo"></p-sortIcon>
                 </th>
 
                 <th pSortableColumn="menuName">
-                    Menu Name
+                    {{ 'menuSetup.menuName' | transloco }}
                     <p-sortIcon field="menuName"></p-sortIcon>
                 </th>
 
-                <th>Parent Menu</th>
+                <th>{{ 'menuSetup.vietnamese' | transloco }}</th>
+                <th>{{ 'menuSetup.english' | transloco }}</th>
+                <th>{{ 'menuSetup.chinese' | transloco }}</th>
+
+                <th>{{ 'menuSetup.parentMenu' | transloco }}</th>
 
                 <th pSortableColumn="routerLink">
-                    Router Link
+                    {{ 'menuSetup.routerLink' | transloco }}
                     <p-sortIcon field="routerLink"></p-sortIcon>
                 </th>
 
-                <th class="icon-column">Icon</th>
+                <th class="icon-column">{{ 'menuSetup.icon' | transloco }}</th>
 
-                <th class="status-column">Status</th>
+                <th class="status-column">{{ 'menuSetup.status' | transloco }}</th>
 
-                <th class="action-column text-center">Action</th>
+                <th class="action-column text-center">{{ 'menuSetup.action' | transloco }}</th>
             </tr>
         </ng-template>
 
@@ -92,9 +100,21 @@
                 </td>
 
                 <td>
+                    <span>{{ item.menuNameVi || '-' }}</span>
+                </td>
+
+                <td>
+                    <span>{{ item.menuNameEn || '-' }}</span>
+                </td>
+
+                <td>
+                    <span>{{ item.menuNameCn || '-' }}</span>
+                </td>
+
+                <td>
                     <span *ngIf="item.parentMenuId" class="parent-menu"> {{ getParentName(item) }} </span>
 
-                    <span *ngIf="!item.parentMenuId" class="root-menu"> Root </span>
+                    <span *ngIf="!item.parentMenuId" class="root-menu"> {{ 'menuSetup.root' | transloco }} </span>
                 </td>
 
                 <td>
@@ -112,25 +132,25 @@
                 <td>
                     <span *ngIf="item.isInactive" class="status-badge status-inactive">
                         <i class="pi pi-ban"></i>
-                        Inactive
+                        {{ 'common.inactive' | transloco }}
                     </span>
 
                     <span *ngIf="!item.isInactive && !item.isVisible" class="status-badge status-hidden">
                         <i class="pi pi-eye-slash"></i>
-                        Hidden
+                        {{ 'common.hidden' | transloco }}
                     </span>
 
                     <span *ngIf="!item.isInactive && item.isVisible" class="status-badge status-active">
                         <i class="pi pi-check-circle"></i>
-                        Active
+                        {{ 'common.active' | transloco }}
                     </span>
                 </td>
 
                 <td class="text-center">
                     <div class="row-actions">
-                        <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true" ariaLabel="Edit menu" title="Edit" (onClick)="edit(item)"> </p-button>
+                        <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true" [ariaLabel]="'common.edit' | transloco" [title]="'common.edit' | transloco" (onClick)="edit(item)"> </p-button>
 
-                        <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" ariaLabel="Delete menu" title="Delete" (onClick)="delete(item)"> </p-button>
+                        <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" [ariaLabel]="'common.delete' | transloco" [title]="'common.delete' | transloco" (onClick)="delete(item)"> </p-button>
                     </div>
                 </td>
             </tr>
@@ -138,10 +158,10 @@
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="8" class="empty-cell">
+                <td colspan="11" class="empty-cell">
                     <i class="pi pi-inbox empty-icon"></i>
 
-                    <div>No Menu found.</div>
+                    <div>{{ 'menuSetup.noMenusFound' | transloco }}</div>
                 </td>
             </tr>
         </ng-template>
@@ -160,9 +180,9 @@
     [draggable]="false"
     [resizable]="false"
     [header]="
-        editingId == null
-            ? 'New Menu'
-            : 'Edit Menu'
+    editingId == null
+        ? ('menuSetup.dialogNew' | transloco)
+        : ('menuSetup.dialogEdit' | transloco)
     "
 >
     <!-- ===================================================== -->
@@ -172,71 +192,107 @@
     <div class="dialog-section">
         <div class="section-title">
             <i class="pi pi-file"></i>
-            Basic Information
+            {{ 'menuSetup.basicInformation' | transloco }}
         </div>
 
         <div class="form-grid two-columns">
             <div class="field-block">
                 <label for="menuNo">
-                    Menu No
+                    {{ 'menuSetup.menuNo' | transloco }}
                     <span class="required">*</span>
                 </label>
 
                 <input id="menuNo" pInputText class="w-full" placeholder="mnuFinancialAccount" [(ngModel)]="form.menuNo" />
 
-                <small class="field-help"> Unique menu code. </small>
+                <small class="field-help"> {{ 'menuSetup.menuNoHelp' | transloco }} </small>
 
-                <small *ngIf="submitted && !form.menuNo.trim()" class="p-error"> Menu No is required. </small>
+                <small *ngIf="submitted && !form.menuNo.trim()" class="p-error"> {{ 'menuSetup.menuNoRequired' | transloco }} </small>
             </div>
 
             <div class="field-block">
                 <label for="menuName">
-                    Menu Name
+                    {{ 'menuSetup.menuName' | transloco }}
                     <span class="required">*</span>
                 </label>
 
                 <input id="menuName" pInputText class="w-full" placeholder="Financial Account" [(ngModel)]="form.menuName" />
 
-                <small class="field-help"> Display name in application menu. </small>
+                <small class="field-help"> {{ 'menuSetup.menuNameHelp' | transloco }} </small>
 
-                <small *ngIf="submitted && !form.menuName.trim()" class="p-error"> Menu Name is required. </small>
+                <small *ngIf="submitted && !form.menuName.trim()" class="p-error"> {{ 'menuSetup.menuNameRequired' | transloco }} </small>
             </div>
 
             <div class="field-block">
-                <label for="parentMenuId"> Parent Menu </label>
+                <label for="parentMenuId"> {{ 'menuSetup.parentMenu' | transloco }} </label>
 
                 <p-select
                     inputId="parentMenuId"
                     [(ngModel)]="form.parentMenuId"
                     [options]="parentMenus"
-                    optionLabel="menuName"
+                    optionLabel="displayName"
                     optionValue="menuId"
-                    placeholder="Root Menu"
+                    [placeholder]="'menuSetup.rootMenu' | transloco"
                     [showClear]="true"
                     [filter]="true"
-                    filterBy="menuName,menuNo"
+                    filterBy="displayName,menuNo"
                     [loading]="parentLoading"
                     appendTo="body"
                     styleClass="w-full"
                 >
                     <ng-template pTemplate="item" let-parent>
                         <div class="parent-option">
-                            <span> {{ parent.menuName }} </span>
-
-                            <small> {{ parent.menuNo }} </small>
+                            <span>{{ parent.displayName }}</span>
+                            <small>{{ parent.menuNo }}</small>
                         </div>
                     </ng-template>
                 </p-select>
 
-                <small class="field-help"> Leave empty for a root menu. </small>
+                <small class="field-help"> {{ 'menuSetup.parentMenuHelp' | transloco }} </small>
             </div>
 
             <div class="field-block">
-                <label for="menuTypeId"> Menu Type ID </label>
+                <label for="menuTypeId"> {{ 'menuSetup.menuTypeId' | transloco }} </label>
 
-                <p-inputNumber inputId="menuTypeId" [(ngModel)]="form.menuTypeId" [min]="1" [useGrouping]="false" styleClass="w-full" inputStyleClass="w-full"> </p-inputNumber>
+                <p-inputNumber inputId="menuTypeId" [(ngModel)]="form.menuTypeId" [min]="1" [useGrouping]="false" styleClass="w-full" inputStyleClass="w-full"></p-inputNumber>
 
-                <small class="field-help"> Menu type identifier. </small>
+                <small class="field-help"> {{ 'menuSetup.menuTypeHelp' | transloco }} </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- MENU TRANSLATIONS -->
+    <!-- ===================================================== -->
+
+    <div class="dialog-section">
+        <div class="section-title">
+            <i class="pi pi-language"></i>
+            {{ 'menuSetup.menuTranslations' | transloco }}
+        </div>
+
+        <div class="form-grid two-columns">
+            <div class="field-block">
+                <label for="menuNameVi"> {{ 'menuSetup.menuNameVi' | transloco }} </label>
+
+                <input id="menuNameVi" pInputText class="w-full" maxlength="255" placeholder="Danh mục tài khoản" [(ngModel)]="form.menuNameVi" />
+
+                <small class="field-help"> {{ 'menuSetup.menuNameViHelp' | transloco }} </small>
+            </div>
+
+            <div class="field-block">
+                <label for="menuNameEn"> {{ 'menuSetup.menuNameEn' | transloco }} </label>
+
+                <input id="menuNameEn" pInputText class="w-full" maxlength="255" placeholder="Financial Account" [(ngModel)]="form.menuNameEn" />
+
+                <small class="field-help"> {{ 'menuSetup.menuNameEnHelp' | transloco }} </small>
+            </div>
+
+            <div class="field-block">
+                <label for="menuNameCn"> {{ 'menuSetup.menuNameCn' | transloco }} </label>
+
+                <input id="menuNameCn" pInputText class="w-full" maxlength="255" placeholder="财务账户" [(ngModel)]="form.menuNameCn" />
+
+                <small class="field-help"> {{ 'menuSetup.menuNameCnHelp' | transloco }} </small>
             </div>
         </div>
     </div>
@@ -248,48 +304,47 @@
     <div class="dialog-section">
         <div class="section-title">
             <i class="pi pi-link"></i>
-            Navigation & Icon
+            {{ 'menuSetup.navigationIcon' | transloco }}
         </div>
 
         <div class="form-grid two-columns">
             <div class="field-block">
-                <label for="routerLink"> Router Link </label>
+                <label for="routerLink"> {{ 'menuSetup.routerLink' | transloco }} </label>
 
                 <input id="routerLink" pInputText class="w-full" placeholder="/financialAccount" [(ngModel)]="form.routerLink" />
 
-                <small class="field-help"> Angular route. May be empty for a container menu. </small>
+                <small class="field-help"> {{ 'menuSetup.routerLinkHelp' | transloco }} </small>
             </div>
 
             <div class="field-block">
-                <label for="menuUrl"> Menu URL </label>
+                <label for="menuUrl"> {{ 'menuSetup.menuUrl' | transloco }} </label>
 
-                <input id="menuUrl" pInputText class="w-full" placeholder="Optional URL" [(ngModel)]="form.menuUrl" />
+                <input id="menuUrl" pInputText class="w-full" [placeholder]="'menuSetup.optionalUrl' | transloco" [(ngModel)]="form.menuUrl" />
 
-                <small class="field-help"> Optional URL for external navigation. </small>
+                <small class="field-help"> {{ 'menuSetup.menuUrlHelp' | transloco }} </small>
             </div>
 
             <div class="field-block">
-                <label for="icon"> Icon </label>
+                <label for="icon"> {{ 'menuSetup.icon' | transloco }} </label>
 
                 <div class="icon-input-row">
                     <input id="icon" pInputText class="w-full" placeholder="pi pi-wallet" [(ngModel)]="form.icon" />
 
                     <div class="icon-preview">
-                        <i *ngIf="form.icon" [class]="form.icon"> </i>
-
-                        <i *ngIf="!form.icon" class="pi pi-image"> </i>
+                        <i *ngIf="form.icon" [class]="form.icon"></i>
+                        <i *ngIf="!form.icon" class="pi pi-image"></i>
                     </div>
                 </div>
 
-                <small class="field-help"> PrimeNG icon class. </small>
+                <small class="field-help"> {{ 'menuSetup.iconHelp' | transloco }} </small>
             </div>
 
             <div class="field-block">
-                <label for="target"> Target </label>
+                <label for="target"> {{ 'menuSetup.target' | transloco }} </label>
 
                 <input id="target" pInputText class="w-full" placeholder="_blank" [(ngModel)]="form.target" />
 
-                <small class="field-help"> Optional navigation target. </small>
+                <small class="field-help"> {{ 'menuSetup.targetHelp' | transloco }} </small>
             </div>
         </div>
     </div>
@@ -301,68 +356,64 @@
     <div class="dialog-section">
         <div class="section-title">
             <i class="pi pi-cog"></i>
-            Settings
+            {{ 'menuSetup.settings' | transloco }}
         </div>
 
         <div class="form-grid two-columns">
             <div class="field-block">
-                <label for="seqNo"> Sequence </label>
+                <label for="seqNo"> {{ 'menuSetup.sequence' | transloco }} </label>
 
-                <p-inputNumber inputId="seqNo" [(ngModel)]="form.seqNo" [min]="1" [useGrouping]="false" styleClass="w-full" inputStyleClass="w-full"> </p-inputNumber>
+                <p-inputNumber inputId="seqNo" [(ngModel)]="form.seqNo" [min]="1" [useGrouping]="false" styleClass="w-full" inputStyleClass="w-full"></p-inputNumber>
 
-                <small class="field-help"> Display order under the parent menu. </small>
+                <small class="field-help"> {{ 'menuSetup.sequenceHelp' | transloco }} </small>
             </div>
 
             <div class="field-block">
-                <label for="permissionCode"> Permission Code </label>
+                <label for="permissionCode"> {{ 'menuSetup.permissionCode' | transloco }} </label>
 
-                <input id="permissionCode" pInputText class="w-full" placeholder="Optional permission code" [(ngModel)]="form.permissionCode" />
+                <input id="permissionCode" pInputText class="w-full" [placeholder]="'menuSetup.permissionCodePlaceholder' | transloco" [(ngModel)]="form.permissionCode" />
 
-                <small class="field-help"> Optional permission identifier. </small>
+                <small class="field-help"> {{ 'menuSetup.permissionCodeHelp' | transloco }} </small>
             </div>
         </div>
 
         <div class="status-area">
-            <div class="settings-label">Menu Status</div>
+            <div class="settings-label">{{ 'menuSetup.menuStatus' | transloco }}</div>
 
             <div class="status-checkbox-grid">
                 <div class="checkbox-item">
-                    <p-checkbox [(ngModel)]="form.isVisible" [binary]="true" inputId="isVisible"> </p-checkbox>
+                    <p-checkbox [(ngModel)]="form.isVisible" [binary]="true" inputId="isVisible"></p-checkbox>
 
                     <div>
-                        <label for="isVisible"> Visible </label>
-
-                        <small> Show this menu. </small>
+                        <label for="isVisible"> {{ 'menuSetup.visible' | transloco }} </label>
+                        <small> {{ 'menuSetup.visibleHelp' | transloco }} </small>
                     </div>
                 </div>
 
                 <div class="checkbox-item">
-                    <p-checkbox [(ngModel)]="form.isInactive" [binary]="true" inputId="isInactive"> </p-checkbox>
+                    <p-checkbox [(ngModel)]="form.isInactive" [binary]="true" inputId="isInactive"></p-checkbox>
 
                     <div>
-                        <label for="isInactive"> Inactive </label>
-
-                        <small> Disable this menu. </small>
+                        <label for="isInactive"> {{ 'common.inactive' | transloco }} </label>
+                        <small> {{ 'menuSetup.inactiveHelp' | transloco }} </small>
                     </div>
                 </div>
 
                 <div class="checkbox-item">
-                    <p-checkbox [(ngModel)]="form.isSecurity" [binary]="true" inputId="isSecurity"> </p-checkbox>
+                    <p-checkbox [(ngModel)]="form.isSecurity" [binary]="true" inputId="isSecurity"></p-checkbox>
 
                     <div>
-                        <label for="isSecurity"> Security </label>
-
-                        <small> Apply permission control. </small>
+                        <label for="isSecurity"> {{ 'menuSetup.security' | transloco }} </label>
+                        <small> {{ 'menuSetup.securityHelp' | transloco }} </small>
                     </div>
                 </div>
 
                 <div class="checkbox-item">
-                    <p-checkbox [(ngModel)]="form.isExternal" [binary]="true" inputId="isExternal"> </p-checkbox>
+                    <p-checkbox [(ngModel)]="form.isExternal" [binary]="true" inputId="isExternal"></p-checkbox>
 
                     <div>
-                        <label for="isExternal"> External </label>
-
-                        <small> Open as external navigation. </small>
+                        <label for="isExternal"> {{ 'menuSetup.external' | transloco }} </label>
+                        <small> {{ 'menuSetup.externalHelp' | transloco }} </small>
                     </div>
                 </div>
             </div>
@@ -376,19 +427,19 @@
     <div class="dialog-section last-section">
         <div class="section-title">
             <i class="pi pi-book"></i>
-            Note
+            {{ 'menuSetup.note' | transloco }}
         </div>
 
-        <textarea id="note" pInputText class="note-input" rows="3" maxlength="500" placeholder="Optional description..." [(ngModel)]="form.note"> </textarea>
+        <textarea id="note" pInputText class="note-input" rows="3" maxlength="500" [placeholder]="'menuSetup.notePlaceholder' | transloco" [(ngModel)]="form.note"></textarea>
 
         <div class="note-count">{{ form.note.length }}/500</div>
     </div>
 
     <ng-template pTemplate="footer">
         <div class="dialog-footer">
-            <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="dialogVisible = false"> </p-button>
+            <p-button [label]="'common.cancel' | transloco" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="dialogVisible = false"></p-button>
 
-            <p-button label="Save" icon="pi pi-save" (onClick)="save()"> </p-button>
+            <p-button [label]="'common.save' | transloco" icon="pi pi-save" (onClick)="save()"></p-button>
         </div>
     </ng-template>
 </p-dialog>

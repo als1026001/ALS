@@ -154,6 +154,7 @@
 
 <p-dialog
     [(visible)]="dialogVisible"
+    (onHide)="hideDialog()"
     [modal]="true"
     [draggable]="false"
     [resizable]="false"

@@ -2,7 +2,6 @@
 <p-confirmDialog></p-confirmDialog>
 
 <div class="auto-generate-number-page">
-
     <!-- ===================================================== -->
     <!-- Page Header -->
     <!-- ===================================================== -->
@@ -11,25 +10,13 @@
         <div>
             <h2 class="page-title">Auto Generate Number</h2>
 
-            <div class="page-subtitle">
-                Manage automatic numbering rules for ERP functions.
-            </div>
+            <div class="page-subtitle">Manage automatic numbering rules for ERP functions.</div>
         </div>
 
         <div class="page-actions">
-            <p-button
-                label="New Number"
-                icon="pi pi-plus"
-                (onClick)="openNew()">
-            </p-button>
+            <p-button label="New Number" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
 
-            <p-button
-                label="Refresh"
-                icon="pi pi-refresh"
-                severity="secondary"
-                [outlined]="true"
-                (onClick)="refresh()">
-            </p-button>
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
         </div>
     </div>
 
@@ -38,49 +25,23 @@
     <!-- ===================================================== -->
 
     <div class="toolbar-row">
-
         <div class="search-area">
-
             <div class="search-box">
-
                 <i class="pi pi-search"></i>
 
-                <input
-                    pInputText
-                    type="text"
-                    [(ngModel)]="searchText"
-                    placeholder="Search function code, name, prefix, suffix or note..."
-                    (keyup.enter)="search()"
-                />
+                <input pInputText type="text" [(ngModel)]="searchText" placeholder="Search function code, name, prefix, suffix or note..." (keyup.enter)="search()" />
 
                 @if (searchText) {
-                    <button
-                        type="button"
-                        class="clear-search"
-                        (click)="clearSearch()"
-                        pTooltip="Clear">
-
-                        <i class="pi pi-times"></i>
-
-                    </button>
+                <button type="button" class="clear-search" (click)="clearSearch()" pTooltip="Clear">
+                    <i class="pi pi-times"></i>
+                </button>
                 }
-
             </div>
 
-            <p-button
-                label="Search"
-                icon="pi pi-search"
-                [outlined]="true"
-                (onClick)="search()">
-            </p-button>
-
+            <p-button label="Search" icon="pi pi-search" [outlined]="true" (onClick)="search()"> </p-button>
         </div>
 
-        <div class="result-summary">
-            {{ totalRecords }}
-            result{{ totalRecords === 1 ? '' : 's' }}
-        </div>
-
+        <div class="result-summary">{{ totalRecords }} result{{ totalRecords === 1 ? '' : 's' }}</div>
     </div>
 
     <!-- ===================================================== -->
@@ -88,7 +49,6 @@
     <!-- ===================================================== -->
 
     <div class="table-card">
-
         <p-table
             [value]="items"
             [lazy]="true"
@@ -104,225 +64,112 @@
             [sortOrder]="sortDirection === 'asc' ? 1 : -1"
             [tableStyle]="{ 'min-width': '90rem' }"
         >
-
             <!-- Header -->
 
             <ng-template pTemplate="header">
-
                 <tr>
-
-                    <th
-                        pSortableColumn="refFunctionCode"
-                        style="width: 10rem">
-
+                    <th pSortableColumn="refFunctionCode" style="width: 10rem">
                         Function Code
 
-                        <p-sortIcon field="refFunctionCode">
-                        </p-sortIcon>
-
+                        <p-sortIcon field="refFunctionCode"> </p-sortIcon>
                     </th>
 
-                    <th
-                        pSortableColumn="refFunctionName"
-                        style="width: 18rem">
-
+                    <th pSortableColumn="refFunctionName" style="width: 18rem">
                         Function Name
 
-                        <p-sortIcon field="refFunctionName">
-                        </p-sortIcon>
-
+                        <p-sortIcon field="refFunctionName"> </p-sortIcon>
                     </th>
 
-                    <th
-                        pSortableColumn="prefix"
-                        style="width: 9rem">
-
+                    <th pSortableColumn="prefix" style="width: 9rem">
                         Prefix
 
-                        <p-sortIcon field="prefix">
-                        </p-sortIcon>
-
+                        <p-sortIcon field="prefix"> </p-sortIcon>
                     </th>
 
-                    <th
-                        pSortableColumn="suffix"
-                        style="width: 9rem">
-
+                    <th pSortableColumn="suffix" style="width: 9rem">
                         Suffix
 
-                        <p-sortIcon field="suffix">
-                        </p-sortIcon>
-
+                        <p-sortIcon field="suffix"> </p-sortIcon>
                     </th>
 
-                    <th
-                        pSortableColumn="minimumDigit"
-                        style="width: 9rem">
-
+                    <th pSortableColumn="minimumDigit" style="width: 9rem">
                         Min. Digit
 
-                        <p-sortIcon field="minimumDigit">
-                        </p-sortIcon>
-
+                        <p-sortIcon field="minimumDigit"> </p-sortIcon>
                     </th>
 
-                    <th
-                        pSortableColumn="currentNumber"
-                        style="width: 10rem">
-
+                    <th pSortableColumn="currentNumber" style="width: 10rem">
                         Current No.
 
-                        <p-sortIcon field="currentNumber">
-                        </p-sortIcon>
-
+                        <p-sortIcon field="currentNumber"> </p-sortIcon>
                     </th>
 
-                    <th
-                        pSortableColumn="isInactive"
-                        style="width: 9rem">
-
+                    <th pSortableColumn="isInactive" style="width: 9rem">
                         Status
 
-                        <p-sortIcon field="isInactive">
-                        </p-sortIcon>
-
+                        <p-sortIcon field="isInactive"> </p-sortIcon>
                     </th>
 
-                    <th style="width: 18rem">
-                        Note
-                    </th>
+                    <th style="width: 18rem">Note</th>
 
-                    <th style="width: 10rem; text-align: center">
-                        Action
-                    </th>
-
+                    <th style="width: 10rem; text-align: center">Action</th>
                 </tr>
-
             </ng-template>
 
             <!-- Body -->
 
-            <ng-template
-                pTemplate="body"
-                let-item>
-
+            <ng-template pTemplate="body" let-item>
                 <tr>
-
                     <td>
-                        <span class="function-code">
-                            {{ item.refFunctionCode }}
-                        </span>
+                        <span class="function-code"> {{ item.refFunctionCode }} </span>
                     </td>
 
                     <td>
-                        <span class="function-name">
-                            {{ item.refFunctionName || '-' }}
-                        </span>
+                        <span class="function-name"> {{ item.refFunctionName || '-' }} </span>
                     </td>
 
+                    <td>{{ item.prefix || '-' }}</td>
+
+                    <td>{{ item.suffix || '-' }}</td>
+
+                    <td>{{ item.minimumDigit ?? '-' }}</td>
+
+                    <td>{{ item.currentNumber ?? '-' }}</td>
+
                     <td>
-                        {{ item.prefix || '-' }}
+                        <span class="status-badge" [class.status-active]="!item.isInactive" [class.status-inactive]="item.isInactive"> {{ item.isInactive ? 'Inactive' : 'Active' }} </span>
                     </td>
 
-                    <td>
-                        {{ item.suffix || '-' }}
-                    </td>
+                    <td>{{ item.note || '-' }}</td>
 
                     <td>
-                        {{ item.minimumDigit ?? '-' }}
-                    </td>
-
-                    <td>
-                        {{ item.currentNumber ?? '-' }}
-                    </td>
-
-                    <td>
-
-                        <span
-                            class="status-badge"
-                            [class.status-active]="!item.isInactive"
-                            [class.status-inactive]="item.isInactive">
-
-                            {{
-                                item.isInactive
-                                    ? 'Inactive'
-                                    : 'Active'
-                            }}
-
-                        </span>
-
-                    </td>
-
-                    <td>
-                        {{ item.note || '-' }}
-                    </td>
-
-                    <td>
-
                         <div class="row-actions">
+                            <p-button icon="pi pi-pencil" label="Edit" [rounded]="true" [text]="true" size="small" (onClick)="edit(item)"> </p-button>
 
-                            <p-button
-                                icon="pi pi-pencil"
-                                label="Edit"
-                                [rounded]="true"
-                                [text]="true"
-                                size="small"
-                                (onClick)="edit(item)">
-                            </p-button>
-
-                            <p-button
-                                icon="pi pi-trash"
-                                label="Delete"
-                                severity="danger"
-                                [rounded]="true"
-                                [text]="true"
-                                size="small"
-                                (onClick)="confirmDelete(item)">
-                            </p-button>
-
+                            <p-button icon="pi pi-trash" label="Delete" severity="danger" [rounded]="true" [text]="true" size="small" (onClick)="confirmDelete(item)"> </p-button>
                         </div>
-
                     </td>
-
                 </tr>
-
             </ng-template>
 
             <!-- Empty -->
 
             <ng-template pTemplate="emptymessage">
-
                 <tr>
-
                     <td colspan="9">
-
                         <div class="empty-state">
-
                             <i class="pi pi-hashtag"></i>
 
-                            <div class="empty-title">
-                                No auto generate numbers found
-                            </div>
+                            <div class="empty-title">No auto generate numbers found</div>
 
-                            <div class="empty-description">
-                                Create an automatic numbering rule
-                                or change your search criteria.
-                            </div>
-
+                            <div class="empty-description">Create an automatic numbering rule or change your search criteria.</div>
                         </div>
-
                     </td>
-
                 </tr>
-
             </ng-template>
-
         </p-table>
-
     </div>
-
 </div>
-
 
 <!-- ========================================================= -->
 <!-- Dialog -->
@@ -330,6 +177,7 @@
 
 <p-dialog
     [(visible)]="dialogVisible"
+    (onHide)="hideDialog()"
     [modal]="true"
     [draggable]="false"
     [resizable]="false"
@@ -344,396 +192,197 @@
     "
     (onHide)="hideDialog()"
 >
-
     <div class="dialog-content">
-
         <!-- ================================================= -->
         <!-- Basic Information -->
         <!-- ================================================= -->
 
         <div class="dialog-section">
-
             <div class="section-title">
                 <i class="pi pi-info-circle"></i>
                 Basic Information
             </div>
 
             <div class="form-grid">
-
                 <div class="field-block">
-
                     <label for="refFunctionCode">
-
                         Function Code
 
                         <span class="required">*</span>
-
                     </label>
 
-                    <p-inputNumber
-                        inputId="refFunctionCode"
-                        [(ngModel)]="form.refFunctionCode"
-                        [useGrouping]="false"
-                        [min]="1"
-                        [disabled]="editingRefFunctionCode != null"
-                        placeholder="e.g. 1001">
-                    </p-inputNumber>
+                    <p-inputNumber inputId="refFunctionCode" [(ngModel)]="form.refFunctionCode" [useGrouping]="false" [min]="1" [disabled]="editingRefFunctionCode != null" placeholder="e.g. 1001"> </p-inputNumber>
 
-                    @if (
-                        submitted &&
-                        (
-                            form.refFunctionCode == null ||
-                            form.refFunctionCode <= 0
-                        )
-                    ) {
+                    @if ( submitted && ( form.refFunctionCode == null || form.refFunctionCode <= 0 ) ) {
 
-                        <small class="field-error">
-                            Function Code is required.
-                        </small>
+                    <small class="field-error"> Function Code is required. </small>
 
                     }
 
-                    <small class="field-help">
-                        Unique ERP function reference code.
-                    </small>
-
+                    <small class="field-help"> Unique ERP function reference code. </small>
                 </div>
-
 
                 <div class="field-block">
+                    <label for="refFunctionName"> Function Name </label>
 
-                    <label for="refFunctionName">
-                        Function Name
-                    </label>
+                    <input id="refFunctionName" pInputText type="text" [(ngModel)]="form.refFunctionName" maxlength="250" autocomplete="off" placeholder="e.g. Sales Invoice" />
 
-                    <input
-                        id="refFunctionName"
-                        pInputText
-                        type="text"
-                        [(ngModel)]="form.refFunctionName"
-                        maxlength="250"
-                        autocomplete="off"
-                        placeholder="e.g. Sales Invoice"
-                    />
-
-                    <small class="field-help">
-                        Description of the ERP function using this numbering rule.
-                    </small>
-
+                    <small class="field-help"> Description of the ERP function using this numbering rule. </small>
                 </div>
-
             </div>
-
         </div>
-
 
         <!-- ================================================= -->
         <!-- Number Format -->
         <!-- ================================================= -->
 
         <div class="dialog-section">
-
             <div class="section-title">
                 <i class="pi pi-tag"></i>
                 Number Format
             </div>
 
             <div class="form-grid">
-
                 <div class="field-block">
+                    <label for="prefix"> Prefix </label>
 
-                    <label for="prefix">
-                        Prefix
-                    </label>
+                    <input id="prefix" pInputText type="text" [(ngModel)]="form.prefix" maxlength="50" autocomplete="off" placeholder="e.g. INV-" />
 
-                    <input
-                        id="prefix"
-                        pInputText
-                        type="text"
-                        [(ngModel)]="form.prefix"
-                        maxlength="50"
-                        autocomplete="off"
-                        placeholder="e.g. INV-"
-                    />
-
-                    <small class="field-help">
-                        Text placed before the generated number.
-                    </small>
-
+                    <small class="field-help"> Text placed before the generated number. </small>
                 </div>
 
-
                 <div class="field-block">
+                    <label for="suffix"> Suffix </label>
 
-                    <label for="suffix">
-                        Suffix
-                    </label>
+                    <input id="suffix" pInputText type="text" [(ngModel)]="form.suffix" maxlength="50" autocomplete="off" placeholder="e.g. -2026" />
 
-                    <input
-                        id="suffix"
-                        pInputText
-                        type="text"
-                        [(ngModel)]="form.suffix"
-                        maxlength="50"
-                        autocomplete="off"
-                        placeholder="e.g. -2026"
-                    />
-
-                    <small class="field-help">
-                        Optional text placed after the generated number.
-                    </small>
-
+                    <small class="field-help"> Optional text placed after the generated number. </small>
                 </div>
-
             </div>
-
         </div>
-
 
         <!-- ================================================= -->
         <!-- Number Settings -->
         <!-- ================================================= -->
 
         <div class="dialog-section">
-
             <div class="section-title">
                 <i class="pi pi-sort-numeric-up"></i>
                 Number Settings
             </div>
 
             <div class="number-grid">
-
                 <div class="field-block">
+                    <label for="minimumDigit"> Minimum Digit </label>
 
-                    <label for="minimumDigit">
-                        Minimum Digit
-                    </label>
+                    <p-inputNumber inputId="minimumDigit" [(ngModel)]="form.minimumDigit" [useGrouping]="false" [min]="0"> </p-inputNumber>
 
-                    <p-inputNumber
-                        inputId="minimumDigit"
-                        [(ngModel)]="form.minimumDigit"
-                        [useGrouping]="false"
-                        [min]="0">
-                    </p-inputNumber>
-
-                    <small class="field-help">
-                        Minimum number of digits.
-                    </small>
-
+                    <small class="field-help"> Minimum number of digits. </small>
                 </div>
 
-
                 <div class="field-block">
+                    <label for="initialNumber"> Initial Number </label>
 
-                    <label for="initialNumber">
-                        Initial Number
-                    </label>
+                    <p-inputNumber inputId="initialNumber" [(ngModel)]="form.initialNumber" [useGrouping]="false" [min]="0"> </p-inputNumber>
 
-                    <p-inputNumber
-                        inputId="initialNumber"
-                        [(ngModel)]="form.initialNumber"
-                        [useGrouping]="false"
-                        [min]="0">
-                    </p-inputNumber>
-
-                    <small class="field-help">
-                        Starting sequence number.
-                    </small>
-
+                    <small class="field-help"> Starting sequence number. </small>
                 </div>
 
-
                 <div class="field-block">
+                    <label for="currentNumber"> Current Number </label>
 
-                    <label for="currentNumber">
-                        Current Number
-                    </label>
+                    <p-inputNumber inputId="currentNumber" [(ngModel)]="form.currentNumber" [useGrouping]="false" [min]="0"> </p-inputNumber>
 
-                    <p-inputNumber
-                        inputId="currentNumber"
-                        [(ngModel)]="form.currentNumber"
-                        [useGrouping]="false"
-                        [min]="0">
-                    </p-inputNumber>
-
-                    <small class="field-help">
-                        Current sequence value.
-                    </small>
-
+                    <small class="field-help"> Current sequence value. </small>
                 </div>
-
             </div>
-
         </div>
-
 
         <!-- ================================================= -->
         <!-- Additional Information -->
         <!-- ================================================= -->
 
         <div class="dialog-section">
-
             <div class="section-title">
                 <i class="pi pi-file-edit"></i>
                 Additional Information
             </div>
 
             <div class="field-block">
+                <label for="note"> Note </label>
 
-                <label for="note">
-                    Note
-                </label>
-
-                <textarea
-                    id="note"
-                    class="note-input"
-                    [(ngModel)]="form.note"
-                    maxlength="250"
-                    rows="3"
-                    placeholder="Optional note...">
-                </textarea>
-
+                <textarea id="note" class="note-input" [(ngModel)]="form.note" maxlength="250" rows="3" placeholder="Optional note..."> </textarea>
             </div>
-
         </div>
-
 
         <!-- ================================================= -->
         <!-- Settings -->
         <!-- ================================================= -->
 
         <div class="dialog-section">
-
             <div class="section-title">
                 <i class="pi pi-cog"></i>
                 Settings
             </div>
 
             <div class="settings-list">
-
                 <!-- Subsidiary -->
 
                 <div class="settings-row">
-
                     <div class="setting-text">
+                        <div class="setting-label">Use Subsidiary</div>
 
-                        <div class="setting-label">
-                            Use Subsidiary
-                        </div>
-
-                        <div class="setting-help">
-                            Generate independent numbering sequences
-                            for each subsidiary.
-                        </div>
-
+                        <div class="setting-help">Generate independent numbering sequences for each subsidiary.</div>
                     </div>
 
-                    <p-checkbox
-                        inputId="isUseSubsidiary"
-                        [(ngModel)]="form.isUseSubsidiary"
-                        [binary]="true">
-                    </p-checkbox>
-
+                    <p-checkbox inputId="isUseSubsidiary" [(ngModel)]="form.isUseSubsidiary" [binary]="true"> </p-checkbox>
                 </div>
-
 
                 <!-- Location -->
 
                 <div class="settings-row">
-
                     <div class="setting-text">
+                        <div class="setting-label">Use Location</div>
 
-                        <div class="setting-label">
-                            Use Location
-                        </div>
-
-                        <div class="setting-help">
-                            Generate independent numbering sequences
-                            for each location.
-                        </div>
-
+                        <div class="setting-help">Generate independent numbering sequences for each location.</div>
                     </div>
 
-                    <p-checkbox
-                        inputId="isUseLocation"
-                        [(ngModel)]="form.isUseLocation"
-                        [binary]="true">
-                    </p-checkbox>
-
+                    <p-checkbox inputId="isUseLocation" [(ngModel)]="form.isUseLocation" [binary]="true"> </p-checkbox>
                 </div>
-
 
                 <!-- Override -->
 
                 <div class="settings-row">
-
                     <div class="setting-text">
+                        <div class="setting-label">Allow Override</div>
 
-                        <div class="setting-label">
-                            Allow Override
-                        </div>
-
-                        <div class="setting-help">
-                            Allow authorized users to override
-                            the automatically generated number.
-                        </div>
-
+                        <div class="setting-help">Allow authorized users to override the automatically generated number.</div>
                     </div>
 
-                    <p-checkbox
-                        inputId="isAllowOverride"
-                        [(ngModel)]="form.isAllowOverride"
-                        [binary]="true">
-                    </p-checkbox>
-
+                    <p-checkbox inputId="isAllowOverride" [(ngModel)]="form.isAllowOverride" [binary]="true"> </p-checkbox>
                 </div>
-
 
                 <!-- Inactive -->
 
                 <div class="settings-row">
-
                     <div class="setting-text">
+                        <div class="setting-label">Inactive</div>
 
-                        <div class="setting-label">
-                            Inactive
-                        </div>
-
-                        <div class="setting-help">
-                            Disable this numbering rule without deleting it.
-                        </div>
-
+                        <div class="setting-help">Disable this numbering rule without deleting it.</div>
                     </div>
 
-                    <p-checkbox
-                        inputId="isInactive"
-                        [(ngModel)]="form.isInactive"
-                        [binary]="true">
-                    </p-checkbox>
-
+                    <p-checkbox inputId="isInactive" [(ngModel)]="form.isInactive" [binary]="true"> </p-checkbox>
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 
     <!-- ===================================================== -->
     <!-- Footer -->
     <!-- ===================================================== -->
 
     <ng-template pTemplate="footer">
-
-        <p-button
-            label="Cancel"
-            icon="pi pi-times"
-            severity="secondary"
-            [outlined]="true"
-            [disabled]="saving"
-            (onClick)="hideDialog()">
-        </p-button>
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="hideDialog()"> </p-button>
 
         <p-button
             [label]="
@@ -743,9 +392,8 @@
             "
             icon="pi pi-check"
             [loading]="saving"
-            (onClick)="save()">
+            (onClick)="save()"
+        >
         </p-button>
-
     </ng-template>
-
 </p-dialog>

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -31,8 +32,10 @@ import { MenuFieldService } from '../../../core/services/menu-field.service';
     templateUrl: './list-view-column.html',
     styleUrl: './list-view-column.css'
 })
-export class ListViewColumnComponent {
+export class ListViewColumnComponent implements OnInit {
     private readonly service = inject(ListViewColumnService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
     private readonly listViewService = inject(ListViewService);
     private readonly menuFieldService = inject(MenuFieldService);
 
@@ -41,6 +44,18 @@ export class ListViewColumnComponent {
 
     constructor() {
         this.loadListViews();
+    }
+
+    ngOnInit(): void {
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openListViewColumnFromCenterSearch(id);
+        });
     }
 
     items: ListViewColumn[] = [];
@@ -143,6 +158,24 @@ export class ListViewColumnComponent {
         this.dialogVisible = true;
     }
 
+    private openListViewColumnFromCenterSearch(viewColumnId: number): void {
+        this.service.getById(viewColumnId).subscribe({
+            next: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                this.edit(item);
+            },
+
+            error: (error) => {
+                console.error('Unable to load List View Column from Center Search.', error);
+
+                this.showApiError(error, 'Unable to load List View Column.');
+            }
+        });
+    }
+
     edit(item: ListViewColumn): void {
         this.editingViewColumnId = item.viewColumnId;
         this.submitted = false;
@@ -190,6 +223,8 @@ export class ListViewColumnComponent {
 
         this.dialogVisible = false;
         this.submitted = false;
+
+        this.clearCenterSearchId();
     }
 
     onViewChange(viewId: number | null): void {
@@ -455,6 +490,19 @@ export class ListViewColumnComponent {
             severity: 'error',
             summary: 'Error',
             detail
+        });
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
         });
     }
 }

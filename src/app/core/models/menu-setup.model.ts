@@ -1,3 +1,8 @@
+export interface MenuTranslation {
+    langCode: 'vi' | 'en' | 'cn';
+    menuName: string;
+}
+
 export interface MenuSetup {
     menuId: number;
     publicId: string;
@@ -5,9 +10,16 @@ export interface MenuSetup {
     menuNo: string;
     menuName: string;
 
+    menuNameVi?: string | null;
+    menuNameEn?: string | null;
+    menuNameCn?: string | null;
+
     parentMenuId?: number | null;
     parentMenuNo?: string | null;
     parentMenuName?: string | null;
+    parentMenuNameVi?: string | null;
+    parentMenuNameEn?: string | null;
+    parentMenuNameCn?: string | null;
 
     seqNo: number;
     menuTypeId: number;
@@ -35,7 +47,11 @@ export interface MenuParentLookup {
     menuId: number;
     menuNo: string;
     menuName: string;
+    menuNameVi?: string | null;
+    menuNameEn?: string | null;
+    menuNameCn?: string | null;
     parentMenuId?: number | null;
+    displayName?: string;
 }
 
 export interface MenuSetupQuery {
@@ -49,6 +65,8 @@ export interface MenuSetupQuery {
 export interface CreateMenuSetupRequest {
     menuNo: string;
     menuName: string;
+
+    translations?: MenuTranslation[];
 
     parentMenuId?: number | null;
 
@@ -72,6 +90,8 @@ export interface CreateMenuSetupRequest {
 export interface UpdateMenuSetupRequest {
     menuNo: string;
     menuName: string;
+
+    translations?: MenuTranslation[];
 
     parentMenuId?: number | null;
 

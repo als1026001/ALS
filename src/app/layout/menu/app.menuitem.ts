@@ -9,17 +9,21 @@ import { AppMenuItem } from './menu.types';
 import { MenuNavigationService } from './services/menu-navigation.service';
 import { MenuStateService } from './services/menu-state.service';
 
+import { TranslocoPipe } from '@jsverse/transloco';
+import { SidebarTranslatePipe } from './sidebar-translate.pipe';
+import { SidebarMenuService } from './services/sidebar-menu.service';
+
 @Component({
     selector: '[app-menuitem]',
-    imports: [CommonModule, RouterModule, RippleModule],
+    imports: [CommonModule, RouterModule, RippleModule, SidebarTranslatePipe],
     template: `
         @if (root() && isVisible()) {
-            <div class="layout-menuitem-root-text">{{ item().label }}</div>
+            <div class="layout-menuitem-root-text">{{ item().skipTranslation ? item().label : (item().label | sidebarTranslate) }}</div>
         }
         @if ((!hasRouterLink() || hasChildren()) && isVisible()) {
             <a [attr.href]="item().url" (click)="itemClick($event)" [ngClass]="item()['class']" [attr.target]="item().target" tabindex="0" pRipple>
                 <i [ngClass]="item().icon" class="layout-menuitem-icon"></i>
-                <span class="layout-menuitem-text">{{ item().label }}</span>
+                <span class="layout-menuitem-text">{{ item().skipTranslation ? item().label : (item().label | sidebarTranslate) }}</span>
                 @if (hasChildren()) {
                     <i class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
                 }
@@ -44,7 +48,7 @@ import { MenuStateService } from './services/menu-state.service';
                 pRipple
             >
                 <i [ngClass]="item().icon" class="layout-menuitem-icon"></i>
-                <span class="layout-menuitem-text">{{ item().label }}</span>
+                <span class="layout-menuitem-text">{{ item().skipTranslation ? item().label : (item().label | sidebarTranslate) }}</span>
                 @if (hasChildren()) {
                     <i class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
                 }
@@ -98,6 +102,8 @@ import { MenuStateService } from './services/menu-state.service';
 })
 export class AppMenuitem {
     private readonly navigationService = inject(MenuNavigationService);
+
+    private readonly sidebarMenuService = inject(SidebarMenuService);
 
     private readonly stateService = inject(MenuStateService);
 
@@ -202,5 +208,9 @@ export class AppMenuitem {
         }
 
         this.stateService.openMenu(this.fullPath());
+    }
+
+    getMenuLabel(label: string | undefined): string {
+        return label ?? '';
     }
 }

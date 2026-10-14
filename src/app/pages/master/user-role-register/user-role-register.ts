@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -36,6 +37,9 @@ import { UserRoleService } from '../../../core/services/user-role.service';
 })
 export class UserRoleRegisterComponent implements OnInit {
     private readonly service = inject(UserRoleRegisterService);
+
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
     private readonly userService = inject(UserService);
 
@@ -79,6 +83,16 @@ export class UserRoleRegisterComponent implements OnInit {
     ngOnInit(): void {
         this.loadUserLookup();
         this.loadRoleLookup();
+
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openUserRoleRegisterFromCenterSearch(id);
+        });
     }
 
     loadData(event?: TableLazyLoadEvent): void {
@@ -165,6 +179,23 @@ export class UserRoleRegisterComponent implements OnInit {
         this.dialogVisible = true;
     }
 
+    private openUserRoleRegisterFromCenterSearch(userRoleId: number): void {
+        this.service.getById(userRoleId).subscribe({
+            next: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                this.edit(item);
+            },
+            error: (error) => {
+                console.error('Unable to load User Role Register from Center Search.', error);
+
+                this.showError(this.getErrorMessage(error, 'Unable to load User Role Register.'));
+            }
+        });
+    }
+
     edit(item: UserRoleRegister): void {
         this.submitted = false;
 
@@ -189,6 +220,8 @@ export class UserRoleRegisterComponent implements OnInit {
 
         this.dialogVisible = false;
         this.submitted = false;
+
+        this.clearCenterSearchId();
     }
 
     save(): void {
@@ -392,5 +425,18 @@ export class UserRoleRegisterComponent implements OnInit {
 
     private getErrorMessage(error: any, fallback: string): string {
         return error?.error?.message || error?.error?.detail || error?.message || fallback;
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+        });
     }
 }

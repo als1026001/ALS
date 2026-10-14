@@ -54,12 +54,12 @@
                     >
                         <i *ngIf="item.icon" [class]="item.icon"> </i>
 
-                        <span> {{ item.label }} </span>
+                        <span> {{ menuTranslationService.translateMenu(item) }} </span>
                     </a>
 
                     <a *ngIf="(!item.items || item.items.length === 0) && item.isExternal" class="top-menu-item" [href]="item.url" [target]="item.target || '_blank'" rel="noopener noreferrer" (click)="closeMenu()">
                         <i *ngIf="item.icon" [class]="item.icon"></i>
-                        <span>{{ item.label }}</span>
+                        <span>{{ menuTranslationService.translateMenu(item) }}</span>
                     </a>
 
                     <!-- ==========================================
@@ -69,7 +69,7 @@
                     <button *ngIf="item.items && item.items.length > 0" type="button" class="top-menu-item" [class.active]="openMenu === item" (click)="toggleMenu(item, $event)">
                         <i *ngIf="item.icon" [class]="item.icon"> </i>
 
-                        <span> {{ item.label }} </span>
+                        <span> {{ menuTranslationService.translateMenu(item) }} </span>
 
                         <i class="pi pi-chevron-down menu-arrow"> </i>
                     </button>
@@ -92,7 +92,7 @@
         <div class="center-search-input-wrapper">
             <i class="pi pi-search center-search-icon"></i>
 
-            <input type="text" class="center-search-input" placeholder="Search ERP..." autocomplete="off" [value]="searchText" (input)="onSearchInput($event)" (focus)="onSearchFocus()" (keydown)="onSearchKeyDown($event)" />
+            <input type="text" class="center-search-input" [placeholder]="'topbar.searchPlaceholder' | transloco" autocomplete="off" [value]="searchText" (input)="onSearchInput($event)" (focus)="onSearchFocus()" (keydown)="onSearchKeyDown($event)" />
 
             <i *ngIf="searchLoading" class="pi pi-spin pi-spinner center-search-loading"></i>
         </div>
@@ -117,11 +117,11 @@
 
             <!-- NO RESULTS -->
 
-            <div *ngIf="!searchLoading && searchResults.length === 0" class="center-search-empty">No results found</div>
+            <div *ngIf="!searchLoading && searchResults.length === 0" class="center-search-empty">{{ 'topbar.noResults' | transloco }}</div>
 
             <!-- LOADING -->
 
-            <div *ngIf="searchLoading" class="center-search-empty">Searching...</div>
+            <div *ngIf="searchLoading" class="center-search-empty">{{ 'topbar.searching' | transloco }}</div>
         </div>
     </div>
 
@@ -138,12 +138,12 @@
             <a *ngIf="!child.isExternal" class="top-menu-dropdown-item" [routerLink]="child.routerLink" (click)="closeMenu()">
                 <i *ngIf="child.icon" [class]="child.icon"> </i>
 
-                <span> {{ child.label }} </span>
+                <span> {{ menuTranslationService.translateMenu(child) }} </span>
             </a>
 
             <a *ngIf="child.isExternal" class="top-menu-dropdown-item" [href]="child.url" [target]="child.target || '_blank'" rel="noopener noreferrer" (click)="closeMenu()">
                 <i *ngIf="child.icon" [class]="child.icon"></i>
-                <span>{{ child.label }}</span>
+                <span>{{ menuTranslationService.translateMenu(child) }}</span>
             </a>
         </ng-container>
     </div>
@@ -153,6 +153,36 @@
          ====================================================== -->
 
     <div class="layout-topbar-actions">
+        <!-- LANGUAGE SETTINGS -->
+        <div class="erp-language-wrapper" (click)="$event.stopPropagation()">
+            <button type="button" class="layout-topbar-action erp-language-button" aria-label="Select language" title="Select language" (click)="languagePopover.toggle($event)">
+                <i class="pi pi-globe"></i>
+
+                <span class="erp-language-code"> {{ currentLanguageCode }} </span>
+
+                <i class="pi pi-chevron-down erp-language-chevron"></i>
+            </button>
+
+            <p-popover #languagePopover styleClass="erp-language-popover">
+                <div class="erp-language-panel">
+                    <div class="erp-language-title">
+                        <span>{{ 'common.language' | transloco }}</span>
+                        <i class="pi pi-language"></i>
+                    </div>
+
+                    <div class="erp-language-list">
+                        <button *ngFor="let language of languageOptions" type="button" class="erp-language-option" [class.active]="languageService.selectedLanguage() === language.code" (click)="selectLanguage(language.code); languagePopover.hide()">
+                            <span class="erp-language-flag"> {{ language.flag }} </span>
+
+                            <span>{{ language.name }}</span>
+
+                            <i *ngIf="languageService.selectedLanguage() === language.code" class="pi pi-check erp-language-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </p-popover>
+        </div>
+
         <!-- DARK MODE -->
 
         <div class="layout-config-menu">
@@ -229,7 +259,7 @@
 
                 <button type="button" class="layout-topbar-action" title="Logout" (click)="logout()">
                     <i class="pi pi-sign-out"></i>
-                    <span>Logout</span>
+                    <span>{{ 'topbar.logout' | transloco }}</span>
                 </button>
             </div>
         </div>

@@ -7,7 +7,7 @@ export const KHO_HANG_MENU: AppMenuItem =
     {
         label: 'Kho hàng',
         icon: 'pi pi-fw pi-box',
-        path: '/pages/kho-hang',
+        path: '/pages/nghiep-vu/kho-hang',
 
         items: [
             {

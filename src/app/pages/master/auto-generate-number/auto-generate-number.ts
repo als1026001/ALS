@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -25,8 +26,11 @@ import { AutoGenerateNumberService } from '../../../core/services/auto-generate-
     templateUrl: './auto-generate-number.html',
     styleUrl: './auto-generate-number.css'
 })
-export class AutoGenerateNumberComponent {
+export class AutoGenerateNumberComponent implements OnInit {
     private readonly service = inject(AutoGenerateNumberService);
+
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
     private readonly messageService = inject(MessageService);
 
@@ -53,6 +57,18 @@ export class AutoGenerateNumberComponent {
     sortDirection: 'asc' | 'desc' = 'asc';
 
     form = this.createEmptyForm();
+
+    ngOnInit(): void {
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openAutoGenerateNumberFromCenterSearch(id);
+        });
+    }
 
     loadData(event?: TableLazyLoadEvent): void {
         if (event) {
@@ -119,6 +135,23 @@ export class AutoGenerateNumberComponent {
         this.dialogVisible = true;
     }
 
+    private openAutoGenerateNumberFromCenterSearch(refFunctionCode: number): void {
+        this.service.getById(refFunctionCode).subscribe({
+            next: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                this.edit(item);
+            },
+            error: (error) => {
+                console.error('Unable to load Auto Generate Number from Center Search.', error);
+
+                this.showApiError(error, 'Unable to load Auto Generate Number.');
+            }
+        });
+    }
+
     edit(item: AutoGenerateNumber): void {
         this.editingRefFunctionCode = item.refFunctionCode;
 
@@ -149,6 +182,8 @@ export class AutoGenerateNumberComponent {
 
         this.dialogVisible = false;
         this.submitted = false;
+
+        this.clearCenterSearchId();
     }
 
     save(): void {
@@ -319,6 +354,19 @@ export class AutoGenerateNumberComponent {
             severity: 'error',
             summary: 'Error',
             detail
+        });
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
         });
     }
 }

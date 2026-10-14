@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -36,6 +37,9 @@ import { MenuSetupService } from '../../../core/services/menu-setup.service';
 })
 export class UserRolePermissionComponent implements OnInit {
     private readonly service = inject(UserRolePermissionService);
+
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
     private readonly userRoleService = inject(UserRoleService);
 
@@ -102,6 +106,16 @@ export class UserRolePermissionComponent implements OnInit {
     ngOnInit(): void {
         this.loadRoleLookup();
         this.loadMenuLookup();
+
+        this.route.queryParamMap.subscribe((params) => {
+            const id = Number(params.get('id'));
+
+            if (!Number.isInteger(id) || id <= 0) {
+                return;
+            }
+
+            this.openPermissionFromCenterSearch(id);
+        });
     }
 
     loadData(event?: TableLazyLoadEvent): void {
@@ -187,6 +201,23 @@ export class UserRolePermissionComponent implements OnInit {
         this.dialogVisible = true;
     }
 
+    private openPermissionFromCenterSearch(permissionId: number): void {
+        this.service.getById(permissionId).subscribe({
+            next: (item) => {
+                if (!item) {
+                    return;
+                }
+
+                this.edit(item);
+            },
+            error: (error) => {
+                console.error('Unable to load User Role Permission from Center Search.', error);
+
+                this.showError(this.getErrorMessage(error, 'Unable to load User Role Permission.'));
+            }
+        });
+    }
+
     edit(item: UserRolePermission): void {
         this.submitted = false;
 
@@ -214,6 +245,8 @@ export class UserRolePermissionComponent implements OnInit {
 
         this.dialogVisible = false;
         this.submitted = false;
+
+        this.clearCenterSearchId();
     }
 
     save(): void {
@@ -444,5 +477,18 @@ export class UserRolePermissionComponent implements OnInit {
 
     private getErrorMessage(error: any, fallback: string): string {
         return error?.error?.message || error?.error?.detail || error?.message || fallback;
+    }
+
+    private clearCenterSearchId(): void {
+        if (!this.route.snapshot.queryParamMap.has('id')) {
+            return;
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+        });
     }
 }

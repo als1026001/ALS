@@ -148,7 +148,16 @@
 <!-- Edit Dialog -->
 <!-- ========================================================= -->
 
-<p-dialog [(visible)]="dialogVisible" [modal]="true" [draggable]="false" [resizable]="false" [style]="{ width: '760px', maxWidth: '95vw' }" [header]="editingMenuGroupId == null ? 'New Menu Group' : 'Edit Menu Group'" (onHide)="hideDialog()">
+<p-dialog
+    [(visible)]="dialogVisible"
+    (onHide)="hideDialog()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '760px', maxWidth: '95vw' }"
+    [header]="editingMenuGroupId == null ? 'New Menu Group' : 'Edit Menu Group'"
+    (onHide)="hideDialog()"
+>
     <div class="dialog-content">
         <!-- Basic Information -->
 

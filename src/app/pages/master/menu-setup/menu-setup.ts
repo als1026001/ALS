@@ -13,17 +13,24 @@ import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 
-import { CreateMenuSetupRequest, MenuParentLookup, MenuSetup, UpdateMenuSetupRequest } from '../../../core/models/menu-setup.model';
-
 import { MenuSetupService } from '../../../core/services/menu-setup.service';
 
 import { ActivatedRoute, Router } from '@angular/router';
+
+import { CreateMenuSetupRequest, MenuParentLookup, MenuSetup, MenuTranslation, UpdateMenuSetupRequest } from '../../../core/models/menu-setup.model';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { LanguageService } from '../../../core/services/language.service';
+import { TranslocoService } from '@jsverse/transloco';
+import { Subscription, switchMap } from 'rxjs';
+import { DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 @Component({
     selector: 'app-menu-setup',
 
     standalone: true,
 
-    imports: [CommonModule, FormsModule, ButtonModule, CheckboxModule, ConfirmDialogModule, DialogModule, InputNumberModule, InputTextModule, SelectModule, TableModule, ToastModule],
+    imports: [CommonModule, FormsModule, ButtonModule, CheckboxModule, ConfirmDialogModule, DialogModule, InputNumberModule, InputTextModule, SelectModule, TableModule, ToastModule, TranslocoPipe],
 
     providers: [MessageService, ConfirmationService],
 
@@ -40,6 +47,14 @@ export class MenuSetupPage implements OnInit {
 
     private readonly confirmationService = inject(ConfirmationService);
 
+    private readonly languageService = inject(LanguageService);
+
+    private readonly translocoService = inject(TranslocoService);
+
+    private deleteConfirmSubscription?: Subscription;
+
+    private readonly destroyRef = inject(DestroyRef);
+
     items: MenuSetup[] = [];
 
     parentMenus: MenuParentLookup[] = [];
@@ -52,7 +67,7 @@ export class MenuSetupPage implements OnInit {
 
     page = 1;
 
-    pageSize = 20;
+    pageSize = 10;
 
     search = '';
 
@@ -70,6 +85,10 @@ export class MenuSetupPage implements OnInit {
 
     ngOnInit(): void {
         this.loadData();
+
+        this.translocoService.langChanges$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+            this.refreshParentMenuLanguage();
+        });
 
         this.route.queryParamMap.subscribe((params) => {
             const id = Number(params.get('id'));
@@ -113,8 +132,8 @@ export class MenuSetupPage implements OnInit {
 
                     this.messageService.add({
                         severity: 'error',
-                        summary: 'Error',
-                        detail: 'Unable to load Menu Setup.'
+                        summary: this.translocoService.translate('common.error'),
+                        detail: this.translocoService.translate('menuSetup.loadError')
                     });
                 }
             });
@@ -125,7 +144,10 @@ export class MenuSetupPage implements OnInit {
 
         this.service.getParents(excludeMenuId).subscribe({
             next: (result) => {
-                this.parentMenus = result ?? [];
+                this.parentMenus = (result ?? []).map((item) => ({
+                    ...item,
+                    displayName: this.getParentOptionName(item)
+                }));
 
                 this.parentLoading = false;
             },
@@ -139,8 +161,8 @@ export class MenuSetupPage implements OnInit {
 
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Error',
-                    detail: 'Unable to load Parent Menu.'
+                    summary: this.translocoService.translate('common.error'),
+                    detail: this.translocoService.translate('menuSetup.parentLoadError')
                 });
             }
         });
@@ -210,8 +232,8 @@ export class MenuSetupPage implements OnInit {
 
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Error',
-                    detail: 'Unable to load Menu Setup.'
+                    summary: this.translocoService.translate('common.error'),
+                    detail: this.translocoService.translate('menuSetup.loadError')
                 });
             }
         });
@@ -224,8 +246,11 @@ export class MenuSetupPage implements OnInit {
 
         this.form = {
             menuNo: item.menuNo ?? '',
-
             menuName: item.menuName ?? '',
+
+            menuNameVi: item.menuNameVi ?? '',
+            menuNameEn: item.menuNameEn ?? '',
+            menuNameCn: item.menuNameCn ?? '',
 
             parentMenuId: item.parentMenuId ?? null,
 
@@ -268,10 +293,18 @@ export class MenuSetupPage implements OnInit {
             return;
         }
 
+        const translations: MenuTranslation[] = [
+            { langCode: 'vi', menuName: this.form.menuNameVi.trim() },
+            { langCode: 'en', menuName: this.form.menuNameEn.trim() },
+            { langCode: 'cn', menuName: this.form.menuNameCn.trim() }
+        ];
+
+        const validTranslations = translations.filter((x) => x.menuName.length > 0);
+
         const request = {
             menuNo: this.form.menuNo,
-
             menuName: this.form.menuName,
+            translations: validTranslations,
 
             parentMenuId: this.form.parentMenuId,
 
@@ -310,47 +343,105 @@ export class MenuSetupPage implements OnInit {
     }
 
     delete(item: MenuSetup): void {
-        this.confirmationService.confirm({
-            message: `Delete '${item.menuName}'?`,
+        this.deleteConfirmSubscription?.unsubscribe();
 
-            header: 'Confirm Delete',
+        const updateConfirmation = () => {
+            const lang = this.languageService.selectedLanguage();
 
-            icon: 'pi pi-exclamation-triangle',
+            const menuName = (lang === 'vi' ? item.menuNameVi : lang === 'cn' ? item.menuNameCn : item.menuNameEn) || item.menuName;
 
-            accept: () => {
-                this.service.delete(item.menuId).subscribe({
-                    next: () => {
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Success',
-                            detail: 'Menu deleted.'
-                        });
+            this.confirmationService.confirm({
+                header: this.translocoService.translate('menuSetup.confirmDeleteTitle'),
+                message: this.translocoService.translate('menuSetup.confirmDeleteMessage', { name: menuName }),
+                acceptLabel: this.translocoService.translate('common.yes'),
+                rejectLabel: this.translocoService.translate('common.no'),
+                icon: 'pi pi-exclamation-triangle',
 
-                        this.loadData();
-                    },
+                accept: () => {
+                    this.deleteConfirmSubscription?.unsubscribe();
 
-                    error: (error) => {
-                        console.error('Delete Menu failed.', error);
+                    this.service.delete(item.menuId).subscribe({
+                        next: () => {
+                            this.messageService.add({
+                                severity: 'success',
+                                summary: this.translocoService.translate('common.success'),
+                                detail: this.translocoService.translate('menuSetup.deletedSuccess')
+                            });
 
-                        const detail = error?.error?.message ?? 'Unable to delete Menu.';
+                            this.loadData();
+                        },
+                        error: (error) => {
+                            console.error('Delete Menu failed.', error);
 
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Error',
-                            detail
-                        });
-                    }
-                });
-            }
+                            const errorCode = error?.error?.code;
+
+                            const backendMessage = String(error?.error?.detail ?? error?.error?.message ?? '');
+
+                            const detail = errorCode === 'MENU_HAS_CHILDREN' ? this.translocoService.translate('menuSetup.hasChildrenError') : backendMessage || this.translocoService.translate('menuSetup.deleteError');
+
+                            this.messageService.add({
+                                severity: 'error',
+                                summary: this.translocoService.translate('common.error'),
+                                detail
+                            });
+                        }
+                    });
+                },
+
+                reject: () => {
+                    this.deleteConfirmSubscription?.unsubscribe();
+                }
+            });
+        };
+
+        updateConfirmation();
+
+        this.deleteConfirmSubscription = this.translocoService.langChanges$.pipe(switchMap((lang) => this.translocoService.load(lang))).subscribe(() => {
+            updateConfirmation();
         });
     }
 
     getParentName(item: MenuSetup): string {
         if (!item.parentMenuId) {
-            return 'Root';
+            return '';
         }
 
-        return item.parentMenuName ?? item.parentMenuNo ?? '-';
+        const lang = this.languageService.selectedLanguage();
+
+        switch (lang) {
+            case 'vi':
+                return item.parentMenuNameVi || item.parentMenuName || item.parentMenuNo || '-';
+
+            case 'cn':
+                return item.parentMenuNameCn || item.parentMenuName || item.parentMenuNo || '-';
+
+            case 'en':
+            default:
+                return item.parentMenuNameEn || item.parentMenuName || item.parentMenuNo || '-';
+        }
+    }
+
+    getParentOptionName(item: MenuParentLookup): string {
+        const lang = this.languageService.selectedLanguage();
+
+        switch (lang) {
+            case 'vi':
+                return item.menuNameVi || item.menuName;
+
+            case 'cn':
+                return item.menuNameCn || item.menuName;
+
+            case 'en':
+            default:
+                return item.menuNameEn || item.menuName;
+        }
+    }
+
+    private refreshParentMenuLanguage(): void {
+        this.parentMenus = this.parentMenus.map((item) => ({
+            ...item,
+            displayName: this.getParentOptionName(item)
+        }));
     }
 
     private create(request: CreateMenuSetupRequest): void {
@@ -362,8 +453,8 @@ export class MenuSetupPage implements OnInit {
 
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Success',
-                    detail: 'Menu created.'
+                    summary: this.translocoService.translate('common.success'),
+                    detail: this.translocoService.translate('menuSetup.createdSuccess')
                 });
 
                 this.loadData();
@@ -384,8 +475,8 @@ export class MenuSetupPage implements OnInit {
 
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Success',
-                    detail: 'Menu updated.'
+                    summary: this.translocoService.translate('common.success'),
+                    detail: this.translocoService.translate('menuSetup.updatedSuccess')
                 });
 
                 this.loadData();
@@ -401,6 +492,9 @@ export class MenuSetupPage implements OnInit {
         return {
             menuNo: '',
             menuName: '',
+            menuNameVi: '',
+            menuNameEn: '',
+            menuNameCn: '',
 
             parentMenuId: null as number | null,
 
@@ -433,15 +527,11 @@ export class MenuSetupPage implements OnInit {
     private handleSaveError(error: any): void {
         console.error('Save Menu failed.', error);
 
-        let detail = error?.error?.message ?? 'Unable to save Menu.';
-
-        if (error?.status === 409) {
-            detail = 'Menu No or Router Link already exists.';
-        }
+        const detail = error?.status === 409 ? this.translocoService.translate('menuSetup.duplicateError') : error?.error?.detail || error?.error?.message || this.translocoService.translate('menuSetup.saveError');
 
         this.messageService.add({
             severity: 'error',
-            summary: 'Error',
+            summary: this.translocoService.translate('common.error'),
             detail
         });
     }

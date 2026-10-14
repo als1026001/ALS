@@ -22,12 +22,23 @@ import { AppMenuItem } from '../../core/models/app-menu-item';
 
 import { CenterSearchItem } from '../../core/models/center-search.model';
 
+import { TranslocoService } from '@jsverse/transloco';
+
+import { AppLanguage, LanguageService } from '../../core/services/language.service';
+
+import { TranslocoPipe } from '@jsverse/transloco';
+
+import { PopoverModule } from 'primeng/popover';
+
+import { MenuTranslationService } from '../../core/services/menu-translation.service';
+
+import { Popover } from 'primeng/popover';
 @Component({
     selector: 'app-topbar',
 
     standalone: true,
 
-    imports: [CommonModule, RouterModule, StyleClassModule, AppConfigurator],
+    imports: [CommonModule, RouterModule, StyleClassModule, AppConfigurator, TranslocoPipe, PopoverModule],
 
     templateUrl: './app.topbar.html',
 
@@ -69,7 +80,10 @@ export class AppTopbar implements OnInit {
         private authService: AuthService,
         private centerSearchService: CenterSearchService,
         private router: Router,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        public languageService: LanguageService,
+        public transloco: TranslocoService,
+        public menuTranslationService: MenuTranslationService
     ) {}
 
     ngOnInit(): void {
@@ -83,31 +97,22 @@ export class AppTopbar implements OnInit {
     }
 
     private loadMenu(): void {
-        this.menuService.getMenu().subscribe({
+        this.menuService.getMenu(this.languageService.selectedLanguage()).subscribe({
             next: (menu) => {
                 this.items = menu ?? [];
+                this.openMenu = null;
 
-                // Important:
-                // API data is loaded asynchronously.
-                // Force topbar to render immediately.
                 this.cdr.detectChanges();
 
-                // Wait until menu DOM has been rendered
-                // before calculating scroll buttons.
                 setTimeout(() => {
                     this.updateScrollButtons();
-
                     this.cdr.detectChanges();
                 }, 0);
             },
-
             error: (error) => {
                 console.error('Unable to load menu.', error);
-
                 this.items = [];
-
                 this.openMenu = null;
-
                 this.cdr.detectChanges();
             }
         });
@@ -302,6 +307,14 @@ export class AppTopbar implements OnInit {
         this.updateScrollButtons();
     }
 
+    @ViewChild('languagePopover')
+    languagePopover?: Popover;
+
+    @HostListener('window:scroll')
+    onWindowScroll(): void {
+        this.languagePopover?.hide();
+    }
+
     onMenuScroll(): void {
         this.updateScrollButtons();
     }
@@ -384,6 +397,34 @@ export class AppTopbar implements OnInit {
         this.authService.logout();
 
         this.router.navigateByUrl('/auth/login');
+    }
+
+    readonly languageOptions: {
+        code: AppLanguage;
+        flag: string;
+        name: string;
+    }[] = [
+        { code: 'vi', flag: 'VN', name: 'Tiếng Việt' },
+        { code: 'en', flag: 'EN', name: 'English' },
+        { code: 'cn', flag: 'CN', name: '简体中文' }
+    ];
+
+    get currentLanguageCode(): string {
+        return this.languageService.selectedLanguage().toUpperCase();
+    }
+
+    selectLanguage(language: AppLanguage): void {
+        if (this.languageService.selectedLanguage() === language) {
+            return;
+        }
+
+        this.languageService.setLanguage(language);
+
+        // Close the currently opened horizontal dropdown.
+        this.closeMenu();
+
+        // Reload horizontal menu using the new language.
+        this.loadMenu();
     }
 
     toggleDarkMode(): void {

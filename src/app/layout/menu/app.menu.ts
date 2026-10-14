@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AppMenuitem } from './app.menuitem';
@@ -12,7 +12,7 @@ import { SidebarMenuService } from './services/sidebar-menu.service';
     imports: [CommonModule, AppMenuitem, RouterModule],
     template: `
         <ul class="layout-menu">
-            @for (item of model; track item.label) {
+            @for (item of model(); track item.label) {
                 @if (!item.separator) {
                     <li app-menuitem [item]="item" [root]="true"></li>
                 } @else {
@@ -26,14 +26,12 @@ export class AppMenu implements OnInit, OnDestroy {
     private readonly sidebarMenuService = inject(SidebarMenuService);
     private readonly destroy$ = new Subject<void>();
 
-    model: AppMenuItem[] = [];
+    readonly model = signal<AppMenuItem[]>([]);
 
     ngOnInit(): void {
-        this.sidebarMenuService.menu$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((menu) => {
-                this.model = menu;
-            });
+        this.sidebarMenuService.menu$.pipe(takeUntil(this.destroy$)).subscribe((menu) => {
+            this.model.set(menu);
+        });
     }
 
     ngOnDestroy(): void {
