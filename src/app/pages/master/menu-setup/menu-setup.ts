@@ -286,6 +286,32 @@ export class MenuSetupPage implements OnInit {
         this.dialogVisible = true;
     }
 
+    private getMenuValidationError(error: any): string {
+        const errorCode = error?.error?.code;
+
+        const translationKeys: Record<string, string> = {
+            // Parent Menu validation
+            MENU_SELF_PARENT: 'menuSetup.selfParentError',
+            MENU_CIRCULAR_REFERENCE: 'menuSetup.circularReferenceError',
+            MENU_PARENT_NOT_FOUND: 'menuSetup.parentNotFoundError',
+
+            // Menu Translation validation
+            MENU_TRANSLATION_INVALID: 'menuSetup.translationInvalidError',
+            MENU_LANGUAGE_NOT_SUPPORTED: 'menuSetup.languageNotSupportedError',
+            MENU_TRANSLATION_REQUIRED: 'menuSetup.translationRequiredError',
+            MENU_TRANSLATION_TOO_LONG: 'menuSetup.translationTooLongError',
+            MENU_TRANSLATION_DUPLICATE: 'menuSetup.translationDuplicateError'
+        };
+
+        const translationKey = translationKeys[errorCode];
+
+        if (translationKey) {
+            return this.translocoService.translate(translationKey);
+        }
+
+        return String(error?.error?.detail ?? error?.error?.message ?? this.translocoService.translate('menuSetup.saveError'));
+    }
+
     save(): void {
         this.submitted = true;
 
@@ -527,7 +553,7 @@ export class MenuSetupPage implements OnInit {
     private handleSaveError(error: any): void {
         console.error('Save Menu failed.', error);
 
-        const detail = error?.status === 409 ? this.translocoService.translate('menuSetup.duplicateError') : error?.error?.detail || error?.error?.message || this.translocoService.translate('menuSetup.saveError');
+        const detail = error?.status === 409 ? this.translocoService.translate('menuSetup.duplicateError') : this.getMenuValidationError(error);
 
         this.messageService.add({
             severity: 'error',
