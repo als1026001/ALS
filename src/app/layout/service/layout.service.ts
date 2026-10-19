@@ -92,16 +92,28 @@ export class LayoutService {
         }
     }
 
-    onMenuToggle() {
-        if (this.isOverlay()) {
-            this.layoutState.update((prev) => ({ ...prev, overlayMenuActive: !this.layoutState().overlayMenuActive }));
+    onMenuToggle(): void {
+        if (!this.isDesktop()) {
+            this.layoutState.update((state) => ({
+                ...state,
+                mobileMenuActive: !state.mobileMenuActive,
+                overlayMenuActive: false
+            }));
+            return;
         }
 
-        if (this.isDesktop()) {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive }));
-        } else {
-            this.layoutState.update((prev) => ({ ...prev, mobileMenuActive: !this.layoutState().mobileMenuActive }));
+        if (this.isOverlay()) {
+            this.layoutState.update((state) => ({
+                ...state,
+                overlayMenuActive: !state.overlayMenuActive
+            }));
+            return;
         }
+
+        this.layoutState.update((state) => ({
+            ...state,
+            staticMenuDesktopInactive: !state.staticMenuDesktopInactive
+        }));
     }
 
     showConfigSidebar() {

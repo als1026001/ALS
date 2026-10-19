@@ -13,7 +13,7 @@ import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 
 import { MenuService } from '../../core/services/menu.service';
-
+import { PermissionRefreshService } from '../../core/services/permission-refresh.service';
 import { AuthService } from '../../core/services/auth.service';
 
 import { CenterSearchService } from '../../core/services/center-search.service';
@@ -33,6 +33,9 @@ import { PopoverModule } from 'primeng/popover';
 import { MenuTranslationService } from '../../core/services/menu-translation.service';
 
 import { Popover } from 'primeng/popover';
+import { DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 @Component({
     selector: 'app-topbar',
 
@@ -51,6 +54,9 @@ export class AppTopbar implements OnInit {
     items: AppMenuItem[] = [];
 
     openMenu: AppMenuItem | null = null;
+
+    // Menu con đang mở tại từng cấp
+    openSubmenuPath: number[] = [];
 
     currentUserName = '';
 
@@ -74,9 +80,12 @@ export class AppTopbar implements OnInit {
 
     canScrollRight = false;
 
+    private readonly destroyRef = inject(DestroyRef);
+
     constructor(
         public layoutService: LayoutService,
         private menuService: MenuService,
+        private permissionRefreshService: PermissionRefreshService,
         private authService: AuthService,
         private centerSearchService: CenterSearchService,
         private router: Router,
@@ -93,6 +102,10 @@ export class AppTopbar implements OnInit {
 
         this.loadMenu();
 
+        this.permissionRefreshService.refresh$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+            this.loadMenu();
+        });
+
         this.initializeCenterSearch();
     }
 
@@ -100,7 +113,12 @@ export class AppTopbar implements OnInit {
         this.menuService.getMenu(this.languageService.selectedLanguage()).subscribe({
             next: (menu) => {
                 this.items = menu ?? [];
+
+                // DEBUG: Kiểm tra menu nhiều cấp từ API
+                console.log('TOPBAR MENU DATA:', JSON.stringify(this.items, null, 2));
+
                 this.openMenu = null;
+                this.openSubmenuPath = [];
 
                 this.cdr.detectChanges();
 
@@ -113,6 +131,7 @@ export class AppTopbar implements OnInit {
                 console.error('Unable to load menu.', error);
                 this.items = [];
                 this.openMenu = null;
+                this.openSubmenuPath = [];
                 this.cdr.detectChanges();
             }
         });
@@ -276,12 +295,41 @@ export class AppTopbar implements OnInit {
 
         const rect = button.getBoundingClientRect();
 
-        this.menuTop = rect.bottom + 6;
+        const topbar = document.querySelector('.layout-topbar');
+        const topbarBottom = topbar?.getBoundingClientRect().bottom ?? rect.bottom;
+
+        this.menuTop = Math.max(rect.bottom + 6, topbarBottom + 4);
         this.menuLeft = rect.left;
 
         this.openMenu = item;
+        this.openSubmenuPath = [];
 
         this.cdr.detectChanges();
+    }
+
+    toggleSubmenu(item: AppMenuItem, level: number, event: MouseEvent): void {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!item.items?.length) {
+            return;
+        }
+
+        const currentId = this.openSubmenuPath[level];
+
+        // Nếu submenu đang mở thì đóng cấp này và các cấp sâu hơn.
+        if (currentId === item.menuId) {
+            this.openSubmenuPath = this.openSubmenuPath.slice(0, level);
+        } else {
+            // Giữ các cấp cha, thay menu đang mở tại cấp hiện tại.
+            this.openSubmenuPath = [...this.openSubmenuPath.slice(0, level), item.menuId];
+        }
+
+        this.cdr.markForCheck();
+    }
+
+    isSubmenuOpen(item: AppMenuItem, level: number): boolean {
+        return this.openSubmenuPath[level] === item.menuId;
     }
 
     closeMenu(): void {
@@ -290,6 +338,7 @@ export class AppTopbar implements OnInit {
         }
 
         this.openMenu = null;
+        this.openSubmenuPath = [];
 
         this.cdr.detectChanges();
     }
@@ -310,9 +359,53 @@ export class AppTopbar implements OnInit {
     @ViewChild('languagePopover')
     languagePopover?: Popover;
 
+    @ViewChild('adminPopover')
+    adminPopover?: Popover;
+
+    readonly adminMenuNumbers = ['mnuMenuSetup', 'mnuUser', 'mnuUserRole', 'mnuUserRolePermission', 'mnuUserRoleRegister'];
+
+    get adminMenuItems(): AppMenuItem[] {
+        const result: AppMenuItem[] = [];
+
+        const collect = (menus: AppMenuItem[]): void => {
+            for (const menu of menus) {
+                if (this.adminMenuNumbers.includes(menu.menuNo) && menu.routerLink && !menu.isExternal) {
+                    result.push(menu);
+                }
+
+                if (menu.items?.length) {
+                    collect(menu.items);
+                }
+            }
+        };
+
+        collect(this.items);
+
+        return result;
+    }
+
+    navigateAdminMenu(item: AppMenuItem): void {
+        if (!item.routerLink || item.isExternal) {
+            return;
+        }
+
+        this.adminPopover?.hide();
+        this.closeMenu();
+
+        this.router.navigateByUrl(item.routerLink);
+    }
+
+    refreshPermissions(): void {
+        this.adminPopover?.hide();
+        this.closeMenu();
+
+        this.permissionRefreshService.refresh();
+    }
+
     @HostListener('window:scroll')
     onWindowScroll(): void {
         this.languagePopover?.hide();
+        this.adminPopover?.hide();
     }
 
     onMenuScroll(): void {
@@ -392,6 +485,7 @@ export class AppTopbar implements OnInit {
     }
 
     logout(): void {
+        this.adminPopover?.hide();
         this.closeMenu();
 
         this.authService.logout();

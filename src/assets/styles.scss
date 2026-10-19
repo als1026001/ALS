@@ -9,3 +9,11 @@
 @use './styles/dialogs';
 @use './styles/feature-page';
 @use './styles/details';
+
+/* =====================================================
+   ERP - User Management Popover
+   ===================================================== */
+
+.p-popover.erp-admin-popover {
+    z-index: 100000 !important;
+}

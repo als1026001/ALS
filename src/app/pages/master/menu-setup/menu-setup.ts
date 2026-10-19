@@ -24,7 +24,8 @@ import { TranslocoService } from '@jsverse/transloco';
 import { Subscription, switchMap } from 'rxjs';
 import { DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
+import { PermissionService } from '@/app/core/services/permission.service';
+import { RouteAccess } from '@/app/core/models/permission.model';
 @Component({
     selector: 'app-menu-setup',
 
@@ -54,6 +55,11 @@ export class MenuSetupPage implements OnInit {
     private deleteConfirmSubscription?: Subscription;
 
     private readonly destroyRef = inject(DestroyRef);
+
+    private readonly permissionService = inject(PermissionService);
+
+    menuAccess: RouteAccess | null = null;
+    permissionsLoading = true;
 
     items: MenuSetup[] = [];
 
@@ -85,6 +91,7 @@ export class MenuSetupPage implements OnInit {
 
     ngOnInit(): void {
         this.loadData();
+        this.loadMenuPermissions();
 
         this.translocoService.langChanges$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
             this.refreshParentMenuLanguage();
@@ -207,6 +214,8 @@ export class MenuSetupPage implements OnInit {
     }
 
     openNew(): void {
+        if (!this.canCreate) return;
+
         this.editingId = null;
 
         this.submitted = false;
@@ -240,6 +249,8 @@ export class MenuSetupPage implements OnInit {
     }
 
     edit(item: MenuSetup): void {
+        if (!this.canUpdate) return;
+
         this.editingId = item.menuId;
 
         this.submitted = false;
@@ -290,6 +301,10 @@ export class MenuSetupPage implements OnInit {
         const errorCode = error?.error?.code;
 
         const translationKeys: Record<string, string> = {
+            // Main Menu Name validation
+            MENU_NAME_REQUIRED: 'menuSetup.menuNameRequiredError',
+            MENU_NAME_TOO_LONG: 'menuSetup.menuNameTooLongError',
+
             // Parent Menu validation
             MENU_SELF_PARENT: 'menuSetup.selfParentError',
             MENU_CIRCULAR_REFERENCE: 'menuSetup.circularReferenceError',
@@ -313,9 +328,21 @@ export class MenuSetupPage implements OnInit {
     }
 
     save(): void {
+        if (this.editingId === null && !this.canCreate) return;
+        if (this.editingId !== null && !this.canUpdate) return;
+
         this.submitted = true;
 
-        if (!this.form.menuNo.trim() || !this.form.menuName.trim()) {
+        if (!this.form.menuNo.trim()) {
+            return;
+        }
+
+        if (!this.form.menuName.trim()) {
+            this.messageService.add({
+                severity: 'error',
+                summary: this.translocoService.translate('common.error'),
+                detail: this.translocoService.translate('menuSetup.menuNameRequiredError')
+            });
             return;
         }
 
@@ -369,6 +396,8 @@ export class MenuSetupPage implements OnInit {
     }
 
     delete(item: MenuSetup): void {
+        if (!this.canDelete) return;
+
         this.deleteConfirmSubscription?.unsubscribe();
 
         const updateConfirmation = () => {
@@ -583,5 +612,34 @@ export class MenuSetupPage implements OnInit {
 
     onDialogHide(): void {
         this.clearCenterSearchId();
+    }
+
+    private loadMenuPermissions(): void {
+        this.permissionsLoading = true;
+        this.menuAccess = null;
+
+        this.permissionService.getRouteAccess('/menuSetup').subscribe({
+            next: (access) => {
+                this.menuAccess = access;
+                this.permissionsLoading = false;
+            },
+            error: (error) => {
+                console.error('Failed to load Menu Setup permissions', error);
+                this.menuAccess = null;
+                this.permissionsLoading = false;
+            }
+        });
+    }
+
+    get canCreate(): boolean {
+        return this.menuAccess?.canCreate === true;
+    }
+
+    get canUpdate(): boolean {
+        return this.menuAccess?.canUpdate === true;
+    }
+
+    get canDelete(): boolean {
+        return this.menuAccess?.canDelete === true;
     }
 }

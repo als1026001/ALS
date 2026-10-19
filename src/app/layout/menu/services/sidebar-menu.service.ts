@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, catchError, map, of, shareReplay, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, of, shareReplay, startWith, switchMap } from 'rxjs';
 import { AppMenuItem as ApiMenuItem } from '@/app/core/models/app-menu-item';
 import { MenuService } from '@/app/core/services/menu.service';
 import { APP_MENU } from '../config/menu.config';
@@ -8,18 +8,26 @@ import { AppMenuItem } from '../menu.types';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { combineLatest } from 'rxjs';
 import { LanguageService } from '@/app/core/services/language.service';
+import { PermissionRefreshService } from '@/app/core/services/permission-refresh.service';
+
 @Injectable({ providedIn: 'root' })
 export class SidebarMenuService {
     private readonly apiMenuService = inject(MenuService);
 
     private readonly languageService = inject(LanguageService);
+    private readonly permissionRefreshService = inject(PermissionRefreshService);
 
     private readonly modeSubject = new BehaviorSubject<SidebarMenuMode>(this.readInitialMode());
 
     readonly mode$ = this.modeSubject.asObservable();
 
     readonly menu$: Observable<AppMenuItem[]> = combineLatest([this.mode$, toObservable(this.languageService.selectedLanguage)]).pipe(
-        switchMap(([mode, language]) => this.loadByMode(mode, language)),
+        switchMap(([mode, language]) =>
+            this.permissionRefreshService.refresh$.pipe(
+                startWith(undefined),
+                switchMap(() => this.loadByMode(mode, language))
+            )
+        ),
         shareReplay({ bufferSize: 1, refCount: true })
     );
 
@@ -86,22 +94,33 @@ export class SidebarMenuService {
         return this.dedupeRootItems([...fixedRoots, ...apiMenu]);
     }
 
-    private mapApiMenu(items: ApiMenuItem[]): AppMenuItem[] {
+    private mapApiMenu(items: ApiMenuItem[], parentPath: string = ''): AppMenuItem[] {
         return items.map((item) => {
-            const children = item.items?.length ? this.mapApiMenu(item.items) : undefined;
             const routerLink = item.routerLink?.trim();
             const externalUrl = item.url?.trim();
+
+            // Stable unique menu path based on menuId.
+            // Example: /menu/3/33/24
+            const menuPath = `${parentPath}/menu/${item.menuId}`;
+
+            const children = item.items?.length ? this.mapApiMenu(item.items, menuPath) : undefined;
 
             return {
                 label: item.label,
                 skipTranslation: true,
                 icon: item.icon ?? undefined,
+
                 routerLink: routerLink && !item.isExternal ? [routerLink] : undefined,
+
                 url: externalUrl || (item.isExternal ? routerLink || undefined : undefined),
+
                 target: item.target ?? (item.isExternal ? '_blank' : undefined),
+
                 items: children,
-                // Keep a stable path for Sakai parent-menu active state.
-                path: routerLink || undefined
+
+                // Path dùng để điều khiển trạng thái menu,
+                // không phải Angular Router URL.
+                path: menuPath
             } satisfies AppMenuItem;
         });
     }

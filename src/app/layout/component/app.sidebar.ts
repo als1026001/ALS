@@ -68,7 +68,6 @@ export class AppSidebar implements OnInit, OnDestroy {
     private onRouteChange(path: string) {
         this.layoutService.layoutState.update((val) => ({
             ...val,
-            activePath: path,
             overlayMenuActive: false,
             staticMenuMobileActive: false,
             mobileMenuActive: false,
@@ -83,7 +82,6 @@ export class AppSidebar implements OnInit, OnDestroy {
                     this.layoutService.layoutState.update((val) => ({
                         ...val,
                         overlayMenuActive: false,
-                        staticMenuMobileActive: false,
                         mobileMenuActive: false,
                         menuHoverActive: false
                     }));
@@ -102,9 +100,18 @@ export class AppSidebar implements OnInit, OnDestroy {
     }
 
     private isOutsideClicked(event: MouseEvent): boolean {
-        const topbarButtonEl = document.querySelector('.topbar-start > button');
-        const sidebarEl = this.el.nativeElement;
+        const topbarButtonEl = document.querySelector('.layout-topbar .layout-menu-button');
 
-        return !(sidebarEl?.isSameNode(event.target as Node) || sidebarEl?.contains(event.target as Node) || topbarButtonEl?.isSameNode(event.target as Node) || topbarButtonEl?.contains(event.target as Node));
+        const sidebarEl = this.el.nativeElement as HTMLElement;
+        const target = event.target as Node | null;
+
+        if (!target) {
+            return false;
+        }
+
+        const clickedSidebar = sidebarEl.contains(target);
+        const clickedToggleButton = topbarButtonEl?.contains(target) ?? false;
+
+        return !clickedSidebar && !clickedToggleButton;
     }
 }

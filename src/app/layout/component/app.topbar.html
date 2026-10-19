@@ -1,267 +1,380 @@
 <div class="layout-topbar">
-    <!-- ======================================================
-         LOGO
-         ====================================================== -->
+    <!-- TẦNG 1: LOGO + SEARCH + ACTIONS -->
+    <div class="erp-topbar-main">
+        <!-- ======================================================
+        LOGO
+        ====================================================== -->
 
-    <div class="layout-topbar-logo-container">
-        <button type="button" class="layout-menu-button layout-topbar-action" aria-label="Toggle main menu" title="Toggle main menu" (click)="layoutService.onMenuToggle()">
-            <i class="pi pi-bars"></i>
-        </button>
-
-        <a class="layout-topbar-logo" routerLink="/">
-            <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M17.1637 19.2467C17.1566 19.4033 17.1529 19.561 17.1529 19.7194C17.1529 25.3503 21.7203 29.915 27.3546 29.915C32.9887 29.915 37.5561 25.3503 37.5561 19.7194C37.5561 19.5572 37.5524 19.3959 37.5449 19.2355C38.5617 19.0801 39.5759 18.9013 40.5867 18.6994L40.6926 18.6782C40.7191 19.0218 40.7326 19.369 40.7326 19.7194C40.7326 27.1036 34.743 33.0896 27.3546 33.0896C19.966 33.0896 13.9765 27.1036 13.9765 19.7194C13.9765 19.374 13.9896 19.0316 14.0154 18.6927L14.0486 18.6994C15.0837 18.9062 16.1223 19.0886 17.1637 19.2467Z"
-                    fill="var(--primary-color)"
-                />
-            </svg>
-
-            <span>SAKAI</span>
-        </a>
-    </div>
-
-    <!-- ======================================================
-         HORIZONTAL MENU
-         ====================================================== -->
-
-    <div class="horizontal-menu-wrapper">
-        <!-- LEFT -->
-
-        <button *ngIf="canScrollLeft" type="button" class="horizontal-scroll-button horizontal-scroll-left" aria-label="Scroll menu left" title="Scroll menu left" (click)="scrollMenuLeft()">
-            <i class="pi pi-chevron-left"></i>
-        </button>
-
-        <!-- SCROLL AREA -->
-
-        <div #menuScroll class="top-menu-scroll-area" (scroll)="onMenuScroll()" (wheel)="onMenuWheel($event)">
-            <nav class="top-horizontal-menu">
-                <div *ngFor="let item of items" class="top-menu-container">
-                    <!-- ==========================================
-                         NORMAL MENU
-                         ========================================== -->
-
-                    <a
-                        *ngIf="(!item.items || item.items.length === 0) && !item.isExternal"
-                        class="top-menu-item"
-                        [routerLink]="item.routerLink"
-                        routerLinkActive="active"
-                        [routerLinkActiveOptions]="{
-                            exact: item.routerLink === '/'
-                        }"
-                        (click)="closeMenu()"
-                    >
-                        <i *ngIf="item.icon" [class]="item.icon"> </i>
-
-                        <span> {{ menuTranslationService.translateMenu(item) }} </span>
-                    </a>
-
-                    <a *ngIf="(!item.items || item.items.length === 0) && item.isExternal" class="top-menu-item" [href]="item.url" [target]="item.target || '_blank'" rel="noopener noreferrer" (click)="closeMenu()">
-                        <i *ngIf="item.icon" [class]="item.icon"></i>
-                        <span>{{ menuTranslationService.translateMenu(item) }}</span>
-                    </a>
-
-                    <!-- ==========================================
-                         MENU WITH CHILDREN
-                         ========================================== -->
-
-                    <button *ngIf="item.items && item.items.length > 0" type="button" class="top-menu-item" [class.active]="openMenu === item" (click)="toggleMenu(item, $event)">
-                        <i *ngIf="item.icon" [class]="item.icon"> </i>
-
-                        <span> {{ menuTranslationService.translateMenu(item) }} </span>
-
-                        <i class="pi pi-chevron-down menu-arrow"> </i>
-                    </button>
-                </div>
-            </nav>
-        </div>
-
-        <!-- RIGHT -->
-
-        <button *ngIf="canScrollRight" type="button" class="horizontal-scroll-button horizontal-scroll-right" aria-label="Scroll menu right" title="Scroll menu right" (click)="scrollMenuRight()">
-            <i class="pi pi-chevron-right"></i>
-        </button>
-    </div>
-
-    <!-- ======================================================
-     CENTER SEARCH
-     ====================================================== -->
-
-    <div class="center-search" (click)="$event.stopPropagation()">
-        <div class="center-search-input-wrapper">
-            <i class="pi pi-search center-search-icon"></i>
-
-            <input type="text" class="center-search-input" [placeholder]="'topbar.searchPlaceholder' | transloco" autocomplete="off" [value]="searchText" (input)="onSearchInput($event)" (focus)="onSearchFocus()" (keydown)="onSearchKeyDown($event)" />
-
-            <i *ngIf="searchLoading" class="pi pi-spin pi-spinner center-search-loading"></i>
-        </div>
-
-        <div *ngIf="searchOpen" class="center-search-dropdown">
-            <!-- RESULTS -->
-
-            <ng-container *ngIf="!searchLoading && searchResults.length > 0">
-                <button *ngFor="let result of searchResults; let i = index" type="button" class="center-search-result" [class.selected]="i === selectedSearchIndex" (mouseenter)="selectedSearchIndex = i" (click)="selectSearchResult(result)">
-                    <div class="center-search-result-main">
-                        <span class="center-search-result-code"> {{ result.code }} </span>
-
-                        <span *ngIf="result.name" class="center-search-result-name"> {{ result.name }} </span>
-                    </div>
-
-                    <div class="center-search-result-meta">
-                        <span>{{ result.group }}</span>
-                        <span>{{ result.type }}</span>
-                    </div>
-                </button>
-            </ng-container>
-
-            <!-- NO RESULTS -->
-
-            <div *ngIf="!searchLoading && searchResults.length === 0" class="center-search-empty">{{ 'topbar.noResults' | transloco }}</div>
-
-            <!-- LOADING -->
-
-            <div *ngIf="searchLoading" class="center-search-empty">{{ 'topbar.searching' | transloco }}</div>
-        </div>
-    </div>
-
-    <!-- ======================================================
-         DROPDOWN
-
-         IMPORTANT:
-         This is outside the scroll area.
-         Therefore it won't be clipped by overflow-x.
-         ====================================================== -->
-
-    <div *ngIf="openMenu" class="top-menu-dropdown" [style.top.px]="menuTop" [style.left.px]="menuLeft" (click)="$event.stopPropagation()">
-        <ng-container *ngFor="let child of openMenu.items">
-            <a *ngIf="!child.isExternal" class="top-menu-dropdown-item" [routerLink]="child.routerLink" (click)="closeMenu()">
-                <i *ngIf="child.icon" [class]="child.icon"> </i>
-
-                <span> {{ menuTranslationService.translateMenu(child) }} </span>
-            </a>
-
-            <a *ngIf="child.isExternal" class="top-menu-dropdown-item" [href]="child.url" [target]="child.target || '_blank'" rel="noopener noreferrer" (click)="closeMenu()">
-                <i *ngIf="child.icon" [class]="child.icon"></i>
-                <span>{{ menuTranslationService.translateMenu(child) }}</span>
-            </a>
-        </ng-container>
-    </div>
-
-    <!-- ======================================================
-         RIGHT SIDE
-         ====================================================== -->
-
-    <div class="layout-topbar-actions">
-        <!-- LANGUAGE SETTINGS -->
-        <div class="erp-language-wrapper" (click)="$event.stopPropagation()">
-            <button type="button" class="layout-topbar-action erp-language-button" aria-label="Select language" title="Select language" (click)="languagePopover.toggle($event)">
-                <i class="pi pi-globe"></i>
-
-                <span class="erp-language-code"> {{ currentLanguageCode }} </span>
-
-                <i class="pi pi-chevron-down erp-language-chevron"></i>
+        <div class="layout-topbar-logo-container">
+            <button type="button" class="layout-menu-button layout-topbar-action" aria-label="Toggle main menu" title="Toggle main menu" (click)="layoutService.onMenuToggle()">
+                <i class="pi pi-bars"></i>
             </button>
 
-            <p-popover #languagePopover styleClass="erp-language-popover">
-                <div class="erp-language-panel">
-                    <div class="erp-language-title">
-                        <span>{{ 'common.language' | transloco }}</span>
-                        <i class="pi pi-language"></i>
-                    </div>
+            <a class="layout-topbar-logo" routerLink="/">
+                <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M17.1637 19.2467C17.1566 19.4033 17.1529 19.561 17.1529 19.7194C17.1529 25.3503 21.7203 29.915 27.3546 29.915C32.9887 29.915 37.5561 25.3503 37.5561 19.7194C37.5561 19.5572 37.5524 19.3959 37.5449 19.2355C38.5617 19.0801 39.5759 18.9013 40.5867 18.6994L40.6926 18.6782C40.7191 19.0218 40.7326 19.369 40.7326 19.7194C40.7326 27.1036 34.743 33.0896 27.3546 33.0896C19.966 33.0896 13.9765 27.1036 13.9765 19.7194C13.9765 19.374 13.9896 19.0316 14.0154 18.6927L14.0486 18.6994C15.0837 18.9062 16.1223 19.0886 17.1637 19.2467Z"
+                        fill="var(--primary-color)"
+                    />
+                </svg>
 
-                    <div class="erp-language-list">
-                        <button *ngFor="let language of languageOptions" type="button" class="erp-language-option" [class.active]="languageService.selectedLanguage() === language.code" (click)="selectLanguage(language.code); languagePopover.hide()">
-                            <span class="erp-language-flag"> {{ language.flag }} </span>
-
-                            <span>{{ language.name }}</span>
-
-                            <i *ngIf="languageService.selectedLanguage() === language.code" class="pi pi-check erp-language-check"></i>
-                        </button>
-                    </div>
-                </div>
-            </p-popover>
+                <span>SAKAI</span>
+            </a>
         </div>
 
-        <!-- DARK MODE -->
+        <!-- ======================================================
+        CENTER SEARCH
+        ====================================================== -->
 
-        <div class="layout-config-menu">
-            <button type="button" class="layout-topbar-action" aria-label="Toggle dark mode" title="Toggle dark mode" (click)="toggleDarkMode()">
-                <i
-                    class="pi"
-                    [ngClass]="{
+        <div class="center-search" (click)="$event.stopPropagation()">
+            <div class="center-search-input-wrapper">
+                <i class="pi pi-search center-search-icon"></i>
+
+                <input
+                    type="text"
+                    class="center-search-input"
+                    [placeholder]="'topbar.searchPlaceholder' | transloco"
+                    autocomplete="off"
+                    [value]="searchText"
+                    (input)="onSearchInput($event)"
+                    (focus)="onSearchFocus()"
+                    (keydown)="onSearchKeyDown($event)"
+                />
+
+                <i *ngIf="searchLoading" class="pi pi-spin pi-spinner center-search-loading"></i>
+            </div>
+
+            <div *ngIf="searchOpen" class="center-search-dropdown">
+                <!-- RESULTS -->
+
+                <ng-container *ngIf="!searchLoading && searchResults.length > 0">
+                    <button *ngFor="let result of searchResults; let i = index" type="button" class="center-search-result" [class.selected]="i === selectedSearchIndex" (mouseenter)="selectedSearchIndex = i" (click)="selectSearchResult(result)">
+                        <div class="center-search-result-main">
+                            <span class="center-search-result-code"> {{ result.code }} </span>
+
+                            <span *ngIf="result.name" class="center-search-result-name"> {{ result.name }} </span>
+                        </div>
+
+                        <div class="center-search-result-meta">
+                            <span>{{ result.group }}</span>
+                            <span>{{ result.type }}</span>
+                        </div>
+                    </button>
+                </ng-container>
+
+                <!-- NO RESULTS -->
+
+                <div *ngIf="!searchLoading && searchResults.length === 0" class="center-search-empty">{{ 'topbar.noResults' | transloco }}</div>
+
+                <!-- LOADING -->
+
+                <div *ngIf="searchLoading" class="center-search-empty">{{ 'topbar.searching' | transloco }}</div>
+            </div>
+        </div>
+
+        <!-- ======================================================
+        DROPDOWN
+
+        IMPORTANT:
+        This is outside the scroll area.
+        Therefore it won't be clipped by overflow-x.
+        ====================================================== -->
+
+        <!-- DROPDOWN MENU NHIỀU CẤP -->
+        <div *ngIf="openMenu" class="top-menu-dropdown" [style.top.px]="menuTop" [style.left.px]="menuLeft" (click)="$event.stopPropagation()">
+            <ng-container *ngFor="let child of openMenu.items">
+                <!-- MENU CÓ MENU CON -->
+                <div *ngIf="child.items && child.items.length > 0" class="top-menu-submenu-container">
+                    <button type="button" class="top-menu-dropdown-item" [class.active]="isSubmenuOpen(child, 0)" (click)="toggleSubmenu(child, 0, $event)">
+                        <i *ngIf="child.icon" [class]="child.icon"></i>
+
+                        <span> {{ menuTranslationService.translateMenu(child) }} </span>
+
+                        <i class="pi pi-angle-right submenu-arrow"></i>
+                    </button>
+
+                    <!-- MENU CẤP 3 -->
+                    <div *ngIf="isSubmenuOpen(child, 0)" class="top-menu-submenu">
+                        <ng-container *ngFor="let grandchild of child.items">
+                            <!-- MENU CẤP 3 CÓ MENU CON -->
+                            <div *ngIf="grandchild.items && grandchild.items.length > 0" class="top-menu-submenu-container">
+                                <button type="button" class="top-menu-dropdown-item" [class.active]="isSubmenuOpen(grandchild, 1)" (click)="toggleSubmenu(grandchild, 1, $event)">
+                                    <i *ngIf="grandchild.icon" [class]="grandchild.icon"></i>
+
+                                    <span> {{ menuTranslationService.translateMenu(grandchild) }} </span>
+
+                                    <i class="pi pi-angle-right submenu-arrow"></i>
+                                </button>
+
+                                <!-- MENU CẤP 4 -->
+                                <div *ngIf="isSubmenuOpen(grandchild, 1)" class="top-menu-submenu">
+                                    <ng-container *ngFor="let leaf of grandchild.items">
+                                        <a *ngIf="!leaf.isExternal" class="top-menu-dropdown-item" [routerLink]="leaf.routerLink" (click)="closeMenu()">
+                                            <i *ngIf="leaf.icon" [class]="leaf.icon"></i>
+                                            <span> {{ menuTranslationService.translateMenu(leaf) }} </span>
+                                        </a>
+
+                                        <a *ngIf="leaf.isExternal" class="top-menu-dropdown-item" [href]="leaf.url" [target]="leaf.target || '_blank'" rel="noopener noreferrer" (click)="closeMenu()">
+                                            <i *ngIf="leaf.icon" [class]="leaf.icon"></i>
+                                            <span> {{ menuTranslationService.translateMenu(leaf) }} </span>
+                                        </a>
+                                    </ng-container>
+                                </div>
+                            </div>
+
+                            <!-- MENU CẤP 3 KHÔNG CÓ MENU CON -->
+                            <ng-container *ngIf="!grandchild.items || grandchild.items.length === 0">
+                                <a *ngIf="!grandchild.isExternal" class="top-menu-dropdown-item" [routerLink]="grandchild.routerLink" (click)="closeMenu()">
+                                    <i *ngIf="grandchild.icon" [class]="grandchild.icon"></i>
+                                    <span> {{ menuTranslationService.translateMenu(grandchild) }} </span>
+                                </a>
+
+                                <a *ngIf="grandchild.isExternal" class="top-menu-dropdown-item" [href]="grandchild.url" [target]="grandchild.target || '_blank'" rel="noopener noreferrer" (click)="closeMenu()">
+                                    <i *ngIf="grandchild.icon" [class]="grandchild.icon"></i>
+                                    <span> {{ menuTranslationService.translateMenu(grandchild) }} </span>
+                                </a>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </div>
+
+                <!-- MENU CẤP 2 KHÔNG CÓ MENU CON -->
+                <ng-container *ngIf="!child.items || child.items.length === 0">
+                    <a *ngIf="!child.isExternal" class="top-menu-dropdown-item" [routerLink]="child.routerLink" (click)="closeMenu()">
+                        <i *ngIf="child.icon" [class]="child.icon"></i>
+                        <span> {{ menuTranslationService.translateMenu(child) }} </span>
+                    </a>
+
+                    <a *ngIf="child.isExternal" class="top-menu-dropdown-item" [href]="child.url" [target]="child.target || '_blank'" rel="noopener noreferrer" (click)="closeMenu()">
+                        <i *ngIf="child.icon" [class]="child.icon"></i>
+                        <span> {{ menuTranslationService.translateMenu(child) }} </span>
+                    </a>
+                </ng-container>
+            </ng-container>
+        </div>
+
+        <!-- ======================================================
+        RIGHT SIDE
+        ====================================================== -->
+
+        <div class="layout-topbar-actions">
+            <!-- LANGUAGE SETTINGS -->
+            <div class="erp-language-wrapper" (click)="$event.stopPropagation()">
+                <button type="button" class="layout-topbar-action erp-language-button" aria-label="Select language" title="Select language" (click)="languagePopover.toggle($event)">
+                    <i class="pi pi-globe"></i>
+
+                    <span class="erp-language-code"> {{ currentLanguageCode }} </span>
+
+                    <i class="pi pi-chevron-down erp-language-chevron"></i>
+                </button>
+
+                <p-popover #languagePopover styleClass="erp-language-popover">
+                    <div class="erp-language-panel">
+                        <div class="erp-language-title">
+                            <span>{{ 'common.language' | transloco }}</span>
+                            <i class="pi pi-language"></i>
+                        </div>
+
+                        <div class="erp-language-list">
+                            <button
+                                *ngFor="let language of languageOptions"
+                                type="button"
+                                class="erp-language-option"
+                                [class.active]="languageService.selectedLanguage() === language.code"
+                                (click)="selectLanguage(language.code); languagePopover.hide()"
+                            >
+                                <span class="erp-language-flag"> {{ language.flag }} </span>
+
+                                <span>{{ language.name }}</span>
+
+                                <i *ngIf="languageService.selectedLanguage() === language.code" class="pi pi-check erp-language-check"></i>
+                            </button>
+                        </div>
+                    </div>
+                </p-popover>
+            </div>
+
+            <!-- DARK MODE -->
+
+            <div class="layout-config-menu">
+                <button type="button" class="layout-topbar-action" aria-label="Toggle dark mode" title="Toggle dark mode" (click)="toggleDarkMode()">
+                    <i
+                        class="pi"
+                        [ngClass]="{
             'pi-moon': layoutService.isDarkTheme(),
             'pi-sun': !layoutService.isDarkTheme()
         }"
-                >
-                </i>
+                    >
+                    </i>
+                </button>
+
+                <!-- PALETTE -->
+
+                <div class="relative">
+                    <button
+                        type="button"
+                        class="layout-topbar-action layout-topbar-action-highlight"
+                        aria-label="Open theme configurator"
+                        title="Open theme configurator"
+                        pStyleClass="@next"
+                        enterFromClass="hidden"
+                        enterActiveClass="animate-scalein"
+                        leaveToClass="hidden"
+                        leaveActiveClass="animate-fadeout"
+                        [hideOnOutsideClick]="true"
+                    >
+                        <i class="pi pi-palette"></i>
+                    </button>
+
+                    <app-configurator />
+                </div>
+            </div>
+
+            <!-- MOBILE -->
+
+            <button
+                type="button"
+                class="layout-topbar-menu-button layout-topbar-action"
+                aria-label="Open topbar menu"
+                title="Open topbar menu"
+                pStyleClass="@next"
+                enterFromClass="hidden"
+                enterActiveClass="animate-scalein"
+                leaveToClass="hidden"
+                leaveActiveClass="animate-fadeout"
+                [hideOnOutsideClick]="true"
+            >
+                <i class="pi pi-ellipsis-v"></i>
             </button>
 
-            <!-- PALETTE -->
+            <!-- RIGHT MENU -->
 
-            <div class="relative">
-                <button
-                    type="button"
-                    class="layout-topbar-action layout-topbar-action-highlight"
-                    aria-label="Open theme configurator"
-                    title="Open theme configurator"
-                    pStyleClass="@next"
-                    enterFromClass="hidden"
-                    enterActiveClass="animate-scalein"
-                    leaveToClass="hidden"
-                    leaveActiveClass="animate-fadeout"
-                    [hideOnOutsideClick]="true"
-                >
-                    <i class="pi pi-palette"></i>
-                </button>
+            <div class="layout-topbar-menu hidden lg:block">
+                <div class="layout-topbar-menu-content">
+                    <button type="button" class="layout-topbar-action">
+                        <i class="pi pi-calendar"></i>
 
-                <app-configurator />
+                        <span>Calendar</span>
+                    </button>
+
+                    <button type="button" class="layout-topbar-action">
+                        <i class="pi pi-inbox"></i>
+
+                        <span>Messages</span>
+                    </button>
+
+                    <div class="relative" (click)="$event.stopPropagation()">
+                        <button type="button" class="layout-topbar-action" title="User Management" aria-label="Open user management menu" (click)="adminPopover.toggle($event)">
+                            <i class="pi pi-user"></i>
+                            <span>{{ currentUserName }}</span>
+                        </button>
+
+                        <p-popover #adminPopover appendTo="body" [autoZIndex]="true" [baseZIndex]="1100" styleClass="erp-admin-popover">
+                            <div style="min-width: 240px; padding: 8px">
+                                <div style="padding: 10px 12px; font-weight: 600; border-bottom: 1px solid var(--surface-border)">
+                                    <i class="pi pi-user mr-2"></i>
+                                    {{ currentUserName }}
+                                </div>
+
+                                <button
+                                    *ngFor="let menu of adminMenuItems"
+                                    type="button"
+                                    class="top-menu-dropdown-item"
+                                    style="display: flex; width: 100%; text-align: left; align-items: center; gap: 12px; padding: 12px"
+                                    (click)="navigateAdminMenu(menu)"
+                                >
+                                    <i [class]="menu.icon || 'pi pi-cog'"></i>
+
+                                    <span> {{ menuTranslationService.translateMenu(menu) }} </span>
+                                </button>
+
+                                <div *ngIf="adminMenuItems.length === 0" style="padding: 12px; opacity: 0.7">No management permissions</div>
+
+                                <!-- REFRESH PERMISSIONS -->
+                                <div style="border-top: 1px solid var(--surface-border); margin-top: 8px; padding-top: 8px">
+                                    <button type="button" class="top-menu-dropdown-item" style="display: flex; width: 100%; text-align: left; align-items: center; gap: 12px; padding: 12px" (click)="refreshPermissions()">
+                                        <i class="pi pi-refresh"></i>
+                                        <span>Refresh Permissions</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </p-popover>
+                    </div>
+
+                    <button type="button" class="layout-topbar-action" title="Logout" (click)="logout()">
+                        <i class="pi pi-sign-out"></i>
+                        <span>{{ 'topbar.logout' | transloco }}</span>
+                    </button>
+                </div>
             </div>
         </div>
+    </div>
+    <!-- KẾT THÚC TẦNG 1 -->
 
-        <!-- MOBILE -->
+    <!-- TẦNG 2: MENU CHỨC NĂNG -->
+    <div class="erp-topbar-navigation">
+        <!-- ======================================================
+        HORIZONTAL MENU
+        ====================================================== -->
 
-        <button
-            type="button"
-            class="layout-topbar-menu-button layout-topbar-action"
-            aria-label="Open topbar menu"
-            title="Open topbar menu"
-            pStyleClass="@next"
-            enterFromClass="hidden"
-            enterActiveClass="animate-scalein"
-            leaveToClass="hidden"
-            leaveActiveClass="animate-fadeout"
-            [hideOnOutsideClick]="true"
-        >
-            <i class="pi pi-ellipsis-v"></i>
-        </button>
+        <div class="horizontal-menu-wrapper">
+            <!-- LEFT -->
 
-        <!-- RIGHT MENU -->
+            <button *ngIf="canScrollLeft" type="button" class="horizontal-scroll-button horizontal-scroll-left" aria-label="Scroll menu left" title="Scroll menu left" (click)="scrollMenuLeft()">
+                <i class="pi pi-chevron-left"></i>
+            </button>
 
-        <div class="layout-topbar-menu hidden lg:block">
-            <div class="layout-topbar-menu-content">
-                <button type="button" class="layout-topbar-action">
-                    <i class="pi pi-calendar"></i>
+            <!-- SCROLL AREA -->
 
-                    <span>Calendar</span>
-                </button>
+            <div #menuScroll class="top-menu-scroll-area" (scroll)="onMenuScroll()" (wheel)="onMenuWheel($event)">
+                <nav class="top-horizontal-menu">
+                    <div *ngFor="let item of items" class="top-menu-container">
+                        <!-- ==========================================
+                        NORMAL MENU
+                        ========================================== -->
 
-                <button type="button" class="layout-topbar-action">
-                    <i class="pi pi-inbox"></i>
+                        <a
+                            *ngIf="(!item.items || item.items.length === 0) && !item.isExternal"
+                            class="top-menu-item"
+                            [routerLink]="item.routerLink"
+                            routerLinkActive="active"
+                            [routerLinkActiveOptions]="{
+                            exact: item.routerLink === '/'
+                        }"
+                            (click)="closeMenu()"
+                        >
+                            <i *ngIf="item.icon" [class]="item.icon"> </i>
 
-                    <span>Messages</span>
-                </button>
+                            <span> {{ menuTranslationService.translateMenu(item) }} </span>
+                        </a>
 
-                <button type="button" class="layout-topbar-action" title="Current user">
-                    <i class="pi pi-user"></i>
-                    <span>{{ currentUserName }}</span>
-                </button>
+                        <a *ngIf="(!item.items || item.items.length === 0) && item.isExternal" class="top-menu-item" [href]="item.url" [target]="item.target || '_blank'" rel="noopener noreferrer" (click)="closeMenu()">
+                            <i *ngIf="item.icon" [class]="item.icon"></i>
+                            <span>{{ menuTranslationService.translateMenu(item) }}</span>
+                        </a>
 
-                <button type="button" class="layout-topbar-action" title="Logout" (click)="logout()">
-                    <i class="pi pi-sign-out"></i>
-                    <span>{{ 'topbar.logout' | transloco }}</span>
-                </button>
+                        <!-- ==========================================
+                        MENU WITH CHILDREN
+                        ========================================== -->
+
+                        <button *ngIf="item.items && item.items.length > 0" type="button" class="top-menu-item" [class.active]="openMenu === item" (click)="toggleMenu(item, $event)">
+                            <i *ngIf="item.icon" [class]="item.icon"> </i>
+
+                            <span> {{ menuTranslationService.translateMenu(item) }} </span>
+
+                            <i class="pi pi-chevron-down menu-arrow"> </i>
+                        </button>
+                    </div>
+                </nav>
             </div>
+
+            <!-- RIGHT -->
+
+            <button *ngIf="canScrollRight" type="button" class="horizontal-scroll-button horizontal-scroll-right" aria-label="Scroll menu right" title="Scroll menu right" (click)="scrollMenuRight()">
+                <i class="pi pi-chevron-right"></i>
+            </button>
         </div>
     </div>
 </div>

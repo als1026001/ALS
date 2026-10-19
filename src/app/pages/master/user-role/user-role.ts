@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -36,6 +36,8 @@ export class UserRoleComponent implements OnInit {
 
     private readonly confirmationService = inject(ConfirmationService);
 
+    private readonly cdr = inject(ChangeDetectorRef);
+
     roles: UserRole[] = [];
 
     loading = false;
@@ -58,6 +60,14 @@ export class UserRoleComponent implements OnInit {
     form = this.createEmptyForm();
 
     ngOnInit(): void {
+        this.messageService.messageObserver.subscribe((message) => {
+            console.log('[USER ROLE TOAST EVENT]', message);
+        });
+
+        this.messageService.clearObserver.subscribe((key) => {
+            console.log('[USER ROLE TOAST CLEAR]', key);
+        });
+
         this.route.queryParamMap.subscribe((params) => {
             const id = Number(params.get('id'));
 
@@ -67,6 +77,7 @@ export class UserRoleComponent implements OnInit {
 
             this.openUserRoleFromCenterSearch(id);
         });
+        this.loadRoles();
     }
 
     loadRoles(event?: TableLazyLoadEvent): void {
@@ -99,12 +110,13 @@ export class UserRoleComponent implements OnInit {
                 next: (result) => {
                     this.roles = result.items;
                     this.totalRecords = result.totalCount;
-
                     this.loading = false;
+                    this.cdr.detectChanges();
                 },
 
                 error: (error) => {
                     this.loading = false;
+                    this.cdr.detectChanges();
 
                     this.showError(this.getErrorMessage(error, 'Unable to load user roles.'));
                 }
@@ -300,6 +312,8 @@ export class UserRoleComponent implements OnInit {
                 this.saving = false;
                 this.dialogVisible = false;
 
+                this.clearCenterSearchId();
+
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',
@@ -396,5 +410,14 @@ export class UserRoleComponent implements OnInit {
 
     private getErrorMessage(error: any, fallback: string): string {
         return error?.error?.message || error?.error?.detail || error?.message || fallback;
+    }
+
+    testToast(): void {
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Toast Test',
+            detail: 'PrimeNG Toast is working',
+            life: 5000
+        });
     }
 }

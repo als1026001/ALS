@@ -1,4 +1,4 @@
-<p-toast></p-toast>
+<p-toast position="top-right" [baseZIndex]="10000"></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
 <div class="user-role-page">
@@ -12,6 +12,8 @@
             <p-button label="New Role" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
 
             <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
+
+            <p-button label="Test Toast" icon="pi pi-bell" severity="secondary" (onClick)="testToast()"> </p-button>
         </div>
     </div>
 
@@ -37,6 +39,7 @@
         <p-table
             [value]="roles"
             [lazy]="true"
+            [lazyLoadOnInit]="false"
             [loading]="loading"
             [paginator]="true"
             [rows]="rows"
@@ -136,7 +139,6 @@
             ? 'New User Role'
             : 'Edit User Role'
     "
-    (onHide)="hideDialog()"
 >
     <div class="dialog-content">
         <div class="dialog-section">

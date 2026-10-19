@@ -9,7 +9,7 @@
         </div>
 
         <div class="header-actions">
-            <p-button [label]="'menuSetup.newMenu' | transloco" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+            <p-button *ngIf="canCreate" [label]="'menuSetup.newMenu' | transloco" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
 
             <p-button [label]="'common.refresh' | transloco" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
         </div>
@@ -148,9 +148,9 @@
 
                 <td class="text-center">
                     <div class="row-actions">
-                        <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true" [ariaLabel]="'common.edit' | transloco" [title]="'common.edit' | transloco" (onClick)="edit(item)"> </p-button>
+                        <p-button *ngIf="canUpdate" icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true" [ariaLabel]="'common.edit' | transloco" [title]="'common.edit' | transloco" (onClick)="edit(item)"> </p-button>
 
-                        <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" [ariaLabel]="'common.delete' | transloco" [title]="'common.delete' | transloco" (onClick)="delete(item)"> </p-button>
+                        <p-button *ngIf="canDelete" icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" [ariaLabel]="'common.delete' | transloco" [title]="'common.delete' | transloco" (onClick)="delete(item)"> </p-button>
                     </div>
                 </td>
             </tr>
@@ -439,7 +439,7 @@
         <div class="dialog-footer">
             <p-button [label]="'common.cancel' | transloco" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="dialogVisible = false"></p-button>
 
-            <p-button [label]="'common.save' | transloco" icon="pi pi-save" (onClick)="save()"></p-button>
+            <p-button *ngIf="editingId === null ? canCreate : canUpdate" [label]="'common.save' | transloco" icon="pi pi-save" (onClick)="save()"> </p-button>
         </div>
     </ng-template>
 </p-dialog>

@@ -34,11 +34,15 @@ export class MenuNavigationService {
             return;
         }
 
-        if (parentPath) {
-            this.layoutService.layoutState.update((state) => ({
-                ...state,
-                activePath: parentPath
-            }));
+        const activePath = item.path ?? parentPath;
+
+        if (!activePath) {
+            return;
         }
+
+        this.layoutService.layoutState.update((state) => ({
+            ...state,
+            activePath
+        }));
     }
 }

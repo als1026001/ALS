@@ -145,14 +145,21 @@ export class AppMenuitem {
 
     isActive = computed(() => {
         const activePath = this.stateService.getActivePath();
-
         const path = this.fullPath();
 
-        if (!path) {
-            return false;
+        const active = !!path && (activePath === path || activePath?.startsWith(path + '/menu/') === true);
+
+        if (this.item().label === 'User Management') {
+            console.log('SIDEBAR DEBUG:', {
+                path,
+                activePath,
+                active,
+                hasChildren: this.hasChildren(),
+                visible: this.isVisible()
+            });
         }
 
-        return activePath?.startsWith(path) ?? false;
+        return active;
     });
 
     initialized = signal(false);
@@ -162,9 +169,7 @@ export class AppMenuitem {
     }
 
     ngOnInit(): void {
-        if (this.item().routerLink) {
-            this.updateActiveStateFromRoute();
-        }
+        this.updateActiveStateFromRoute();
     }
 
     ngAfterViewInit(): void {
@@ -201,9 +206,17 @@ export class AppMenuitem {
     }
 
     private handleParentClick(): void {
+        console.log('SIDEBAR PARENT CLICK:', {
+            label: this.item().label,
+            path: this.item().path,
+            fullPath: this.fullPath(),
+            parentPath: this.parentPath(),
+            activePath: this.stateService.getActivePath(),
+            hasChildren: this.hasChildren()
+        });
+
         if (this.isActive()) {
             this.stateService.setActivePath(this.parentPath());
-
             return;
         }
 
