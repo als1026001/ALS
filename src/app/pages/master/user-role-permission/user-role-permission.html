@@ -15,6 +15,8 @@
         <div class="page-actions">
             <p-button label="New Permission" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
 
+            <p-button label="Bulk Permission" icon="pi pi-list-check" severity="success" (onClick)="openBulkPermission()"> </p-button>
+
             <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()"> </p-button>
         </div>
     </div>
@@ -355,5 +357,132 @@
         <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="hideDialog()"> </p-button>
 
         <p-button label="Save" icon="pi pi-check" [loading]="saving" (onClick)="save()"> </p-button>
+    </ng-template>
+</p-dialog>
+
+<!-- =========================================================
+     BULK USER ROLE PERMISSION DIALOG
+     ========================================================= -->
+
+<p-dialog
+    header="Bulk User Role Permission"
+    [(visible)]="bulkDialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [blockScroll]="true"
+    [appendTo]="'body'"
+    position="center"
+    styleClass="bulk-permission-dialog"
+    [style]="{
+        width: '1100px',
+        maxWidth: '92vw',
+        maxHeight: 'calc(100dvh - 160px)'
+    }"
+    [contentStyle]="{
+        overflowY: 'auto'
+    }"
+>
+    <div class="dialog-content">
+        <!-- ROLE SELECTION -->
+        <div class="field-block">
+            <label>Select Role <span class="required">*</span></label>
+
+            <p-select
+                [(ngModel)]="bulkRoleId"
+                (ngModelChange)="onBulkRoleChange()"
+                [disabled]="bulkMenuLoading"
+                [options]="roles"
+                optionLabel="roleName"
+                optionValue="roleId"
+                placeholder="Select Role"
+                [filter]="true"
+                filterBy="roleNo,roleName"
+                [loading]="roleLoading"
+                appendTo="body"
+                styleClass="w-full"
+            >
+            </p-select>
+
+            @if (bulkMenuLoading) {
+            <div class="field-help">
+                <i class="pi pi-spin pi-spinner"></i>
+                Loading menus...
+            </div>
+            }
+        </div>
+
+        <div *ngIf="bulkPermissionLoading" class="field-help">
+            <i class="pi pi-spin pi-spinner"></i>
+            Loading existing permissions...
+        </div>
+
+        <!-- SEARCH MENU -->
+        <div class="field-block">
+            <label>Search Menu</label>
+
+            <input pInputText type="text" [(ngModel)]="bulkSearchText" placeholder="Search menu..." class="w-full" />
+        </div>
+
+        <!-- SELECTION BUTTONS -->
+        <div class="flex gap-2">
+            <p-button label="Select All" icon="pi pi-check-square" severity="secondary" [outlined]="true" (onClick)="selectAllBulkMenus()" [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkRoleId === null"> </p-button>
+
+            <p-button label="Clear Selection" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="clearBulkSelection()" [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkRoleId === null"> </p-button>
+        </div>
+
+        <!-- MENU PERMISSION TABLE -->
+        <p-table [value]="filteredBulkRows" [scrollable]="true" scrollHeight="280px" styleClass="p-datatable-gridlines p-datatable-sm" [loading]="bulkMenuLoading || bulkPermissionLoading">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 70px">Select</th>
+                    <th>Menu</th>
+                    <th>Router Link</th>
+                    <th style="width: 240px">Permission Level</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-row>
+                <tr>
+                    <td>
+                        <p-checkbox [(ngModel)]="row.selected" [binary]="true" [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkRoleId === null"> </p-checkbox>
+                    </td>
+
+                    <td>
+                        <strong>{{ row.menuNo }}</strong>
+
+                        <div class="cell-sub">{{ row.menuName }}</div>
+                    </td>
+
+                    <td>{{ row.routerLink || '-' }}</td>
+
+                    <td>
+                        <p-select [(ngModel)]="row.levelId" [options]="bulkPermissionLevels" optionLabel="label" optionValue="value" [disabled]="!row.selected || bulkMenuLoading || bulkPermissionLoading" appendTo="body" styleClass="w-full">
+                        </p-select>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4">
+                        <div class="empty-state">
+                            <i class="pi pi-search"></i>
+                            <div>No menus found.</div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <!-- SELECTED COUNT -->
+        <div class="result-summary">Selected: {{ bulkSelectedCount }} menu(s)</div>
+    </div>
+
+    <!-- FOOTER -->
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="bulkDialogVisible = false"> </p-button>
+
+        <p-button label="Save All" icon="pi pi-save" [disabled]="true"> </p-button>
     </ng-template>
 </p-dialog>

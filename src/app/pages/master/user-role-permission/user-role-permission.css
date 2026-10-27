@@ -463,3 +463,79 @@
         align-items: flex-start;
     }
 }
+
+/* =========================================================
+   BULK PERMISSION DIALOG - FINAL LAYOUT
+   ========================================================= */
+
+:host ::ng-deep .bulk-permission-dialog {
+    display: flex;
+    flex-direction: column;
+
+    margin: 0 !important;
+
+    max-height: calc(100dvh - 160px) !important;
+
+    border-radius: 14px;
+    overflow: hidden;
+
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+
+/* HEADER */
+:host ::ng-deep .bulk-permission-dialog .p-dialog-header {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+
+    min-height: 58px;
+    padding: 1rem 1.5rem;
+
+    border-bottom: 1px solid var(--surface-border);
+}
+
+/* CONTENT */
+:host ::ng-deep .bulk-permission-dialog .p-dialog-content {
+    flex: 1 1 auto;
+    min-height: 0;
+
+    padding: 1rem 1.5rem;
+    overflow-y: auto;
+}
+
+/* CONTENT LAYOUT */
+:host ::ng-deep .bulk-permission-dialog .dialog-content {
+    display: flex;
+    flex-direction: column;
+
+    height: auto;
+    min-height: 0;
+    gap: 0.75rem;
+}
+
+/* =========================================================
+   BULK PERMISSION TABLE SCROLL FIX
+   ========================================================= */
+
+:host ::ng-deep .bulk-permission-dialog .p-datatable {
+    display: block;
+    flex: 0 1 auto;
+    min-height: 0;
+}
+
+/* PrimeNG manages scrolling inside this container */
+:host ::ng-deep .bulk-permission-dialog .p-datatable-table-container {
+    max-height: 280px;
+    overflow-y: auto !important;
+    overflow-x: auto;
+}
+
+/* FOOTER */
+:host ::ng-deep .bulk-permission-dialog .p-dialog-footer {
+    flex: 0 0 auto;
+
+    padding: 0.85rem 1.5rem;
+
+    border-top: 1px solid var(--surface-border);
+}

@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { API_BASE_URL } from '../config/api.config';
-import { UserRolePermission, UserRolePermissionQuery, CreateUserRolePermissionRequest, UpdateUserRolePermissionRequest } from '../models/user-role-permission.model';
+import { UserRolePermission, UserRolePermissionQuery, CreateUserRolePermissionRequest, UpdateUserRolePermissionRequest, BulkUserRolePermissionRequest } from '../models/user-role-permission.model';
 
 export interface UserRolePermissionPagedResult {
     items: UserRolePermission[];
@@ -57,5 +57,17 @@ export class UserRolePermissionService {
 
     delete(permissionId: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${permissionId}`);
+    }
+
+    // =====================================================
+    // BULK SAVE USER ROLE PERMISSIONS
+    // =====================================================
+
+    bulkSave(roleId: number, request: BulkUserRolePermissionRequest): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/bulk/${roleId}`, request);
+    }
+
+    getByRole(roleId: number): Observable<UserRolePermission[]> {
+        return this.http.get<UserRolePermission[]>(`${this.apiUrl}/role/${roleId}`);
     }
 }

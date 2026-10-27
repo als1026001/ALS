@@ -54,3 +54,18 @@ export interface UpdateUserRolePermissionRequest {
 
     note?: string | null;
 }
+
+// =====================================================
+// BULK USER ROLE PERMISSION
+// =====================================================
+
+export interface BulkUserRolePermissionItem {
+    menuId: number;
+    levelId: number;
+    isInactive: boolean;
+    note: string | null;
+}
+
+export interface BulkUserRolePermissionRequest {
+    permissions: BulkUserRolePermissionItem[];
+}

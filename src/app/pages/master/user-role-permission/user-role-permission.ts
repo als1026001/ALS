@@ -23,6 +23,16 @@ import { MenuSetup } from '../../../core/models/menu-setup.model';
 import { UserRolePermissionService } from '../../../core/services/user-role-permission.service';
 import { UserRoleService } from '../../../core/services/user-role.service';
 import { MenuSetupService } from '../../../core/services/menu-setup.service';
+import { firstValueFrom } from 'rxjs';
+
+interface BulkPermissionRow {
+    menuId: number;
+    menuNo: string;
+    menuName: string;
+    routerLink: string;
+    selected: boolean;
+    levelId: number;
+}
 
 @Component({
     selector: 'app-user-role-permission',
@@ -77,6 +87,21 @@ export class UserRolePermissionComponent implements OnInit {
     submitted = false;
 
     editingPermissionId: number | null = null;
+
+    bulkDialogVisible = false;
+    bulkRoleId: number | null = null;
+    bulkPermissionLoading = false;
+    bulkMenuLoading = false;
+    bulkSearchText = '';
+
+    bulkRows: BulkPermissionRow[] = [];
+
+    readonly bulkPermissionLevels = [
+        { label: '1 - View', value: 1 },
+        { label: '2 - View + Create', value: 2 },
+        { label: '3 - View + Create + Update', value: 3 },
+        { label: '4 - Full Access', value: 4 }
+    ];
 
     form = this.createEmptyForm();
 
@@ -489,6 +514,135 @@ export class UserRolePermissionComponent implements OnInit {
             queryParams: { id: null },
             queryParamsHandling: 'merge',
             replaceUrl: true
+        });
+    }
+
+    private async loadAllBulkMenus(): Promise<void> {
+        this.bulkMenuLoading = true;
+
+        try {
+            const pageSize = 200;
+            let page = 1;
+            let totalPages = 1;
+
+            const allMenus: MenuSetup[] = [];
+
+            do {
+                const result = await firstValueFrom(
+                    this.menuSetupService.getPage({
+                        page: page,
+                        pageSize: pageSize,
+                        sortField: 'menuName',
+                        sortDirection: 'asc'
+                    })
+                );
+
+                allMenus.push(...(result.items ?? []));
+
+                totalPages = result.totalPages ?? 1;
+                page++;
+            } while (page <= totalPages);
+
+            // Chỉ lấy menu đang hoạt động
+            const activeMenus = allMenus.filter((menu) => !menu.isInactive);
+
+            // Cập nhật danh sách menu mới nhất
+            this.menus = activeMenus;
+
+            // Chuẩn bị danh sách Bulk Permission
+            this.bulkRows = activeMenus.map((menu) => ({
+                menuId: menu.menuId,
+                menuNo: menu.menuNo ?? '',
+                menuName: menu.menuName ?? '',
+                routerLink: menu.routerLink ?? '',
+                selected: false,
+                levelId: 1
+            }));
+        } catch (error) {
+            console.error('Failed to load bulk menus:', error);
+
+            this.showError('Unable to load menu list.');
+        } finally {
+            this.bulkMenuLoading = false;
+        }
+    }
+
+    openBulkPermission(): void {
+        this.bulkRoleId = null;
+        this.bulkSearchText = '';
+        this.bulkRows = [];
+
+        this.bulkDialogVisible = true;
+
+        // Tải danh sách Menu mới nhất từ API
+        void this.loadAllBulkMenus();
+    }
+
+    get filteredBulkRows(): BulkPermissionRow[] {
+        const keyword = this.bulkSearchText.trim().toLowerCase();
+
+        if (!keyword) {
+            return this.bulkRows;
+        }
+
+        return this.bulkRows.filter((row) => row.menuNo.toLowerCase().includes(keyword) || row.menuName.toLowerCase().includes(keyword) || row.routerLink.toLowerCase().includes(keyword));
+    }
+
+    get bulkSelectedCount(): number {
+        return this.bulkRows.filter((row) => row.selected).length;
+    }
+
+    selectAllBulkMenus(): void {
+        this.filteredBulkRows.forEach((row) => {
+            row.selected = true;
+        });
+    }
+
+    clearBulkSelection(): void {
+        this.filteredBulkRows.forEach((row) => {
+            row.selected = false;
+        });
+    }
+
+    onBulkRoleChange(): void {
+        const roleId = this.bulkRoleId;
+
+        // Reset quyền khi chuyển Role
+        this.bulkRows.forEach((row) => {
+            row.selected = false;
+            row.levelId = 1;
+        });
+
+        if (roleId === null) {
+            return;
+        }
+
+        this.bulkPermissionLoading = true;
+
+        this.service.getByRole(roleId).subscribe({
+            next: (permissions: UserRolePermission[]) => {
+                // Chỉ lấy quyền đang hoạt động
+                const permissionMap = new Map<number, UserRolePermission>(permissions.filter((p) => p.isInactive !== true).map((p): [number, UserRolePermission] => [p.menuId, p]));
+
+                this.bulkRows.forEach((row) => {
+                    const permission = permissionMap.get(row.menuId);
+
+                    if (permission) {
+                        row.selected = true;
+                        row.levelId = permission.levelId ?? 1;
+                    }
+                });
+
+                this.bulkPermissionLoading = false;
+            },
+
+            error: (err: unknown) => {
+                console.error('Failed to load role permissions:', err);
+
+                this.bulkPermissionLoading = false;
+
+                this.showError('Unable to load existing role permissions.');
+            }
         });
     }
 }
