@@ -367,6 +367,7 @@
 <p-dialog
     header="Bulk User Role Permission"
     [(visible)]="bulkDialogVisible"
+    (onHide)="closeBulkPermission()"
     [modal]="true"
     [draggable]="false"
     [resizable]="false"
@@ -391,7 +392,7 @@
             <p-select
                 [(ngModel)]="bulkRoleId"
                 (ngModelChange)="onBulkRoleChange()"
-                [disabled]="bulkMenuLoading"
+                [disabled]="bulkMenuLoading || bulkMenuLoadError"
                 [options]="roles"
                 optionLabel="roleName"
                 optionValue="roleId"
@@ -426,9 +427,25 @@
 
         <!-- SELECTION BUTTONS -->
         <div class="flex gap-2">
-            <p-button label="Select All" icon="pi pi-check-square" severity="secondary" [outlined]="true" (onClick)="selectAllBulkMenus()" [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkRoleId === null"> </p-button>
+            <p-button
+                label="Select All"
+                icon="pi pi-check-square"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="selectAllBulkMenus()"
+                [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkMenuLoadError || bulkPermissionLoadError || bulkRoleId === null"
+            >
+            </p-button>
 
-            <p-button label="Clear Selection" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="clearBulkSelection()" [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkRoleId === null"> </p-button>
+            <p-button
+                label="Clear Selection"
+                icon="pi pi-times"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="clearBulkSelection()"
+                [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkMenuLoadError || bulkPermissionLoadError || bulkRoleId === null"
+            >
+            </p-button>
         </div>
 
         <!-- MENU PERMISSION TABLE -->
@@ -445,7 +462,7 @@
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td>
-                        <p-checkbox [(ngModel)]="row.selected" [binary]="true" [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkRoleId === null"> </p-checkbox>
+                        <p-checkbox [(ngModel)]="row.selected" [binary]="true" [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkMenuLoadError || bulkPermissionLoadError || bulkRoleId === null"> </p-checkbox>
                     </td>
 
                     <td>
@@ -457,7 +474,15 @@
                     <td>{{ row.routerLink || '-' }}</td>
 
                     <td>
-                        <p-select [(ngModel)]="row.levelId" [options]="bulkPermissionLevels" optionLabel="label" optionValue="value" [disabled]="!row.selected || bulkMenuLoading || bulkPermissionLoading" appendTo="body" styleClass="w-full">
+                        <p-select
+                            [(ngModel)]="row.levelId"
+                            [options]="bulkPermissionLevels"
+                            optionLabel="label"
+                            optionValue="value"
+                            [disabled]="!row.selected || bulkMenuLoading || bulkPermissionLoading || bulkMenuLoadError || bulkPermissionLoadError || bulkRoleId === null"
+                            appendTo="body"
+                            styleClass="w-full"
+                        >
                         </p-select>
                     </td>
                 </tr>
@@ -481,7 +506,7 @@
 
     <!-- FOOTER -->
     <ng-template pTemplate="footer">
-        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="bulkDialogVisible = false"> </p-button>
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="closeBulkPermission()"> </p-button>
 
         <p-button label="Save All" icon="pi pi-save" [disabled]="true"> </p-button>
     </ng-template>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -58,6 +58,7 @@ export class UserRolePermissionComponent implements OnInit {
     private readonly messageService = inject(MessageService);
 
     private readonly confirmationService = inject(ConfirmationService);
+    private readonly cdr = inject(ChangeDetectorRef);
 
     items: UserRolePermission[] = [];
 
@@ -92,7 +93,14 @@ export class UserRolePermissionComponent implements OnInit {
     bulkRoleId: number | null = null;
     bulkPermissionLoading = false;
     bulkMenuLoading = false;
+    bulkMenuLoadError = false;
+    bulkPermissionLoadError = false;
     bulkSearchText = '';
+
+    private bulkMenuRequestId = 0;
+    private bulkPermissionRequestId = 0;
+    private bulkLoadedRoleId: number | null = null;
+    private bulkMenusLoaded = false;
 
     bulkRows: BulkPermissionRow[] = [];
 
@@ -518,7 +526,11 @@ export class UserRolePermissionComponent implements OnInit {
     }
 
     private async loadAllBulkMenus(): Promise<void> {
+        const requestId = ++this.bulkMenuRequestId;
+
+        this.bulkMenusLoaded = false;
         this.bulkMenuLoading = true;
+        this.bulkMenuLoadError = false;
 
         try {
             const pageSize = 200;
@@ -530,12 +542,17 @@ export class UserRolePermissionComponent implements OnInit {
             do {
                 const result = await firstValueFrom(
                     this.menuSetupService.getPage({
-                        page: page,
-                        pageSize: pageSize,
+                        page,
+                        pageSize,
                         sortField: 'menuName',
                         sortDirection: 'asc'
                     })
                 );
+
+                // Request cũ hoặc Dialog đã đóng
+                if (requestId !== this.bulkMenuRequestId || !this.bulkDialogVisible) {
+                    return;
+                }
 
                 allMenus.push(...(result.items ?? []));
 
@@ -543,13 +560,16 @@ export class UserRolePermissionComponent implements OnInit {
                 page++;
             } while (page <= totalPages);
 
-            // Chỉ lấy menu đang hoạt động
             const activeMenus = allMenus.filter((menu) => !menu.isInactive);
 
-            // Cập nhật danh sách menu mới nhất
-            this.menus = activeMenus;
+            // Chỉ cập nhật khi request còn hợp lệ
+            if (requestId !== this.bulkMenuRequestId || !this.bulkDialogVisible) {
+                return;
+            }
 
-            // Chuẩn bị danh sách Bulk Permission
+            this.menus = activeMenus;
+            this.bulkMenuLoadError = false;
+
             this.bulkRows = activeMenus.map((menu) => ({
                 menuId: menu.menuId,
                 menuNo: menu.menuNo ?? '',
@@ -558,24 +578,71 @@ export class UserRolePermissionComponent implements OnInit {
                 selected: false,
                 levelId: 1
             }));
+
+            // Chỉ đánh dấu thành công sau khi tải và tạo đủ danh sách Menu
+            this.bulkMenusLoaded = true;
         } catch (error) {
+            if (requestId !== this.bulkMenuRequestId || !this.bulkDialogVisible) {
+                return;
+            }
+
             console.error('Failed to load bulk menus:', error);
+
+            this.bulkMenusLoaded = false;
+            this.bulkMenuLoadError = true;
+            this.bulkRows = [];
 
             this.showError('Unable to load menu list.');
         } finally {
-            this.bulkMenuLoading = false;
+            if (requestId === this.bulkMenuRequestId) {
+                this.bulkMenuLoading = false;
+                this.cdr.detectChanges();
+            }
         }
     }
 
     openBulkPermission(): void {
+        // Vô hiệu hóa request Permission cũ
+        ++this.bulkPermissionRequestId;
+
+        // Reset dữ liệu
         this.bulkRoleId = null;
+        this.bulkLoadedRoleId = null;
+        this.bulkMenusLoaded = false;
         this.bulkSearchText = '';
         this.bulkRows = [];
 
+        // Reset Loading
+        this.bulkPermissionLoading = false;
+
+        // Reset lỗi API
+        this.bulkMenuLoadError = false;
+        this.bulkPermissionLoadError = false;
+
+        // Mở Dialog
         this.bulkDialogVisible = true;
 
-        // Tải danh sách Menu mới nhất từ API
+        // Tải Menu mới nhất
         void this.loadAllBulkMenus();
+    }
+
+    closeBulkPermission(): void {
+        // Vô hiệu hóa các request cũ
+        ++this.bulkMenuRequestId;
+        ++this.bulkPermissionRequestId;
+
+        // Reset Loading
+        this.bulkMenuLoading = false;
+        this.bulkPermissionLoading = false;
+
+        // Reset lỗi API
+        this.bulkMenuLoadError = false;
+        this.bulkPermissionLoadError = false;
+
+        // Đóng Dialog
+        this.bulkLoadedRoleId = null;
+        this.bulkMenusLoaded = false;
+        this.bulkDialogVisible = false;
     }
 
     get filteredBulkRows(): BulkPermissionRow[] {
@@ -592,6 +659,51 @@ export class UserRolePermissionComponent implements OnInit {
         return this.bulkRows.filter((row) => row.selected).length;
     }
 
+    get canSaveBulkPermissions(): boolean {
+        // Dialog phải đang mở
+        if (!this.bulkDialogVisible) {
+            return false;
+        }
+
+        // Phải tải hoàn tất toàn bộ danh sách Menu
+        if (!this.bulkMenusLoaded) {
+            return false;
+        }
+
+        // Phải chọn Role hợp lệ
+        if (this.bulkRoleId === null || !Number.isInteger(this.bulkRoleId) || this.bulkRoleId <= 0) {
+            return false;
+        }
+
+        // Permission phải được tải thành công cho đúng Role đang chọn
+        if (this.bulkLoadedRoleId !== this.bulkRoleId) {
+            return false;
+        }
+
+        // Không được đang tải dữ liệu
+        if (this.bulkMenuLoading || this.bulkPermissionLoading) {
+            return false;
+        }
+
+        // Không được có lỗi API
+        if (this.bulkMenuLoadError || this.bulkPermissionLoadError) {
+            return false;
+        }
+
+        // Phải có danh sách Menu
+        if (this.bulkRows.length === 0) {
+            return false;
+        }
+
+        // Phải chọn ít nhất một Menu
+        if (this.bulkSelectedCount === 0) {
+            return false;
+        }
+
+        // Tất cả Menu được chọn phải có Permission Level hợp lệ
+        return this.bulkRows.filter((row) => row.selected).every((row) => [1, 2, 3, 4].includes(row.levelId));
+    }
+
     selectAllBulkMenus(): void {
         this.filteredBulkRows.forEach((row) => {
             row.selected = true;
@@ -605,7 +717,11 @@ export class UserRolePermissionComponent implements OnInit {
     }
 
     onBulkRoleChange(): void {
+        const requestId = ++this.bulkPermissionRequestId;
         const roleId = this.bulkRoleId;
+
+        this.bulkLoadedRoleId = null;
+        this.bulkPermissionLoadError = false;
 
         // Reset quyền khi chuyển Role
         this.bulkRows.forEach((row) => {
@@ -613,15 +729,21 @@ export class UserRolePermissionComponent implements OnInit {
             row.levelId = 1;
         });
 
-        if (roleId === null) {
+        // Xác định trạng thái Loading một lần
+        const shouldLoad = roleId !== null && !this.bulkMenuLoading && this.bulkDialogVisible;
+
+        this.bulkPermissionLoading = shouldLoad;
+
+        if (!shouldLoad || roleId === null) {
             return;
         }
 
-        this.bulkPermissionLoading = true;
-
         this.service.getByRole(roleId).subscribe({
             next: (permissions: UserRolePermission[]) => {
-                // Chỉ lấy quyền đang hoạt động
+                if (requestId !== this.bulkPermissionRequestId || this.bulkRoleId !== roleId || !this.bulkDialogVisible) {
+                    return;
+                }
+
                 const permissionMap = new Map<number, UserRolePermission>(permissions.filter((p) => p.isInactive !== true).map((p): [number, UserRolePermission] => [p.menuId, p]));
 
                 this.bulkRows.forEach((row) => {
@@ -633,13 +755,25 @@ export class UserRolePermissionComponent implements OnInit {
                     }
                 });
 
+                // Xác nhận Permission đã tải thành công cho Role hiện tại
+                this.bulkLoadedRoleId = roleId;
+
+                this.bulkPermissionLoadError = false;
                 this.bulkPermissionLoading = false;
+                this.cdr.detectChanges();
             },
 
-            error: (err: unknown) => {
-                console.error('Failed to load role permissions:', err);
+            error: (error: unknown) => {
+                if (requestId !== this.bulkPermissionRequestId || this.bulkRoleId !== roleId || !this.bulkDialogVisible) {
+                    return;
+                }
 
+                console.error('Failed to load role permissions:', error);
+
+                this.bulkLoadedRoleId = null;
+                this.bulkPermissionLoadError = true;
                 this.bulkPermissionLoading = false;
+                this.cdr.detectChanges();
 
                 this.showError('Unable to load existing role permissions.');
             }
