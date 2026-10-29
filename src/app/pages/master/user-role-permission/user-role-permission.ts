@@ -92,6 +92,10 @@ export class UserRolePermissionComponent implements OnInit {
     bulkDialogVisible = false;
     bulkRoleId: number | null = null;
     bulkPermissionLoading = false;
+    bulkSaving = false;
+
+    private bulkSaveConfirmed = false;
+
     bulkMenuLoading = false;
     bulkMenuLoadError = false;
     bulkPermissionLoadError = false;
@@ -191,6 +195,8 @@ export class UserRolePermissionComponent implements OnInit {
                     this.totalRecords = result.totalCount ?? 0;
 
                     this.loading = false;
+
+                    this.cdr.detectChanges();
                 },
 
                 error: (error) => {
@@ -536,6 +542,7 @@ export class UserRolePermissionComponent implements OnInit {
             const pageSize = 200;
             let page = 1;
             let totalPages = 1;
+            let expectedTotalCount: number | null = null;
 
             const allMenus: MenuSetup[] = [];
 
@@ -554,11 +561,52 @@ export class UserRolePermissionComponent implements OnInit {
                     return;
                 }
 
-                allMenus.push(...(result.items ?? []));
+                const pageItems = result.items;
 
-                totalPages = result.totalPages ?? 1;
+                if (!Array.isArray(pageItems)) {
+                    throw new Error('Invalid menu page response.');
+                }
+
+                const totalCount = result.totalCount;
+                const reportedTotalPages = result.totalPages;
+
+                if (typeof totalCount !== 'number' || !Number.isInteger(totalCount) || totalCount < 0 || typeof reportedTotalPages !== 'number' || !Number.isInteger(reportedTotalPages) || reportedTotalPages < 1) {
+                    throw new Error('Invalid menu pagination metadata.');
+                }
+
+                if (expectedTotalCount === null) {
+                    expectedTotalCount = totalCount;
+                } else if (expectedTotalCount !== totalCount) {
+                    throw new Error('Menu total count changed during loading.');
+                }
+
+                if (reportedTotalPages !== Math.max(1, Math.ceil(totalCount / pageSize))) {
+                    throw new Error('Inconsistent menu page count.');
+                }
+
+                if (pageItems.length !== Math.min(pageSize, Math.max(0, totalCount - (page - 1) * pageSize))) {
+                    throw new Error('Incomplete menu page.');
+                }
+
+                allMenus.push(...pageItems);
+
+                totalPages = reportedTotalPages;
                 page++;
             } while (page <= totalPages);
+
+            const menuIds = new Set<number>();
+
+            for (const menu of allMenus) {
+                if (!Number.isInteger(menu.menuId) || menu.menuId <= 0 || menuIds.has(menu.menuId)) {
+                    throw new Error('Invalid or duplicate menu ID.');
+                }
+
+                menuIds.add(menu.menuId);
+            }
+
+            if (allMenus.length !== expectedTotalCount) {
+                throw new Error('Incomplete menu list.');
+            }
 
             const activeMenus = allMenus.filter((menu) => !menu.isInactive);
 
@@ -627,6 +675,11 @@ export class UserRolePermissionComponent implements OnInit {
     }
 
     closeBulkPermission(): void {
+        // Không cho đóng Dialog khi đang lưu dữ liệu
+        if (this.bulkSaving) {
+            return;
+        }
+
         // Vô hiệu hóa các request cũ
         ++this.bulkMenuRequestId;
         ++this.bulkPermissionRequestId;
@@ -671,7 +724,7 @@ export class UserRolePermissionComponent implements OnInit {
         }
 
         // Phải chọn Role hợp lệ
-        if (this.bulkRoleId === null || !Number.isInteger(this.bulkRoleId) || this.bulkRoleId <= 0) {
+        if (this.bulkRoleId === null || !Number.isInteger(this.bulkRoleId) || this.bulkRoleId <= 0 || this.bulkRoleId === 1) {
             return false;
         }
 
@@ -695,13 +748,181 @@ export class UserRolePermissionComponent implements OnInit {
             return false;
         }
 
-        // Phải chọn ít nhất một Menu
-        if (this.bulkSelectedCount === 0) {
-            return false;
-        }
-
         // Tất cả Menu được chọn phải có Permission Level hợp lệ
         return this.bulkRows.filter((row) => row.selected).every((row) => [1, 2, 3, 4].includes(row.levelId));
+    }
+
+    private buildBulkPermissionItems(): {
+        menuId: number;
+        levelId: number;
+        isInactive: boolean;
+        note: string | null;
+    }[] {
+        if (!this.canSaveBulkPermissions) {
+            return [];
+        }
+
+        return this.bulkRows.map((row) => ({
+            menuId: row.menuId,
+            levelId: row.levelId,
+            isInactive: !row.selected,
+            note: null
+        }));
+    }
+
+    confirmBulkSave(): void {
+        if (this.bulkSaving || !this.canSaveBulkPermissions) {
+            return;
+        }
+
+        const roleId = this.bulkRoleId;
+
+        if (roleId === null || roleId === 1) {
+            return;
+        }
+
+        const role = this.roles.find((x) => x.roleId === roleId);
+
+        const roleName = role?.roleName ?? `Role ID ${roleId}`;
+
+        const selectedCount = this.bulkRows.filter((row) => row.selected).length;
+
+        const unselectedCount = this.bulkRows.length - selectedCount;
+
+        // Snapshot toàn bộ dữ liệu tại thời điểm xác nhận
+        const permissionSnapshot = JSON.stringify(
+            this.bulkRows
+                .map((row) => ({
+                    menuId: row.menuId,
+                    selected: row.selected,
+                    levelId: row.levelId
+                }))
+                .sort((a, b) => a.menuId - b.menuId)
+        );
+
+        const warning = selectedCount === 0 ? 'WARNING: All existing permissions for active menus in this role will be deactivated.' : 'Unselected menus will have their existing permissions deactivated.';
+
+        this.confirmationService.confirm({
+            key: 'bulkPermissionConfirm',
+
+            header: 'Confirm Bulk Permission Synchronization',
+
+            icon: 'pi pi-exclamation-triangle',
+
+            message: `Role: ${roleName}\n` + `Selected menus: ${selectedCount}\n` + `Unselected menus: ${unselectedCount}\n\n` + warning,
+
+            acceptLabel: 'Confirm Save',
+
+            rejectLabel: 'Cancel',
+
+            acceptButtonStyleClass: 'p-button-danger',
+
+            accept: () => {
+                // Prevent saving if the Role or selection changed
+                // while the confirmation dialog was open.
+                if (this.bulkRoleId !== roleId || !this.canSaveBulkPermissions || this.bulkSaving) {
+                    return;
+                }
+
+                // Kiểm tra dữ liệu có thay đổi sau khi mở ConfirmDialog không
+                const currentSnapshot = JSON.stringify(
+                    this.bulkRows
+                        .map((row) => ({
+                            menuId: row.menuId,
+                            selected: row.selected,
+                            levelId: row.levelId
+                        }))
+                        .sort((a, b) => a.menuId - b.menuId)
+                );
+
+                if (currentSnapshot !== permissionSnapshot) {
+                    this.messageService.add({
+                        severity: 'warn',
+                        summary: 'Permission Changed',
+                        detail: 'Permission data has changed. Please review and confirm again.'
+                    });
+
+                    return;
+                }
+
+                this.bulkSaveConfirmed = true;
+                this.saveBulkPermissions();
+            }
+        });
+    }
+
+    private saveBulkPermissions(): void {
+        if (!this.bulkSaveConfirmed) {
+            return;
+        }
+
+        // Xác nhận chỉ được sử dụng một lần.
+        this.bulkSaveConfirmed = false;
+
+        if (this.bulkSaving || !this.canSaveBulkPermissions) {
+            return;
+        }
+
+        const roleId = this.bulkRoleId;
+
+        if (roleId === null || roleId === 1) {
+            return;
+        }
+
+        const permissions = this.buildBulkPermissionItems();
+
+        if (permissions.length === 0) {
+            return;
+        }
+
+        this.bulkSaving = true;
+
+        this.service.bulkSave(roleId, { permissions }).subscribe({
+            next: () => {
+                this.bulkSaving = false;
+
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Bulk Save Success',
+                    detail: `${permissions.length} permissions synchronized successfully.`,
+                    life: 10000
+                });
+
+                // Refresh main permission table
+                this.loadData();
+
+                // Refresh Bulk Dialog only if the same Role is still selected
+                if (this.bulkDialogVisible && this.bulkRoleId === roleId) {
+                    this.onBulkRoleChange();
+                }
+
+                this.cdr.detectChanges();
+            },
+
+            error: (error) => {
+                this.bulkSaving = false;
+
+                let detail = 'Unable to save bulk permissions.';
+
+                if (error.status === 403) {
+                    detail = 'You do not have permission to manage role permissions.';
+                } else if (error.status === 400) {
+                    detail = error.error?.message || 'Invalid permission data.';
+                } else if (error.status === 409) {
+                    detail = 'Permission data conflict. Please refresh and try again.';
+                } else if (error.status === 0) {
+                    detail = 'Cannot connect to the server.';
+                }
+
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Bulk Save Failed',
+                    detail
+                });
+
+                this.cdr.detectChanges();
+            }
+        });
     }
 
     selectAllBulkMenus(): void {
@@ -717,6 +938,11 @@ export class UserRolePermissionComponent implements OnInit {
     }
 
     onBulkRoleChange(): void {
+        // Không xử lý thay đổi Role trong khi Bulk Save
+        if (this.bulkSaving) {
+            return;
+        }
+
         const requestId = ++this.bulkPermissionRequestId;
         const roleId = this.bulkRoleId;
 

@@ -1,4 +1,7 @@
-<p-toast></p-toast>
+<p-toast position="top-right" [baseZIndex]="30000" [autoZIndex]="true" [style]="{ 'z-index': 30000 }"> </p-toast>
+
+<p-confirmDialog key="bulkPermissionConfirm" [style]="{ width: '32rem', maxWidth: '95vw' }" [closable]="false" [dismissableMask]="false" [closeOnEscape]="false"> </p-confirmDialog>
+
 <p-confirmDialog></p-confirmDialog>
 
 <div class="user-role-permission-page">
@@ -369,6 +372,9 @@
     [(visible)]="bulkDialogVisible"
     (onHide)="closeBulkPermission()"
     [modal]="true"
+    [closable]="!bulkSaving"
+    [closeOnEscape]="!bulkSaving"
+    [dismissableMask]="false"
     [draggable]="false"
     [resizable]="false"
     [blockScroll]="true"
@@ -392,7 +398,7 @@
             <p-select
                 [(ngModel)]="bulkRoleId"
                 (ngModelChange)="onBulkRoleChange()"
-                [disabled]="bulkMenuLoading || bulkMenuLoadError"
+                [disabled]="bulkMenuLoading || bulkMenuLoadError || bulkSaving"
                 [options]="roles"
                 optionLabel="roleName"
                 optionValue="roleId"
@@ -433,7 +439,7 @@
                 severity="secondary"
                 [outlined]="true"
                 (onClick)="selectAllBulkMenus()"
-                [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkMenuLoadError || bulkPermissionLoadError || bulkRoleId === null"
+                [disabled]="bulkSaving || bulkMenuLoading || bulkPermissionLoading || bulkMenuLoadError || bulkPermissionLoadError || bulkRoleId === null"
             >
             </p-button>
 
@@ -462,7 +468,7 @@
             <ng-template pTemplate="body" let-row>
                 <tr>
                     <td>
-                        <p-checkbox [(ngModel)]="row.selected" [binary]="true" [disabled]="bulkMenuLoading || bulkPermissionLoading || bulkMenuLoadError || bulkPermissionLoadError || bulkRoleId === null"> </p-checkbox>
+                        <p-checkbox [(ngModel)]="row.selected" [binary]="true" [disabled]="bulkSaving || bulkMenuLoading || bulkPermissionLoading || bulkMenuLoadError || bulkPermissionLoadError || bulkRoleId === null"> </p-checkbox>
                     </td>
 
                     <td>
@@ -479,7 +485,7 @@
                             [options]="bulkPermissionLevels"
                             optionLabel="label"
                             optionValue="value"
-                            [disabled]="!row.selected || bulkMenuLoading || bulkPermissionLoading || bulkMenuLoadError || bulkPermissionLoadError || bulkRoleId === null"
+                            [disabled]="bulkSaving || !row.selected || bulkMenuLoading || bulkPermissionLoading || bulkMenuLoadError || bulkPermissionLoadError || bulkRoleId === null"
                             appendTo="body"
                             styleClass="w-full"
                         >
@@ -506,8 +512,8 @@
 
     <!-- FOOTER -->
     <ng-template pTemplate="footer">
-        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="closeBulkPermission()"> </p-button>
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="bulkSaving" (onClick)="closeBulkPermission()"> </p-button>
 
-        <p-button label="Save All" icon="pi pi-save" [disabled]="true"> </p-button>
+        <p-button label="Save All" icon="pi pi-save" severity="success" [loading]="bulkSaving" [disabled]="bulkSaving || !canSaveBulkPermissions" (onClick)="confirmBulkSave()"> </p-button>
     </ng-template>
 </p-dialog>
