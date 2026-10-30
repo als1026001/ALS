@@ -1,0 +1,310 @@
+﻿<p-toast />
+
+<div class="card">
+
+    <p-toolbar styleClass="mb-4">
+
+        <ng-template #start>
+            <div class="flex flex-wrap gap-2">
+
+                @if (access.canCreate) {
+                    <p-button
+                        label="New"
+                        icon="pi pi-plus"
+                        (onClick)="openNew()"
+                    />
+                }
+
+                <p-button
+                    label="Refresh"
+                    icon="pi pi-refresh"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="refresh()"
+                />
+
+                @if (access.canView) {
+                    <app-excel-export-button
+                        endpoint="hrdepartment/export"
+                        fileName="HR_Department"
+                        [search]="search"
+                        [sortField]="sortField"
+                        [sortDirection]="sortDirection"
+                    />
+                }
+
+            </div>
+        </ng-template>
+
+        <ng-template #end>
+            <div class="flex flex-wrap gap-2 items-center">
+
+                <input
+                    pInputText
+                    type="text"
+                    [(ngModel)]="search"
+                    maxlength="250"
+                    placeholder="Search Department Code / Name"
+                    (keyup.enter)="searchDepartments()"
+                    class="w-64"
+                />
+
+                <p-button
+                    icon="pi pi-search"
+                    ariaLabel="Search"
+                    (onClick)="searchDepartments()"
+                />
+
+                @if (search) {
+                    <p-button
+                        icon="pi pi-times"
+                        ariaLabel="Clear"
+                        severity="secondary"
+                        [outlined]="true"
+                        (onClick)="clearSearch()"
+                    />
+                }
+
+            </div>
+        </ng-template>
+
+    </p-toolbar>
+
+    <p-table
+        [value]="departments"
+        [loading]="loading"
+        [paginator]="true"
+        [lazy]="true"
+        (onLazyLoad)="onLazyLoad($event)"
+        [rows]="pageSize"
+        [first]="first"
+        [totalRecords]="totalRecords"
+        [rowsPerPageOptions]="[10, 20, 50, 100]"
+        [rowHover]="true"
+        [showGridlines]="true"
+        dataKey="departmentId"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} departments"
+    >
+
+        <ng-template #header>
+            <tr>
+                <th>Department Code</th>
+                <th>Department Name</th>
+                <th>Sequence No</th>
+                <th>Note</th>
+                <th>Created At</th>
+                <th>Created By</th>
+                <th>Edited At</th>
+                <th>Edited By</th>
+
+                @if (access.canUpdate) {
+                    <th class="text-center" style="width: 7rem">
+                        Action
+                    </th>
+                }
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-department>
+            <tr>
+                <td class="font-medium">
+                    {{ department.departmentCode }}
+                </td>
+
+                <td>
+                    {{ department.departmentName }}
+                </td>
+
+                <td>
+                    {{ department.seqNo ?? '-' }}
+                </td>
+
+                <td>
+                    {{ department.note || '-' }}
+                </td>
+
+                <td>
+                    {{ department.createdAt
+                        ? (department.createdAt | date:'dd/MM/yyyy HH:mm')
+                        : '-' }}
+                </td>
+
+                <td>
+                    {{ department.createdBy ?? '-' }}
+                </td>
+
+                <td>
+                    {{ department.editedAt
+                        ? (department.editedAt | date:'dd/MM/yyyy HH:mm')
+                        : '-' }}
+                </td>
+
+                <td>
+                    {{ department.editedBy ?? '-' }}
+                </td>
+
+                @if (access.canUpdate) {
+                    <td class="text-center">
+                        <p-button
+                            icon="pi pi-pencil"
+                            severity="success"
+                            [rounded]="true"
+                            [outlined]="true"
+                            ariaLabel="Edit"
+                            (onClick)="editDepartment(department)"
+                        />
+                    </td>
+                }
+            </tr>
+        </ng-template>
+
+        <ng-template #emptymessage>
+            <tr>
+                <td
+                    [attr.colspan]="access.canUpdate ? 9 : 8"
+                    class="text-center py-8"
+                >
+                    No departments found.
+                </td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+
+</div>
+
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [closable]="!saving"
+    [closeOnEscape]="!saving"
+    [style]="{ width: '36rem', maxWidth: '95vw' }"
+    [header]="editing ? 'Edit Department' : 'New Department'"
+>
+
+    <div class="flex flex-col gap-5 pt-2">
+
+        <div>
+            <label
+                for="departmentCode"
+                class="block font-medium mb-2"
+            >
+                Department Code
+                <span class="text-red-500">*</span>
+            </label>
+
+            <input
+                id="departmentCode"
+                pInputText
+                [(ngModel)]="form.departmentCode"
+                maxlength="50"
+                class="w-full"
+                [disabled]="saving"
+            />
+
+            @if (submitted && !form.departmentCode.trim()) {
+                <small class="text-red-500">
+                    Department Code is required.
+                </small>
+            }
+        </div>
+
+        <div>
+            <label
+                for="departmentName"
+                class="block font-medium mb-2"
+            >
+                Department Name
+                <span class="text-red-500">*</span>
+            </label>
+
+            <input
+                id="departmentName"
+                pInputText
+                [(ngModel)]="form.departmentName"
+                maxlength="250"
+                class="w-full"
+                [disabled]="saving"
+            />
+
+            @if (submitted && !form.departmentName.trim()) {
+                <small class="text-red-500">
+                    Department Name is required.
+                </small>
+            }
+        </div>
+
+        <div>
+            <label
+                for="seqNo"
+                class="block font-medium mb-2"
+            >
+                Sequence Number
+            </label>
+
+            <input
+                id="seqNo"
+                type="number"
+                pInputText
+                [(ngModel)]="form.seqNo"
+                step="1"
+                class="w-full"
+                [disabled]="saving"
+            />
+
+            @if (
+                submitted &&
+                form.seqNo != null &&
+                (
+                    form.seqNo < -2147483648 ||
+                    form.seqNo > 2147483647
+                )
+            ) {
+                <small class="text-red-500">
+                    Sequence Number is outside the allowed range.
+                </small>
+            }
+        </div>
+
+        <div>
+            <label
+                for="departmentNote"
+                class="block font-medium mb-2"
+            >
+                Note
+            </label>
+
+            <input
+                id="departmentNote"
+                pInputText
+                [(ngModel)]="form.note"
+                maxlength="250"
+                class="w-full"
+                [disabled]="saving"
+            />
+        </div>
+
+    </div>
+
+    <ng-template #footer>
+
+        <p-button
+            label="Cancel"
+            severity="secondary"
+            [outlined]="true"
+            [disabled]="saving"
+            (onClick)="hideDialog()"
+        />
+
+        <p-button
+            label="Save"
+            icon="pi pi-check"
+            [loading]="saving"
+            [disabled]="saving"
+            (onClick)="saveDepartment()"
+        />
+
+    </ng-template>
+
+</p-dialog>

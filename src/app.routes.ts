@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+﻿import { Routes } from '@angular/router';
 import { AppLayout } from './app/layout/component/app.layout';
 import { Dashboard } from './app/pages/dashboard/dashboard';
 import { Documentation } from './app/pages/documentation/documentation';
@@ -59,7 +59,7 @@ export const appRoutes: Routes = [
                     permissionRoute: '/menuSetup'
                 },
 
-                loadComponent: () => import('./app/pages/master/menu-setup/menu-setup').then((m) => m.MenuSetupPage)
+                loadComponent: () => import('./app/pages/system/menu-setup/menu-setup').then((m) => m.MenuSetupPage)
             },
             {
                 path: 'menuField',
@@ -70,7 +70,7 @@ export const appRoutes: Routes = [
                     permissionRoute: '/menuField'
                 },
 
-                loadComponent: () => import('./app/pages/master/menu-field/menu-field').then((m) => m.MenuFieldComponent)
+                loadComponent: () => import('./app/pages/system/menu-field/menu-field').then((m) => m.MenuFieldComponent)
             },
             {
                 path: 'menuGroup',
@@ -79,16 +79,13 @@ export const appRoutes: Routes = [
 
                 data: { permissionRoute: '/menuGroup' },
 
-                loadComponent: () => import('./app/pages/master/menu-group/menu-group').then((m) => m.MenuGroupComponent)
+                loadComponent: () => import('./app/pages/system/menu-group/menu-group').then((m) => m.MenuGroupComponent)
             },
             {
                 path: 'menuType',
-
                 canActivate: [routePermissionGuard],
-
                 data: { permissionRoute: '/menuType' },
-
-                loadComponent: () => import('./app/pages/master/menu-type/menu-type').then((m) => m.MenuTypeComponent)
+                loadComponent: () => import('./app/pages/system/menu-type/menu-type').then((m) => m.MenuTypeComponent)
             },
             {
                 path: 'user',
@@ -99,7 +96,7 @@ export const appRoutes: Routes = [
                     permissionRoute: '/user'
                 },
 
-                loadComponent: () => import('./app/pages/master/user/user').then((m) => m.UserComponent)
+                loadComponent: () => import('./app/pages/system/user/user').then((m) => m.UserComponent)
             },
             {
                 path: 'userRole',
@@ -110,7 +107,7 @@ export const appRoutes: Routes = [
                     permissionRoute: '/userRole'
                 },
 
-                loadComponent: () => import('./app/pages/master/user-role/user-role').then((m) => m.UserRoleComponent)
+                loadComponent: () => import('./app/pages/system/user-role/user-role').then((m) => m.UserRoleComponent)
             },
             {
                 path: 'userRolePermission',
@@ -121,7 +118,7 @@ export const appRoutes: Routes = [
                     permissionRoute: '/userRolePermission'
                 },
 
-                loadComponent: () => import('./app/pages/master/user-role-permission/user-role-permission').then((m) => m.UserRolePermissionComponent)
+                loadComponent: () => import('./app/pages/system/user-role-permission/user-role-permission').then((m) => m.UserRolePermissionComponent)
             },
             {
                 path: 'userRoleRegister',
@@ -132,7 +129,7 @@ export const appRoutes: Routes = [
                     permissionRoute: '/userRoleRegister'
                 },
 
-                loadComponent: () => import('./app/pages/master/user-role-register/user-role-register').then((m) => m.UserRoleRegisterComponent)
+                loadComponent: () => import('./app/pages/system/user-role-register/user-role-register').then((m) => m.UserRoleRegisterComponent)
             },
             {
                 path: 'autoGenerateNumber',
@@ -143,7 +140,7 @@ export const appRoutes: Routes = [
                     permissionRoute: '/autoGenerateNumber'
                 },
 
-                loadComponent: () => import('./app/pages/master/auto-generate-number/auto-generate-number').then((m) => m.AutoGenerateNumberComponent)
+                loadComponent: () => import('./app/pages/system/auto-generate-number/auto-generate-number').then((m) => m.AutoGenerateNumberComponent)
             },
             {
                 path: 'company',
@@ -154,7 +151,7 @@ export const appRoutes: Routes = [
                     permissionRoute: '/company'
                 },
 
-                loadComponent: () => import('./app/pages/master/company/company').then((m) => m.CompanyComponent)
+                loadComponent: () => import('./app/pages/system/company/company').then((m) => m.CompanyComponent)
             },
             {
                 path: 'listView',
@@ -163,7 +160,7 @@ export const appRoutes: Routes = [
 
                 data: { permissionRoute: '/listView' },
 
-                loadComponent: () => import('./app/pages/master/list-view/list-view').then((m) => m.ListViewComponent)
+                loadComponent: () => import('./app/pages/system/list-view/list-view').then((m) => m.ListViewComponent)
             },
             {
                 path: 'listViewColumn',
@@ -174,7 +171,7 @@ export const appRoutes: Routes = [
                     permissionRoute: '/listViewColumn'
                 },
 
-                loadComponent: () => import('./app/pages/master/list-view-column/list-view-column').then((m) => m.ListViewColumnComponent)
+                loadComponent: () => import('./app/pages/system/list-view-column/list-view-column').then((m) => m.ListViewColumnComponent)
             },
             {
                 path: 'listViewFilter',
@@ -185,8 +182,32 @@ export const appRoutes: Routes = [
                     permissionRoute: '/listViewFilter'
                 },
 
-                loadComponent: () => import('./app/pages/master/list-view-filter/list-view-filter').then((m) => m.ListViewFilterComponent)
+                loadComponent: () => import('./app/pages/system/list-view-filter/list-view-filter').then((m) => m.ListViewFilterComponent)
             },
+            {
+    path: '',
+    loadChildren: () =>
+        import('./app/pages/hr/hr.routes')
+            .then(m => m.featureRoutes)
+},
+{
+    path: '',
+    loadChildren: () =>
+        import('./app/pages/system/system.routes')
+            .then(m => m.featureRoutes)
+},
+{
+    path: '',
+    loadChildren: () =>
+        import('./app/pages/master/master.routes')
+            .then(m => m.featureRoutes)
+},
+{
+    path: '',
+    loadChildren: () =>
+        import('./app/pages/document/document.routes')
+            .then(m => m.featureRoutes)
+},
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },
@@ -194,3 +215,7 @@ export const appRoutes: Routes = [
     { path: 'notfound', component: Notfound },
     { path: '**', redirectTo: '/notfound' }
 ];
+
+
+
+

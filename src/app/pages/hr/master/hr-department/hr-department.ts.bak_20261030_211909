@@ -1,0 +1,402 @@
+﻿import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { ToastModule } from 'primeng/toast';
+import { ToolbarModule } from 'primeng/toolbar';
+
+import { finalize } from 'rxjs';
+
+import {
+    HrDepartment as HrDepartmentModel,
+    CreateHrDepartmentRequest,
+    UpdateHrDepartmentRequest
+} from '../../../../core/models/hr-department.model';
+
+import { RouteAccess } from '../../../../core/models/permission.model';
+
+import { HrDepartmentService } from '../../../../core/services/hr-department.service';
+import { PermissionService } from '../../../../core/services/permission.service';
+
+import { ExcelExportButton } from '../../../../shared/components/excel-export-button/excel-export-button';
+
+@Component({
+    selector: 'app-hr-department',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule,
+        TableModule,
+        ButtonModule,
+        DialogModule,
+        InputTextModule,
+        ToastModule,
+        ToolbarModule,
+        ExcelExportButton
+    ],
+    providers: [MessageService],
+    templateUrl: './hr-department.html',
+    styleUrl: './hr-department.scss'
+})
+export class HrDepartment implements OnInit {
+
+    private readonly departmentService = inject(HrDepartmentService);
+    private readonly permissionService = inject(PermissionService);
+    private readonly messageService = inject(MessageService);
+    private readonly cdr = inject(ChangeDetectorRef);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+
+    readonly permissionRoute = '/hrDepartment';
+
+    departments: HrDepartmentModel[] = [];
+
+    totalRecords = 0;
+    loading = false;
+    saving = false;
+    submitted = false;
+
+    dialogVisible = false;
+    editing = false;
+
+    search = '';
+
+    pageSize = 20;
+    first = 0;
+
+    sortField = 'departmentCode';
+    sortDirection: 'asc' | 'desc' = 'asc';
+
+    form: CreateHrDepartmentRequest = this.emptyForm();
+
+    editingDepartmentId: number | null = null;
+
+    access: RouteAccess = {
+        routerLink: this.permissionRoute,
+        levelId: 0,
+        canView: false,
+        canCreate: false,
+        canUpdate: false,
+        canDelete: false
+    };
+
+    ngOnInit(): void {
+
+        this.permissionService
+            .getRouteAccess(this.permissionRoute)
+            .subscribe({
+                next: access => {
+                    this.access = access;
+
+                    if (access.canView) {
+                        this.loadPage();
+                        this.openFromCenterSearch();
+                    }
+
+                    this.cdr.markForCheck();
+                },
+                error: () => {
+                    this.showError('Unable to load Department permissions.');
+                }
+            });
+    }
+
+    onLazyLoad(event: TableLazyLoadEvent): void {
+
+        this.first = event.first ?? 0;
+        this.pageSize = event.rows ?? this.pageSize;
+
+        if (typeof event.sortField === 'string' && event.sortField) {
+            this.sortField = event.sortField;
+
+            if (event.sortOrder === -1) {
+                this.sortDirection = 'desc';
+            } else if (event.sortOrder === 1) {
+                this.sortDirection = 'asc';
+            }
+        }
+
+        if (this.access.canView) {
+            this.loadPage();
+        }
+    }
+
+    searchDepartments(): void {
+        this.first = 0;
+        this.loadPage();
+    }
+
+    clearSearch(): void {
+        this.search = '';
+        this.first = 0;
+        this.loadPage();
+    }
+
+    refresh(): void {
+        this.loadPage();
+    }
+
+    openNew(): void {
+
+        if (!this.access.canCreate) return;
+
+        this.editing = false;
+        this.editingDepartmentId = null;
+        this.form = this.emptyForm();
+        this.submitted = false;
+        this.dialogVisible = true;
+    }
+
+    editDepartment(department: HrDepartmentModel): void {
+
+        if (!this.access.canUpdate) return;
+
+        this.editing = true;
+        this.editingDepartmentId = department.departmentId;
+
+        this.form = {
+            departmentCode: department.departmentCode,
+            departmentName: department.departmentName,
+            seqNo: department.seqNo ?? null,
+            note: department.note ?? ''
+        };
+
+        this.submitted = false;
+        this.dialogVisible = true;
+    }
+
+    hideDialog(): void {
+
+        if (this.saving) return;
+
+        this.dialogVisible = false;
+        this.submitted = false;
+
+        this.clearCenterSearchId();
+    }
+
+    saveDepartment(): void {
+
+        this.submitted = true;
+
+        if (this.saving) return;
+
+        const departmentCode = this.form.departmentCode.trim();
+        const departmentName = this.form.departmentName.trim();
+        const note = this.form.note?.trim() || null;
+
+        if (!departmentCode || !departmentName) return;
+
+        if (
+            departmentCode.length > 50 ||
+            departmentName.length > 250 ||
+            (note?.length ?? 0) > 250
+        ) return;
+
+        const seqNo = this.form.seqNo;
+
+        if (
+            seqNo !== null &&
+            seqNo !== undefined &&
+            (!Number.isSafeInteger(seqNo) ||
+             seqNo < -2147483648 ||
+             seqNo > 2147483647)
+        ) return;
+
+        const request: CreateHrDepartmentRequest = {
+            departmentCode,
+            departmentName,
+            seqNo: seqNo ?? null,
+            note
+        };
+
+        if (this.editing) {
+
+            if (!this.access.canUpdate || this.editingDepartmentId === null) return;
+
+            this.saving = true;
+
+            const updateRequest: UpdateHrDepartmentRequest = request;
+
+            this.departmentService
+                .update(this.editingDepartmentId, updateRequest)
+                .pipe(finalize(() => {
+                    this.saving = false;
+                    this.cdr.markForCheck();
+                }))
+                .subscribe({
+                    next: () => {
+                        this.dialogVisible = false;
+                        this.clearCenterSearchId();
+                        this.showSuccess('Department updated successfully.');
+                        this.loadPage();
+                    },
+                    error: error => {
+                        this.showError(
+                            this.getErrorMessage(error, 'Unable to update Department.')
+                        );
+                    }
+                });
+
+            return;
+        }
+
+        if (!this.access.canCreate) return;
+
+        this.saving = true;
+
+        this.departmentService
+            .create(request)
+            .pipe(finalize(() => {
+                this.saving = false;
+                this.cdr.markForCheck();
+            }))
+            .subscribe({
+                next: () => {
+                    this.dialogVisible = false;
+                    this.first = 0;
+                    this.showSuccess('Department created successfully.');
+                    this.loadPage();
+                },
+                error: error => {
+                    this.showError(
+                        this.getErrorMessage(error, 'Unable to create Department.')
+                    );
+                }
+            });
+    }
+
+    private loadPage(): void {
+
+        if (!this.access.canView) return;
+
+        this.loading = true;
+
+        const page = Math.floor(this.first / this.pageSize) + 1;
+
+        this.departmentService
+            .getPage({
+                page,
+                pageSize: this.pageSize,
+                search: this.search,
+                sortField: this.sortField,
+                sortDirection: this.sortDirection
+            })
+            .pipe(finalize(() => {
+                this.loading = false;
+                this.cdr.markForCheck();
+            }))
+            .subscribe({
+                next: result => {
+
+                    this.departments = result.items ?? [];
+                    this.totalRecords = result.totalCount ?? 0;
+
+                    if (
+                        this.departments.length === 0 &&
+                        this.first > 0
+                    ) {
+                        this.first = Math.max(0, this.first - this.pageSize);
+                        this.loadPage();
+                    }
+
+                    this.cdr.markForCheck();
+                },
+                error: error => {
+                    this.showError(
+                        this.getErrorMessage(error, 'Unable to load Departments.')
+                    );
+                }
+            });
+    }
+
+    private openFromCenterSearch(): void {
+
+        const idParam = this.route.snapshot.queryParamMap.get('id');
+
+        if (!idParam || !this.access.canUpdate) return;
+
+        const departmentId = Number(idParam);
+
+        if (!Number.isInteger(departmentId) || departmentId <= 0) return;
+
+        this.departmentService.getById(departmentId).subscribe({
+            next: department => {
+                this.editDepartment(department);
+                this.cdr.markForCheck();
+            },
+            error: error => {
+                this.showError(
+                    this.getErrorMessage(error, 'Unable to load Department.')
+                );
+            }
+        });
+    }
+
+    private clearCenterSearchId(): void {
+
+        if (!this.route.snapshot.queryParamMap.has('id')) return;
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { id: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true
+        });
+    }
+
+    private emptyForm(): CreateHrDepartmentRequest {
+        return {
+            departmentCode: '',
+            departmentName: '',
+            seqNo: null,
+            note: ''
+        };
+    }
+
+    private showSuccess(detail: string): void {
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail
+        });
+    }
+
+    private showError(detail: string): void {
+        this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail
+        });
+    }
+
+    private getErrorMessage(
+        error: HttpErrorResponse,
+        fallback: string
+    ): string {
+
+        if (error.status === 409) {
+            return 'Department Code already exists.';
+        }
+
+        if (error.status === 403) {
+            return 'You do not have permission for this action.';
+        }
+
+        const body = error.error as {
+            detail?: string;
+            message?: string;
+            title?: string;
+        } | null;
+
+        return body?.detail || body?.message || body?.title || fallback;
+    }
+}
+

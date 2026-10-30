@@ -1,0 +1,11 @@
+﻿import { ErpPageShell } from './';
+import { Component } from '@angular/core';
+
+@Component({
+    selector: 'app-hr-employee-allowance',
+    imports: [ErpPageShell],
+    templateUrl: './hr-employee-allowance.html',
+    styleUrl: './hr-employee-allowance.scss'
+})
+export class HrEmployeeAllowance {}
+
