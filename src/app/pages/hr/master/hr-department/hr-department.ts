@@ -10,6 +10,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 
@@ -39,6 +40,7 @@ import { ExcelExportButton } from '../../../../shared/components/excel-export-bu
         DialogModule,
         InputTextModule,
         InputNumberModule,
+        TagModule,
         ToastModule,
         ToolbarModule,
         ExcelExportButton
@@ -69,6 +71,9 @@ export class HrDepartment implements OnInit {
     dialogVisible = false;
     editing = false;
 
+    statusDialogVisible = false;
+    statusSaving = false;
+    selectedStatusDepartment: HrDepartmentModel | null = null;
     search = '';
 
     pageSize = 20;
@@ -285,6 +290,57 @@ export class HrDepartment implements OnInit {
             });
     }
 
+    confirmStatusChange(department: HrDepartmentModel): void {
+        if (!this.access.canUpdate || this.statusSaving) return;
+
+        this.selectedStatusDepartment = department;
+        this.statusDialogVisible = true;
+    }
+
+    cancelStatusChange(): void {
+        if (this.statusSaving) return;
+
+        this.statusDialogVisible = false;
+        this.selectedStatusDepartment = null;
+    }
+
+    applyStatusChange(): void {
+        if (!this.access.canUpdate || this.statusSaving) return;
+
+        const department = this.selectedStatusDepartment;
+        if (!department) return;
+
+        const newStatus = !department.isInactive;
+
+        this.statusSaving = true;
+
+        this.departmentService
+            .setInactive(department.departmentId, newStatus)
+            .pipe(finalize(() => {
+                this.statusSaving = false;
+                this.cdr.markForCheck();
+            }))
+            .subscribe({
+                next: () => {
+                    this.statusDialogVisible = false;
+                    this.selectedStatusDepartment = null;
+                    this.loadPage();
+                    this.showSuccess(
+                        newStatus
+                            ? 'Department deactivated successfully.'
+                            : 'Department reactivated successfully.'
+                    );
+                },
+                error: error => {
+                    this.showError(
+                        this.getErrorMessage(
+                            error,
+                            'Unable to change Department status.'
+                        )
+                    );
+                }
+            });
+    }
     private loadPage(): void {
 
         if (!this.access.canView) return;
@@ -429,6 +485,8 @@ export class HrDepartment implements OnInit {
         return body?.detail || body?.message || body?.title || fallback;
     }
 }
+
+
 
 
 

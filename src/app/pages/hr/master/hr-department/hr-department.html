@@ -128,6 +128,7 @@
                         <p-sortIcon field="seqNo" />
                     </th>
 
+                    <th>Status</th>
                     <th>Note</th>
                     <th>Created At</th>
                     <th>Created By</th>
@@ -156,6 +157,12 @@
                         {{ department.seqNo ?? '-' }}
                     </td>
 
+                    <td>
+                        <p-tag
+                            [value]="department.isInactive ? 'Inactive' : 'Active'"
+                            [severity]="department.isInactive ? 'danger' : 'success'"
+                        />
+                    </td>
                     <td>
                         {{ department.note || '-' }}
                     </td>
@@ -192,6 +199,16 @@
                                     size="small"
                                     (onClick)="editDepartment(department)"
                                 />
+                                <p-button
+                                    [icon]="department.isInactive ? 'pi pi-check-circle' : 'pi pi-ban'"
+                                    [label]="department.isInactive ? 'Reactivate' : 'Deactivate'"
+                                    [severity]="department.isInactive ? 'success' : 'warn'"
+                                    [rounded]="true"
+                                    [text]="true"
+                                    size="small"
+                                    [disabled]="statusSaving"
+                                    (onClick)="confirmStatusChange(department)"
+                                />
                             </div>
                         </td>
                     }
@@ -200,7 +217,7 @@
 
             <ng-template #emptymessage>
                 <tr>
-                    <td [attr.colspan]="access.canUpdate ? 9 : 8">
+                    <td [attr.colspan]="access.canUpdate ? 10 : 9">
                         <div class="empty-state">
                             <i class="pi pi-sitemap"></i>
 
@@ -221,6 +238,44 @@
 
 </div>
 
+<p-dialog
+    [(visible)]="statusDialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="!statusSaving"
+    [closeOnEscape]="!statusSaving"
+    [style]="{ width: '440px', maxWidth: '95vw' }"
+    header="Confirm Department Status"
+>
+    @if (selectedStatusDepartment; as department) {
+        <p>
+            Are you sure you want to
+            <strong>
+                {{ department.isInactive ? 'reactivate' : 'deactivate' }}
+            </strong>
+            department
+            <strong>{{ department.departmentCode }}</strong>?
+        </p>
+    }
+
+    <ng-template #footer>
+        <p-button
+            label="Cancel"
+            severity="secondary"
+            [outlined]="true"
+            [disabled]="statusSaving"
+            (onClick)="cancelStatusChange()"
+        />
+        <p-button
+            label="Confirm"
+            icon="pi pi-check"
+            [loading]="statusSaving"
+            [disabled]="statusSaving"
+            (onClick)="applyStatusChange()"
+        />
+    </ng-template>
+</p-dialog>
 <p-dialog
     [(visible)]="dialogVisible"
     [modal]="true"
@@ -365,5 +420,7 @@
     </ng-template>
 
 </p-dialog>
+
+
 
 

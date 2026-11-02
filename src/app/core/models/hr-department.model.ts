@@ -3,6 +3,7 @@
     publicId?: string | null;
     departmentCode: string;
     departmentName: string;
+    isInactive: boolean;
     seqNo?: number | null;
     note?: string | null;
     createdAt?: string | null;
@@ -32,3 +33,6 @@ export interface UpdateHrDepartmentRequest {
     seqNo?: number | null;
     note?: string | null;
 }
+
+
+

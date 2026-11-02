@@ -65,6 +65,16 @@ export class HrDepartmentService {
         );
     }
 
+    setInactive(
+        departmentId: number,
+        isInactive: boolean
+    ): Observable<HrDepartment> {
+
+        return this.http.patch<HrDepartment>(
+            `${this.apiUrl}/${departmentId}/status`,
+            { isInactive }
+        );
+    }
     exportExcel(query: HrDepartmentQuery): Observable<Blob> {
 
         let params = new HttpParams()
@@ -84,3 +94,4 @@ export class HrDepartmentService {
         );
     }
 }
+
