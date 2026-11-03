@@ -1,4 +1,4 @@
-﻿<p-toast position="top-right" [baseZIndex]="10000"></p-toast>
+<p-toast position="top-right" [baseZIndex]="10000"></p-toast>
 
 <div class="department-page">
 
@@ -135,7 +135,7 @@
                     <th>Edited At</th>
                     <th>Edited By</th>
 
-                    @if (access.canUpdate) {
+                    @if (access.canUpdate || access.canDelete) {
                         <th class="text-center" style="width: 9rem">
                             Action
                         </th>
@@ -187,28 +187,42 @@
                         {{ department.editedBy ?? '-' }}
                     </td>
 
-                    @if (access.canUpdate) {
+                    @if (access.canUpdate || access.canDelete) {
                         <td>
                             <div class="row-actions">
-                                <p-button
-                                    icon="pi pi-pencil"
-                                    label="Edit"
-                                    severity="success"
-                                    [rounded]="true"
-                                    [text]="true"
-                                    size="small"
-                                    (onClick)="editDepartment(department)"
-                                />
-                                <p-button
-                                    [icon]="department.isInactive ? 'pi pi-check-circle' : 'pi pi-ban'"
-                                    [label]="department.isInactive ? 'Reactivate' : 'Deactivate'"
-                                    [severity]="department.isInactive ? 'success' : 'warn'"
-                                    [rounded]="true"
-                                    [text]="true"
-                                    size="small"
-                                    [disabled]="statusSaving"
-                                    (onClick)="confirmStatusChange(department)"
-                                />
+                                @if (access.canUpdate) {
+                                    <p-button
+                                        icon="pi pi-pencil"
+                                        label="Edit"
+                                        severity="success"
+                                        [rounded]="true"
+                                        [text]="true"
+                                        size="small"
+                                        (onClick)="editDepartment(department)"
+                                    />
+                                    <p-button
+                                        [icon]="department.isInactive ? 'pi pi-check-circle' : 'pi pi-ban'"
+                                        [label]="department.isInactive ? 'Reactivate' : 'Deactivate'"
+                                        [severity]="department.isInactive ? 'success' : 'warn'"
+                                        [rounded]="true"
+                                        [text]="true"
+                                        size="small"
+                                        [disabled]="statusSaving"
+                                        (onClick)="confirmStatusChange(department)"
+                                    />
+                                }
+                                @if (access.canDelete) {
+                                    <p-button
+                                        icon="pi pi-trash"
+                                        label="Delete"
+                                        severity="danger"
+                                        [rounded]="true"
+                                        [text]="true"
+                                        size="small"
+                                        [disabled]="deleteSaving"
+                                        (onClick)="confirmDelete(department)"
+                                    />
+                                }
                             </div>
                         </td>
                     }
@@ -217,7 +231,7 @@
 
             <ng-template #emptymessage>
                 <tr>
-                    <td [attr.colspan]="access.canUpdate ? 10 : 9">
+                    <td [attr.colspan]="(access.canUpdate || access.canDelete) ? 10 : 9">
                         <div class="empty-state">
                             <i class="pi pi-sitemap"></i>
 
@@ -238,6 +252,46 @@
 
 </div>
 
+<p-dialog
+    [(visible)]="deleteDialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="!deleteSaving"
+    [closeOnEscape]="!deleteSaving"
+    [style]="{ width: '460px', maxWidth: '95vw' }"
+    header="Confirm Delete Department"
+>
+    @if (selectedDeleteDepartment; as department) {
+        <p>
+            Are you sure you want to permanently delete department
+            <strong>{{ department.departmentCode }}</strong>
+            - {{ department.departmentName }}?
+        </p>
+
+        <p class="text-red-500 font-semibold">
+            Warning: This action cannot be undone.
+        </p>
+    }
+
+    <ng-template #footer>
+        <p-button
+            label="Cancel"
+            severity="secondary"
+            [outlined]="true"
+            [disabled]="deleteSaving"
+            (onClick)="cancelDelete()"
+        />
+        <p-button
+            label="Delete"
+            icon="pi pi-trash"
+            severity="danger"
+            [loading]="deleteSaving"
+            [disabled]="deleteSaving"
+            (onClick)="applyDelete()"
+        />
+    </ng-template>
+</p-dialog>
 <p-dialog
     [(visible)]="statusDialogVisible"
     [modal]="true"

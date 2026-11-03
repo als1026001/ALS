@@ -1,4 +1,4 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, NgZone, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -70,6 +70,10 @@ export class HrDepartment implements OnInit {
 
     dialogVisible = false;
     editing = false;
+
+    deleteDialogVisible = false;
+    deleteSaving = false;
+    selectedDeleteDepartment: HrDepartmentModel | null = null;
 
     statusDialogVisible = false;
     statusSaving = false;
@@ -290,6 +294,73 @@ export class HrDepartment implements OnInit {
             });
     }
 
+    confirmDelete(department: HrDepartmentModel): void {
+        if (!this.access.canDelete || this.deleteSaving) return;
+
+        this.selectedDeleteDepartment = department;
+        this.deleteDialogVisible = true;
+    }
+
+    cancelDelete(): void {
+        if (this.deleteSaving) return;
+
+        this.deleteDialogVisible = false;
+        this.selectedDeleteDepartment = null;
+    }
+
+    applyDelete(): void {
+        if (!this.access.canDelete || this.deleteSaving) return;
+
+        const department = this.selectedDeleteDepartment;
+        if (!department) return;
+
+        this.deleteSaving = true;
+
+        this.departmentService
+            .delete(department.departmentId)
+            .pipe(finalize(() => {
+                this.deleteSaving = false;
+                this.cdr.markForCheck();
+            }))
+            .subscribe({
+                next: () => {
+                    this.deleteDialogVisible = false;
+                    this.selectedDeleteDepartment = null;
+
+                    this.loadPage();
+                    this.showSuccess('Department deleted successfully.');
+                },
+                error: (error: HttpErrorResponse) => {
+                    let message: string;
+
+                    switch (error.status) {
+                        case 403:
+                            message = 'You do not have Delete permission for HR Department.';
+                            break;
+
+                        case 404:
+                            message = 'Department not found. It may have already been deleted.';
+                            this.deleteDialogVisible = false;
+                            this.selectedDeleteDepartment = null;
+                            this.loadPage();
+                            break;
+
+                        case 409:
+                            message = 'This department cannot be deleted because it is referenced by other records.';
+                            break;
+
+                        default:
+                            message = this.getErrorMessage(
+                                error,
+                                'Unable to delete Department.'
+                            );
+                            break;
+                    }
+
+                    this.showError(message);
+                }
+            });
+    }
     confirmStatusChange(department: HrDepartmentModel): void {
         if (!this.access.canUpdate || this.statusSaving) return;
 

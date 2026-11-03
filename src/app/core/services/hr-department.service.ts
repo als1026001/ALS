@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -73,6 +73,11 @@ export class HrDepartmentService {
         return this.http.patch<HrDepartment>(
             `${this.apiUrl}/${departmentId}/status`,
             { isInactive }
+        );
+    }
+    delete(departmentId: number): Observable<void> {
+        return this.http.delete<void>(
+            `${this.apiUrl}/${departmentId}`
         );
     }
     exportExcel(query: HrDepartmentQuery): Observable<Blob> {
