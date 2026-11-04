@@ -1,0 +1,257 @@
+<p-toast position="top-right" [baseZIndex]="10000"></p-toast>
+
+<div class="department-page">
+    <div style="margin-bottom: 1rem">
+        <p-button label="Test Toast" icon="pi pi-bell" severity="warn" (onClick)="testToast()" />
+    </div>
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">{{ 'hrDepartment.title' | transloco }}</h2>
+            <div class="page-subtitle">{{ 'hrDepartment.description' | transloco }}</div>
+        </div>
+
+        <div class="page-actions">
+            @if (access.canCreate) {
+            <p-button label="New Department" icon="pi pi-plus" (onClick)="openNew()" />
+            }
+
+            <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refresh()" />
+
+            @if (access.canView) {
+            <app-excel-export-button endpoint="hrdepartment/export" fileName="HR_Department" [search]="search" [sortField]="sortField" [sortDirection]="sortDirection" />
+            }
+        </div>
+    </div>
+
+    <div class="toolbar-row">
+        <div class="search-area">
+            <div class="search-box">
+                <i class="pi pi-search"></i>
+
+                <input pInputText type="text" [(ngModel)]="search" maxlength="250" [placeholder]="'hrDepartment.searchPlaceholder' | transloco" (keyup.enter)="searchDepartments()" />
+
+                @if (search) {
+                <button type="button" class="clear-search" aria-label="Clear search" (click)="clearSearch()">
+                    <i class="pi pi-times"></i>
+                </button>
+                }
+            </div>
+
+            <p-button [label]="'common.search' | transloco" icon="pi pi-search" [outlined]="true" (onClick)="searchDepartments()" />
+        </div>
+
+        <div class="result-summary">{{ totalRecords }} result{{ totalRecords === 1 ? '' : 's' }}</div>
+    </div>
+
+    <div class="table-card">
+        <p-table
+            [value]="departments"
+            [loading]="loading"
+            [paginator]="true"
+            [lazy]="true"
+            (onLazyLoad)="onLazyLoad($event)"
+            [rows]="pageSize"
+            [first]="first"
+            [totalRecords]="totalRecords"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            [rowHover]="true"
+            [showGridlines]="true"
+            dataKey="departmentId"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} departments"
+            [sortField]="sortField"
+            [sortOrder]="sortDirection === 'asc' ? 1 : -1"
+            [tableStyle]="{ 'min-width': '65rem' }"
+        >
+            <ng-template #header>
+                <tr>
+                    <th pSortableColumn="departmentCode">
+                        Department Code
+                        <p-sortIcon field="departmentCode" />
+                    </th>
+
+                    <th pSortableColumn="departmentName">
+                        Department Name
+                        <p-sortIcon field="departmentName" />
+                    </th>
+
+                    <th pSortableColumn="seqNo">
+                        Sequence No
+                        <p-sortIcon field="seqNo" />
+                    </th>
+
+                    <th>Status</th>
+                    <th>Note</th>
+                    <th>Created At</th>
+                    <th>Created By</th>
+                    <th>Edited At</th>
+                    <th>Edited By</th>
+
+                    @if (access.canUpdate || access.canDelete) {
+                    <th class="text-center" style="width: 9rem">Action</th>
+                    }
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-department>
+                <tr>
+                    <td class="font-semibold">{{ department.departmentCode }}</td>
+
+                    <td>{{ department.departmentName }}</td>
+
+                    <td>{{ department.seqNo ?? '-' }}</td>
+
+                    <td>
+                        <p-tag [value]="department.isInactive ? 'Inactive' : 'Active'" [severity]="department.isInactive ? 'danger' : 'success'" />
+                    </td>
+                    <td>{{ department.note || '-' }}</td>
+
+                    <td>{{ department.createdAt ? (department.createdAt | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+
+                    <td>{{ department.createdBy ?? '-' }}</td>
+
+                    <td>{{ department.editedAt ? (department.editedAt | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+
+                    <td>{{ department.editedBy ?? '-' }}</td>
+
+                    @if (access.canUpdate || access.canDelete) {
+                    <td>
+                        <div class="row-actions">
+                            @if (access.canUpdate) {
+                            <p-button icon="pi pi-pencil" label="Edit" severity="success" [rounded]="true" [text]="true" size="small" (onClick)="editDepartment(department)" />
+                            <p-button
+                                [icon]="department.isInactive ? 'pi pi-check-circle' : 'pi pi-ban'"
+                                [label]="department.isInactive ? 'Reactivate' : 'Deactivate'"
+                                [severity]="department.isInactive ? 'success' : 'warn'"
+                                [rounded]="true"
+                                [text]="true"
+                                size="small"
+                                [disabled]="statusSaving"
+                                (onClick)="confirmStatusChange(department)"
+                            />
+                            } @if (access.canDelete) {
+                            <p-button icon="pi pi-trash" label="Delete" severity="danger" [rounded]="true" [text]="true" size="small" [disabled]="deleteSaving" (onClick)="confirmDelete(department)" />
+                            }
+                        </div>
+                    </td>
+                    }
+                </tr>
+            </ng-template>
+
+            <ng-template #emptymessage>
+                <tr>
+                    <td [attr.colspan]="(access.canUpdate || access.canDelete) ? 10 : 9">
+                        <div class="empty-state">
+                            <i class="pi pi-sitemap"></i>
+
+                            <div class="empty-title">{{ 'hrDepartment.noDepartments' | transloco }}</div>
+
+                            <div class="empty-description">{{ 'hrDepartment.emptyDescription' | transloco }}</div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog [(visible)]="deleteDialogVisible" [modal]="true" [draggable]="false" [resizable]="false" [closable]="!deleteSaving" [closeOnEscape]="!deleteSaving" [style]="{ width: '460px', maxWidth: '95vw' }" header="Confirm Delete Department">
+    @if (selectedDeleteDepartment; as department) {
+    <p>
+        Are you sure you want to permanently delete department
+        <strong>{{ department.departmentCode }}</strong>
+        - {{ department.departmentName }}?
+    </p>
+
+    <p class="text-red-500 font-semibold">Warning: This action cannot be undone.</p>
+    }
+
+    <ng-template #footer>
+        <p-button label="Cancel" severity="secondary" [outlined]="true" [disabled]="deleteSaving" (onClick)="cancelDelete()" />
+        <p-button label="Delete" icon="pi pi-trash" severity="danger" [loading]="deleteSaving" [disabled]="deleteSaving" (onClick)="applyDelete()" />
+    </ng-template>
+</p-dialog>
+<p-dialog [(visible)]="statusDialogVisible" [modal]="true" [draggable]="false" [resizable]="false" [closable]="!statusSaving" [closeOnEscape]="!statusSaving" [style]="{ width: '440px', maxWidth: '95vw' }" header="Confirm Department Status">
+    @if (selectedStatusDepartment; as department) {
+    <p>
+        Are you sure you want to
+        <strong> {{ department.isInactive ? 'reactivate' : 'deactivate' }} </strong>
+        department
+        <strong>{{ department.departmentCode }}</strong>?
+    </p>
+    }
+
+    <ng-template #footer>
+        <p-button label="Cancel" severity="secondary" [outlined]="true" [disabled]="statusSaving" (onClick)="cancelStatusChange()" />
+        <p-button label="Confirm" icon="pi pi-check" [loading]="statusSaving" [disabled]="statusSaving" (onClick)="applyStatusChange()" />
+    </ng-template>
+</p-dialog>
+<p-dialog [(visible)]="dialogVisible" [modal]="true" [draggable]="false" [resizable]="false" [closable]="!saving" [closeOnEscape]="!saving" [style]="{ width: '800px', maxWidth: '95vw' }" [header]="editing ? 'Edit Department' : 'New Department'">
+    <div class="dialog-content">
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-info-circle"></i>
+                Basic Information
+            </div>
+
+            <div class="form-grid">
+                <div class="field-block">
+                    <label for="departmentCode">
+                        Department Code
+                        <span class="required">*</span>
+                    </label>
+
+                    <input id="departmentCode" pInputText [(ngModel)]="form.departmentCode" maxlength="50" autocomplete="off" placeholder="e.g. HR" [disabled]="saving" />
+
+                    @if (submitted && !form.departmentCode.trim()) {
+                    <small class="field-error"> Department Code is required. </small>
+                    }
+
+                    <small class="field-help"> Unique department code within the company. </small>
+                </div>
+
+                <div class="field-block">
+                    <label for="departmentName">
+                        Department Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <input id="departmentName" pInputText [(ngModel)]="form.departmentName" maxlength="250" autocomplete="off" placeholder="Department name" [disabled]="saving" />
+
+                    @if (submitted && !form.departmentName.trim()) {
+                    <small class="field-error"> Department Name is required. </small>
+                    }
+                </div>
+
+                <div class="field-block">
+                    <label for="seqNo"> Sequence Number </label>
+
+                    <p-inputNumber inputId="seqNo" [(ngModel)]="form.seqNo" [useGrouping]="false" [minFractionDigits]="0" [maxFractionDigits]="0" [min]="-2147483648" [max]="2147483647" [disabled]="saving" />
+
+                    <small class="field-help"> Optional display order. </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="dialog-section">
+            <div class="section-title">
+                <i class="pi pi-file-edit"></i>
+                Additional Information
+            </div>
+
+            <div class="field-block">
+                <label for="departmentNote"> Note </label>
+
+                <textarea id="departmentNote" class="note-input" [(ngModel)]="form.note" maxlength="250" rows="3" placeholder="Optional note..." [disabled]="saving"></textarea>
+
+                <small class="field-help"> Maximum 250 characters. </small>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #footer>
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="hideDialog()" />
+
+        <p-button [label]="editing ? 'Save' : 'Create'" icon="pi pi-check" [loading]="saving" [disabled]="saving" (onClick)="saveDepartment()" />
+    </ng-template>
+</p-dialog>

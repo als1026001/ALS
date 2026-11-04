@@ -132,7 +132,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.15rem;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    white-space: nowrap;
+    width: max-content;
+    min-width: 100%;
 }
 
 /* =========================================================
@@ -430,4 +434,55 @@
     .settings-row {
         align-items: center;
     }
+}
+
+/* Bước 80U.31 - Department table multilingual layout */
+
+/* Không ngắt chữ trong tiêu đề bảng */
+:host ::ng-deep .p-datatable-thead > tr > th {
+    white-space: nowrap;
+    word-break: keep-all;
+}
+
+/* Giữ biểu tượng sort cùng dòng với tiêu đề */
+:host ::ng-deep .p-datatable-thead > tr > th .p-datatable-sort-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0.25rem;
+}
+
+/* Không xuống dòng trạng thái Active / Inactive */
+:host ::ng-deep .p-tag {
+    white-space: nowrap;
+    word-break: keep-all;
+}
+
+/* Cho phép cuộn ngang nếu tổng độ rộng cột vượt quá màn hình */
+:host ::ng-deep .p-datatable-table-container {
+    overflow-x: auto;
+}
+
+/* Bước 80U.35 - Không xuống dòng các nút thao tác */
+
+:host ::ng-deep .p-datatable-tbody .p-button {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+:host ::ng-deep .p-datatable-tbody .p-button .p-button-label {
+    white-space: nowrap;
+    word-break: keep-all;
+}
+
+:host ::ng-deep .p-datatable-thead > tr > th:last-child,
+:host ::ng-deep .p-datatable-tbody > tr > td:last-child {
+    min-width: 13rem;
+    white-space: nowrap;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr > td:last-child > div {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.25rem;
 }

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, NgZone, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MessageService } from 'primeng/api';
@@ -16,11 +17,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 
 import { finalize } from 'rxjs';
 
-import {
-    HrDepartment as HrDepartmentModel,
-    CreateHrDepartmentRequest,
-    UpdateHrDepartmentRequest
-} from '../../../../core/models/hr-department.model';
+import { HrDepartment as HrDepartmentModel, CreateHrDepartmentRequest, UpdateHrDepartmentRequest } from '../../../../core/models/hr-department.model';
 
 import { RouteAccess } from '../../../../core/models/permission.model';
 
@@ -32,25 +29,12 @@ import { ExcelExportButton } from '../../../../shared/components/excel-export-bu
 @Component({
     selector: 'app-hr-department',
     standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        TableModule,
-        ButtonModule,
-        DialogModule,
-        InputTextModule,
-        InputNumberModule,
-        TagModule,
-        ToastModule,
-        ToolbarModule,
-        ExcelExportButton
-    ],
+    imports: [CommonModule, FormsModule, TranslocoPipe, TableModule, ButtonModule, DialogModule, InputTextModule, InputNumberModule, TagModule, ToastModule, ToolbarModule, ExcelExportButton],
     providers: [MessageService],
     templateUrl: './hr-department.html',
     styleUrl: './hr-department.scss'
 })
 export class HrDepartment implements OnInit {
-
     private readonly departmentService = inject(HrDepartmentService);
     private readonly permissionService = inject(PermissionService);
     private readonly messageService = inject(MessageService);
@@ -100,28 +84,24 @@ export class HrDepartment implements OnInit {
     };
 
     ngOnInit(): void {
+        this.permissionService.getRouteAccess(this.permissionRoute).subscribe({
+            next: (access) => {
+                this.access = access;
 
-        this.permissionService
-            .getRouteAccess(this.permissionRoute)
-            .subscribe({
-                next: access => {
-                    this.access = access;
-
-                    if (access.canView) {
-                        this.loadPage();
-                        this.openFromCenterSearch();
-                    }
-
-                    this.cdr.markForCheck();
-                },
-                error: () => {
-                    this.showError('Unable to load Department permissions.');
+                if (access.canView) {
+                    this.loadPage();
+                    this.openFromCenterSearch();
                 }
-            });
+
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.showError('Unable to load Department permissions.');
+            }
+        });
     }
 
     onLazyLoad(event: TableLazyLoadEvent): void {
-
         this.first = event.first ?? 0;
         this.pageSize = event.rows ?? this.pageSize;
 
@@ -156,7 +136,6 @@ export class HrDepartment implements OnInit {
     }
 
     openNew(): void {
-
         if (!this.access.canCreate) return;
 
         this.editing = false;
@@ -167,7 +146,6 @@ export class HrDepartment implements OnInit {
     }
 
     editDepartment(department: HrDepartmentModel): void {
-
         if (!this.access.canUpdate) return;
 
         this.editing = true;
@@ -185,7 +163,6 @@ export class HrDepartment implements OnInit {
     }
 
     hideDialog(): void {
-
         if (this.saving) return;
 
         this.dialogVisible = false;
@@ -195,7 +172,6 @@ export class HrDepartment implements OnInit {
     }
 
     saveDepartment(): void {
-
         this.submitted = true;
 
         if (this.saving) return;
@@ -206,21 +182,11 @@ export class HrDepartment implements OnInit {
 
         if (!departmentCode || !departmentName) return;
 
-        if (
-            departmentCode.length > 50 ||
-            departmentName.length > 250 ||
-            (note?.length ?? 0) > 250
-        ) return;
+        if (departmentCode.length > 50 || departmentName.length > 250 || (note?.length ?? 0) > 250) return;
 
         const seqNo = this.form.seqNo;
 
-        if (
-            seqNo !== null &&
-            seqNo !== undefined &&
-            (!Number.isSafeInteger(seqNo) ||
-             seqNo < -2147483648 ||
-             seqNo > 2147483647)
-        ) return;
+        if (seqNo !== null && seqNo !== undefined && (!Number.isSafeInteger(seqNo) || seqNo < -2147483648 || seqNo > 2147483647)) return;
 
         const request: CreateHrDepartmentRequest = {
             departmentCode,
@@ -230,7 +196,6 @@ export class HrDepartment implements OnInit {
         };
 
         if (this.editing) {
-
             if (!this.access.canUpdate || this.editingDepartmentId === null) return;
 
             this.saving = true;
@@ -239,10 +204,12 @@ export class HrDepartment implements OnInit {
 
             this.departmentService
                 .update(this.editingDepartmentId, updateRequest)
-                .pipe(finalize(() => {
-                    this.saving = false;
-                    this.cdr.markForCheck();
-                }))
+                .pipe(
+                    finalize(() => {
+                        this.saving = false;
+                        this.cdr.markForCheck();
+                    })
+                )
                 .subscribe({
                     next: () => {
                         this.dialogVisible = false;
@@ -259,10 +226,8 @@ export class HrDepartment implements OnInit {
                             });
                         }, 100);
                     },
-                    error: error => {
-                        this.showError(
-                            this.getErrorMessage(error, 'Unable to update Department.')
-                        );
+                    error: (error) => {
+                        this.showError(this.getErrorMessage(error, 'Unable to update Department.'));
                     }
                 });
 
@@ -275,10 +240,12 @@ export class HrDepartment implements OnInit {
 
         this.departmentService
             .create(request)
-            .pipe(finalize(() => {
-                this.saving = false;
-                this.cdr.markForCheck();
-            }))
+            .pipe(
+                finalize(() => {
+                    this.saving = false;
+                    this.cdr.markForCheck();
+                })
+            )
             .subscribe({
                 next: () => {
                     this.dialogVisible = false;
@@ -286,10 +253,8 @@ export class HrDepartment implements OnInit {
                     this.showSuccess('Department created successfully.');
                     this.loadPage();
                 },
-                error: error => {
-                    this.showError(
-                        this.getErrorMessage(error, 'Unable to create Department.')
-                    );
+                error: (error) => {
+                    this.showError(this.getErrorMessage(error, 'Unable to create Department.'));
                 }
             });
     }
@@ -318,10 +283,12 @@ export class HrDepartment implements OnInit {
 
         this.departmentService
             .delete(department.departmentId)
-            .pipe(finalize(() => {
-                this.deleteSaving = false;
-                this.cdr.markForCheck();
-            }))
+            .pipe(
+                finalize(() => {
+                    this.deleteSaving = false;
+                    this.cdr.markForCheck();
+                })
+            )
             .subscribe({
                 next: () => {
                     this.deleteDialogVisible = false;
@@ -350,10 +317,7 @@ export class HrDepartment implements OnInit {
                             break;
 
                         default:
-                            message = this.getErrorMessage(
-                                error,
-                                'Unable to delete Department.'
-                            );
+                            message = this.getErrorMessage(error, 'Unable to delete Department.');
                             break;
                     }
 
@@ -387,33 +351,25 @@ export class HrDepartment implements OnInit {
 
         this.departmentService
             .setInactive(department.departmentId, newStatus)
-            .pipe(finalize(() => {
-                this.statusSaving = false;
-                this.cdr.markForCheck();
-            }))
+            .pipe(
+                finalize(() => {
+                    this.statusSaving = false;
+                    this.cdr.markForCheck();
+                })
+            )
             .subscribe({
                 next: () => {
                     this.statusDialogVisible = false;
                     this.selectedStatusDepartment = null;
                     this.loadPage();
-                    this.showSuccess(
-                        newStatus
-                            ? 'Department deactivated successfully.'
-                            : 'Department reactivated successfully.'
-                    );
+                    this.showSuccess(newStatus ? 'Department deactivated successfully.' : 'Department reactivated successfully.');
                 },
-                error: error => {
-                    this.showError(
-                        this.getErrorMessage(
-                            error,
-                            'Unable to change Department status.'
-                        )
-                    );
+                error: (error) => {
+                    this.showError(this.getErrorMessage(error, 'Unable to change Department status.'));
                 }
             });
     }
     private loadPage(): void {
-
         if (!this.access.canView) return;
 
         this.loading = true;
@@ -428,36 +384,31 @@ export class HrDepartment implements OnInit {
                 sortField: this.sortField,
                 sortDirection: this.sortDirection
             })
-            .pipe(finalize(() => {
-                this.loading = false;
-                this.cdr.markForCheck();
-            }))
+            .pipe(
+                finalize(() => {
+                    this.loading = false;
+                    this.cdr.markForCheck();
+                })
+            )
             .subscribe({
-                next: result => {
-
+                next: (result) => {
                     this.departments = result.items ?? [];
                     this.totalRecords = result.totalCount ?? 0;
 
-                    if (
-                        this.departments.length === 0 &&
-                        this.first > 0
-                    ) {
+                    if (this.departments.length === 0 && this.first > 0) {
                         this.first = Math.max(0, this.first - this.pageSize);
                         this.loadPage();
                     }
 
                     this.cdr.markForCheck();
                 },
-                error: error => {
-                    this.showError(
-                        this.getErrorMessage(error, 'Unable to load Departments.')
-                    );
+                error: (error) => {
+                    this.showError(this.getErrorMessage(error, 'Unable to load Departments.'));
                 }
             });
     }
 
     private openFromCenterSearch(): void {
-
         const idParam = this.route.snapshot.queryParamMap.get('id');
 
         if (!idParam || !this.access.canUpdate) return;
@@ -467,20 +418,17 @@ export class HrDepartment implements OnInit {
         if (!Number.isInteger(departmentId) || departmentId <= 0) return;
 
         this.departmentService.getById(departmentId).subscribe({
-            next: department => {
+            next: (department) => {
                 this.editDepartment(department);
                 this.cdr.markForCheck();
             },
-            error: error => {
-                this.showError(
-                    this.getErrorMessage(error, 'Unable to load Department.')
-                );
+            error: (error) => {
+                this.showError(this.getErrorMessage(error, 'Unable to load Department.'));
             }
         });
     }
 
     private clearCenterSearchId(): void {
-
         if (!this.route.snapshot.queryParamMap.has('id')) return;
 
         this.router.navigate([], {
@@ -534,11 +482,7 @@ export class HrDepartment implements OnInit {
         this.cdr.detectChanges();
     }
 
-    private getErrorMessage(
-        error: HttpErrorResponse,
-        fallback: string
-    ): string {
-
+    private getErrorMessage(error: HttpErrorResponse, fallback: string): string {
         if (error.status === 409) {
             return 'Department Code already exists.';
         }
@@ -556,11 +500,3 @@ export class HrDepartment implements OnInit {
         return body?.detail || body?.message || body?.title || fallback;
     }
 }
-
-
-
-
-
-
-
-
