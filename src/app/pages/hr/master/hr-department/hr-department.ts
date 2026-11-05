@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { TranslocoService } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -37,6 +38,7 @@ import { ExcelExportButton } from '../../../../shared/components/excel-export-bu
 export class HrDepartment implements OnInit {
     private readonly departmentService = inject(HrDepartmentService);
     private readonly permissionService = inject(PermissionService);
+    private readonly transloco = inject(TranslocoService);
     private readonly messageService = inject(MessageService);
     private readonly cdr = inject(ChangeDetectorRef);
     private readonly ngZone = inject(NgZone);
@@ -96,7 +98,7 @@ export class HrDepartment implements OnInit {
                 this.cdr.markForCheck();
             },
             error: () => {
-                this.showError('Unable to load Department permissions.');
+                this.showError(this.transloco.translate('hrDepartment.loadPermissionsError'));
             }
         });
     }
@@ -222,12 +224,12 @@ export class HrDepartment implements OnInit {
                             console.log('[Department Update] Showing Toast inside NgZone');
 
                             this.ngZone.run(() => {
-                                this.showSuccess('Department updated successfully.');
+                                this.showSuccess(this.transloco.translate('hrDepartment.updatedSuccess'));
                             });
                         }, 100);
                     },
                     error: (error) => {
-                        this.showError(this.getErrorMessage(error, 'Unable to update Department.'));
+                        this.showError(this.getErrorMessage(error, this.transloco.translate('hrDepartment.updateError')));
                     }
                 });
 
@@ -250,11 +252,11 @@ export class HrDepartment implements OnInit {
                 next: () => {
                     this.dialogVisible = false;
                     this.first = 0;
-                    this.showSuccess('Department created successfully.');
+                    this.showSuccess(this.transloco.translate('hrDepartment.createdSuccess'));
                     this.loadPage();
                 },
                 error: (error) => {
-                    this.showError(this.getErrorMessage(error, 'Unable to create Department.'));
+                    this.showError(this.getErrorMessage(error, this.transloco.translate('hrDepartment.createError')));
                 }
             });
     }
@@ -295,29 +297,29 @@ export class HrDepartment implements OnInit {
                     this.selectedDeleteDepartment = null;
 
                     this.loadPage();
-                    this.showSuccess('Department deleted successfully.');
+                    this.showSuccess(this.transloco.translate('hrDepartment.deletedSuccess'));
                 },
                 error: (error: HttpErrorResponse) => {
                     let message: string;
 
                     switch (error.status) {
                         case 403:
-                            message = 'You do not have Delete permission for HR Department.';
+                            message = this.transloco.translate('hrDepartment.deleteNoPermission');
                             break;
 
                         case 404:
-                            message = 'Department not found. It may have already been deleted.';
+                            message = this.transloco.translate('hrDepartment.deleteNotFound');
                             this.deleteDialogVisible = false;
                             this.selectedDeleteDepartment = null;
                             this.loadPage();
                             break;
 
                         case 409:
-                            message = 'This department cannot be deleted because it is referenced by other records.';
+                            message = this.transloco.translate('hrDepartment.deleteReferenced');
                             break;
 
                         default:
-                            message = this.getErrorMessage(error, 'Unable to delete Department.');
+                            message = this.getErrorMessage(error, this.transloco.translate('hrDepartment.deleteError'));
                             break;
                     }
 
@@ -362,10 +364,10 @@ export class HrDepartment implements OnInit {
                     this.statusDialogVisible = false;
                     this.selectedStatusDepartment = null;
                     this.loadPage();
-                    this.showSuccess(newStatus ? 'Department deactivated successfully.' : 'Department reactivated successfully.');
+                    this.showSuccess(this.transloco.translate(newStatus ? 'hrDepartment.deactivatedSuccess' : 'hrDepartment.reactivatedSuccess'));
                 },
                 error: (error) => {
-                    this.showError(this.getErrorMessage(error, 'Unable to change Department status.'));
+                    this.showError(this.getErrorMessage(error, this.transloco.translate('hrDepartment.statusError')));
                 }
             });
     }
@@ -403,7 +405,7 @@ export class HrDepartment implements OnInit {
                     this.cdr.markForCheck();
                 },
                 error: (error) => {
-                    this.showError(this.getErrorMessage(error, 'Unable to load Departments.'));
+                    this.showError(this.getErrorMessage(error, this.transloco.translate('hrDepartment.loadDepartmentsError')));
                 }
             });
     }
@@ -423,7 +425,7 @@ export class HrDepartment implements OnInit {
                 this.cdr.markForCheck();
             },
             error: (error) => {
-                this.showError(this.getErrorMessage(error, 'Unable to load Department.'));
+                this.showError(this.getErrorMessage(error, this.transloco.translate('hrDepartment.loadDepartmentError')));
             }
         });
     }
@@ -453,8 +455,8 @@ export class HrDepartment implements OnInit {
 
         this.messageService.add({
             severity: 'success',
-            summary: 'Toast Test',
-            detail: 'PrimeNG Toast test message',
+            summary: this.transloco.translate('hrDepartment.toastTestTitle'),
+            detail: this.transloco.translate('hrDepartment.toastTestMessage'),
             life: 10000
         });
 
@@ -463,7 +465,7 @@ export class HrDepartment implements OnInit {
     private showSuccess(detail: string): void {
         this.messageService.add({
             severity: 'success',
-            summary: 'Success',
+            summary: this.transloco.translate('common.success'),
             detail,
             life: 5000
         });
@@ -474,7 +476,7 @@ export class HrDepartment implements OnInit {
     private showError(detail: string): void {
         this.messageService.add({
             severity: 'error',
-            summary: 'Error',
+            summary: this.transloco.translate('common.error'),
             detail,
             life: 6000
         });
@@ -484,11 +486,11 @@ export class HrDepartment implements OnInit {
 
     private getErrorMessage(error: HttpErrorResponse, fallback: string): string {
         if (error.status === 409) {
-            return 'Department Code already exists.';
+            return this.transloco.translate('hrDepartment.codeExists');
         }
 
         if (error.status === 403) {
-            return 'You do not have permission for this action.';
+            return this.transloco.translate('hrDepartment.noPermission');
         }
 
         const body = error.error as {

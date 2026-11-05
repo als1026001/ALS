@@ -21,6 +21,10 @@ export class AuthService {
         );
     }
 
+    logoutWithAudit(): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/logout`, {});
+    }
+
     logout(): void {
         localStorage.removeItem('access_token');
         localStorage.removeItem('user');

@@ -1,5 +1,5 @@
-import { Injectable, inject } from '@angular/core';
-import { TranslocoService } from '@jsverse/transloco';
+import { Injectable } from '@angular/core';
+
 
 import { AppMenuItem } from '../models/app-menu-item';
 
@@ -7,14 +7,8 @@ import { AppMenuItem } from '../models/app-menu-item';
     providedIn: 'root'
 })
 export class MenuTranslationService {
-    private readonly transloco = inject(TranslocoService);
-
     translateMenu(item: AppMenuItem): string {
-        const key = `menus.${item.menuNo}`;
-
-        const translated = this.transloco.translate(key);
-
-        // Nếu chưa có bản dịch thì giữ nguyên tên từ API.
-        return translated === key ? item.label : translated;
+        // Menu label is already localized by the API.
+        return item.label;
     }
 }

@@ -17,3 +17,8 @@
 .p-popover.erp-admin-popover {
     z-index: 100000 !important;
 }
+
+/* ERP Topbar Tooltip - above horizontal menu */
+body .p-tooltip {
+    z-index: 11000 !important;
+}

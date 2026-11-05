@@ -1,0 +1,19 @@
+/* You can add global styles to this file, and also import other style files */
+@use 'primeicons/primeicons.css';
+@use '@/assets/layout/layout.scss';
+@use '@/assets/demo/demo.scss';
+
+@use './styles/buttons';
+@use './styles/forms';
+@use './styles/tables';
+@use './styles/dialogs';
+@use './styles/feature-page';
+@use './styles/details';
+
+/* =====================================================
+   ERP - User Management Popover
+   ===================================================== */
+
+.p-popover.erp-admin-popover {
+    z-index: 100000 !important;
+}

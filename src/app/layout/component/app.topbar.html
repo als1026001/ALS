@@ -6,7 +6,7 @@
         ====================================================== -->
 
         <div class="layout-topbar-logo-container">
-            <button type="button" class="layout-menu-button layout-topbar-action" aria-label="Toggle main menu" title="Toggle main menu" (click)="layoutService.onMenuToggle()">
+            <button type="button" class="layout-menu-button layout-topbar-action" [attr.aria-label]="'topbar.toggleMainMenu' | transloco" [pTooltip]="'topbar.toggleMainMenu' | transloco" tooltipPosition="bottom" appendTo="body" [showDelay]="300" [hideDelay]="100" (click)="layoutService.onMenuToggle()">
                 <i class="pi pi-bars"></i>
             </button>
 
@@ -162,7 +162,7 @@
         <div class="layout-topbar-actions">
             <!-- LANGUAGE SETTINGS -->
             <div class="erp-language-wrapper" (click)="$event.stopPropagation()">
-                <button type="button" class="layout-topbar-action erp-language-button" aria-label="Select language" title="Select language" (click)="languagePopover.toggle($event)">
+                <button type="button" class="layout-topbar-action erp-language-button" [attr.aria-label]="'topbar.selectLanguage' | transloco" [pTooltip]="'topbar.selectLanguage' | transloco" tooltipPosition="bottom" appendTo="body" [showDelay]="300" [hideDelay]="100" (click)="languagePopover.toggle($event)">
                     <i class="pi pi-globe"></i>
 
                     <span class="erp-language-code"> {{ currentLanguageCode }} </span>
@@ -199,7 +199,7 @@
             <!-- DARK MODE -->
 
             <div class="layout-config-menu">
-                <button type="button" class="layout-topbar-action" aria-label="Toggle dark mode" title="Toggle dark mode" (click)="toggleDarkMode()">
+                <button type="button" class="layout-topbar-action" [attr.aria-label]="'topbar.toggleDarkMode' | transloco" [pTooltip]="'topbar.toggleDarkMode' | transloco" tooltipPosition="bottom" appendTo="body" [showDelay]="300" [hideDelay]="100" (click)="toggleDarkMode()">
                     <i
                         class="pi"
                         [ngClass]="{
@@ -216,8 +216,8 @@
                     <button
                         type="button"
                         class="layout-topbar-action layout-topbar-action-highlight"
-                        aria-label="Open theme configurator"
-                        title="Open theme configurator"
+                        [attr.aria-label]="'topbar.openThemeConfigurator' | transloco"
+                        [pTooltip]="'topbar.openThemeConfigurator' | transloco" tooltipPosition="bottom" appendTo="body" [showDelay]="300" [hideDelay]="100"
                         pStyleClass="@next"
                         enterFromClass="hidden"
                         enterActiveClass="animate-scalein"
@@ -237,8 +237,8 @@
             <button
                 type="button"
                 class="layout-topbar-menu-button layout-topbar-action"
-                aria-label="Open topbar menu"
-                title="Open topbar menu"
+                [attr.aria-label]="'topbar.openTopbarMenu' | transloco"
+                [pTooltip]="'topbar.openTopbarMenu' | transloco" tooltipPosition="bottom" appendTo="body" [showDelay]="300" [hideDelay]="100"
                 pStyleClass="@next"
                 enterFromClass="hidden"
                 enterActiveClass="animate-scalein"
@@ -262,11 +262,11 @@
                     <button type="button" class="layout-topbar-action">
                         <i class="pi pi-inbox"></i>
 
-                        <span>Messages</span>
+                        <span>{{ 'topbar.messages' | transloco }}</span>
                     </button>
 
                     <div class="relative" (click)="$event.stopPropagation()">
-                        <button type="button" class="layout-topbar-action" title="User Management" aria-label="Open user management menu" (click)="adminPopover.toggle($event)">
+                        <button type="button" class="layout-topbar-action" [pTooltip]="'topbar.userManagement' | transloco" tooltipPosition="bottom" appendTo="body" [showDelay]="300" [hideDelay]="100" [attr.aria-label]="'topbar.openUserManagementMenu' | transloco" (click)="adminPopover.toggle($event)">
                             <i class="pi pi-user"></i>
                             <span>{{ currentUserName }}</span>
                         </button>
@@ -290,20 +290,20 @@
                                     <span> {{ menuTranslationService.translateMenu(menu) }} </span>
                                 </button>
 
-                                <div *ngIf="adminMenuItems.length === 0" style="padding: 12px; opacity: 0.7">No management permissions</div>
+                                <div *ngIf="adminMenuItems.length === 0" style="padding: 12px; opacity: 0.7">{{ 'topbar.noManagementPermissions' | transloco }}</div>
 
                                 <!-- REFRESH PERMISSIONS -->
                                 <div style="border-top: 1px solid var(--surface-border); margin-top: 8px; padding-top: 8px">
                                     <button type="button" class="top-menu-dropdown-item" style="display: flex; width: 100%; text-align: left; align-items: center; gap: 12px; padding: 12px" (click)="refreshPermissions()">
                                         <i class="pi pi-refresh"></i>
-                                        <span>Refresh Permissions</span>
+                                        <span>{{ 'topbar.refreshPermissions' | transloco }}</span>
                                     </button>
                                 </div>
                             </div>
                         </p-popover>
                     </div>
 
-                    <button type="button" class="layout-topbar-action" title="Logout" (click)="logout()">
+                    <button type="button" class="layout-topbar-action" [pTooltip]="'topbar.logout' | transloco" tooltipPosition="bottom" appendTo="body" [showDelay]="300" [hideDelay]="100" (click)="logout()">
                         <i class="pi pi-sign-out"></i>
                         <span>{{ 'topbar.logout' | transloco }}</span>
                     </button>
@@ -322,7 +322,7 @@
         <div class="horizontal-menu-wrapper">
             <!-- LEFT -->
 
-            <button *ngIf="canScrollLeft" type="button" class="horizontal-scroll-button horizontal-scroll-left" aria-label="Scroll menu left" title="Scroll menu left" (click)="scrollMenuLeft()">
+            <button *ngIf="canScrollLeft" type="button" class="horizontal-scroll-button horizontal-scroll-left" [attr.aria-label]="'topbar.scrollMenuLeft' | transloco" [pTooltip]="'topbar.scrollMenuLeft' | transloco" tooltipPosition="bottom" appendTo="body" [showDelay]="300" [hideDelay]="100" (click)="scrollMenuLeft()">
                 <i class="pi pi-chevron-left"></i>
             </button>
 
@@ -372,7 +372,7 @@
 
             <!-- RIGHT -->
 
-            <button *ngIf="canScrollRight" type="button" class="horizontal-scroll-button horizontal-scroll-right" aria-label="Scroll menu right" title="Scroll menu right" (click)="scrollMenuRight()">
+            <button *ngIf="canScrollRight" type="button" class="horizontal-scroll-button horizontal-scroll-right" [attr.aria-label]="'topbar.scrollMenuRight' | transloco" [pTooltip]="'topbar.scrollMenuRight' | transloco" tooltipPosition="bottom" appendTo="body" [showDelay]="300" [hideDelay]="100" (click)="scrollMenuRight()">
                 <i class="pi pi-chevron-right"></i>
             </button>
         </div>

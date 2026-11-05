@@ -27,6 +27,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import { AppLanguage, LanguageService } from '../../core/services/language.service';
 
 import { TranslocoPipe } from '@jsverse/transloco';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { PopoverModule } from 'primeng/popover';
 
@@ -41,7 +42,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
     standalone: true,
 
-    imports: [CommonModule, RouterModule, StyleClassModule, AppConfigurator, TranslocoPipe, PopoverModule],
+    imports: [CommonModule, RouterModule, StyleClassModule, AppConfigurator, TranslocoPipe, PopoverModule, TooltipModule],
 
     templateUrl: './app.topbar.html',
 
@@ -488,9 +489,20 @@ export class AppTopbar implements OnInit {
         this.adminPopover?.hide();
         this.closeMenu();
 
-        this.authService.logout();
+        this.authService.logoutWithAudit().subscribe({
+            next: () => {
+                this.finishLogout();
+            },
+            error: (error) => {
+                console.error('Logout audit request failed.', error);
+                this.finishLogout();
+            }
+        });
+    }
 
-        this.router.navigateByUrl('/auth/login');
+    private finishLogout(): void {
+        this.authService.logout();
+        void this.router.navigateByUrl('/auth/login');
     }
 
     readonly languageOptions: {

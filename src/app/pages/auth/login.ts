@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -53,7 +53,19 @@ import { AuthService } from '../../core/services/auth.service';
                             <input pInputText id="username" name="username" type="text" autocomplete="username" placeholder="Username" class="w-full md:w-120 mb-8" [(ngModel)]="username" [disabled]="loading" (keyup.enter)="login()" />
 
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <p-password id="password1" name="password" [(ngModel)]="password" autocomplete="current-password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false" [disabled]="loading" (keyup.enter)="login()"></p-password>
+                            <p-password
+                                id="password1"
+                                name="password"
+                                [(ngModel)]="password"
+                                autocomplete="current-password"
+                                placeholder="Password"
+                                [toggleMask]="true"
+                                styleClass="mb-4"
+                                [fluid]="true"
+                                [feedback]="false"
+                                [disabled]="loading"
+                                (keyup.enter)="login()"
+                            ></p-password>
 
                             <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                                 <div class="flex items-center">
@@ -91,7 +103,8 @@ export class Login {
     constructor(
         private readonly authService: AuthService,
         private readonly router: Router,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
+        private readonly cdr: ChangeDetectorRef
     ) {}
 
     login(): void {
@@ -112,9 +125,10 @@ export class Login {
             },
             error: (error: HttpErrorResponse) => {
                 this.loading = false;
-                this.errorMessage = error.status === 401
-                    ? 'Invalid username or password.'
-                    : 'Unable to sign in. Please check that the API is running.';
+
+                this.errorMessage = error.status === 401 ? 'Invalid username or password.' : 'Unable to sign in. Please check that the API is running.';
+
+                this.cdr.detectChanges();
             }
         });
     }
