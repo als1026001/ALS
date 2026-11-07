@@ -1,4 +1,4 @@
-﻿import { Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { AppLayout } from './app/layout/component/app.layout';
 import { Dashboard } from './app/pages/dashboard/dashboard';
 import { Documentation } from './app/pages/documentation/documentation';
@@ -35,7 +35,7 @@ export const appRoutes: Routes = [
                 path: 'expenseCategory',
                 canActivate: [routePermissionGuard],
                 data: {
-                    permissionRoute: '/index'
+                    permissionRoute: '/expenseCategory'
                 },
                 loadComponent: () => import('./app/pages/master/expense-category/expense-category').then((m) => m.ExpenseCategoryPage)
             },
@@ -45,7 +45,7 @@ export const appRoutes: Routes = [
                 canActivate: [routePermissionGuard],
 
                 data: {
-                    permissionRoute: '/index'
+                    permissionRoute: '/financialAccount'
                 },
 
                 loadComponent: () => import('./app/pages/master/financial-account/financial-account').then((m) => m.FinancialAccountPage)

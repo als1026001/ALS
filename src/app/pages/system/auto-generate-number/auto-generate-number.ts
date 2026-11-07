@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -28,6 +28,8 @@ import { AutoGenerateNumberService } from '../../../core/services/auto-generate-
 })
 export class AutoGenerateNumberComponent implements OnInit {
     private readonly service = inject(AutoGenerateNumberService);
+    // 80U.49L.15H.7E.2 - NG0100 synchronization
+    private readonly cdr = inject(ChangeDetectorRef);
 
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
@@ -104,6 +106,7 @@ export class AutoGenerateNumberComponent implements OnInit {
                     this.items = result.items ?? [];
                     this.totalRecords = result.totalCount ?? 0;
                     this.loading = false;
+                    this.cdr.detectChanges();
                 },
                 error: (error) => {
                     this.loading = false;

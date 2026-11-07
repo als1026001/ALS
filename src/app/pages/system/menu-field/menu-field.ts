@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -33,6 +33,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class MenuFieldComponent implements OnInit {
     private readonly menuFieldService = inject(MenuFieldService);
+    // 80U.49L.15H.7F.2 - NG0100 synchronization
+    private readonly cdr = inject(ChangeDetectorRef);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly menuSetupService = inject(MenuSetupService);
@@ -84,6 +86,7 @@ export class MenuFieldComponent implements OnInit {
         this.menuSetupService.getParents().subscribe({
             next: (data) => {
                 this.menus = data;
+                this.cdr.detectChanges();
             },
             error: (error) => {
                 console.error(error);
@@ -132,6 +135,7 @@ export class MenuFieldComponent implements OnInit {
                 this.items = result.items;
                 this.totalRecords = result.totalCount;
                 this.loading = false;
+                this.cdr.detectChanges();
             },
             error: (error) => {
                 console.error(error);

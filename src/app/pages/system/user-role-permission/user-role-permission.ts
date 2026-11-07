@@ -451,6 +451,7 @@ export class UserRolePermissionComponent implements OnInit {
                     this.roles = (result.items ?? []).filter((x) => !x.isInactive);
 
                     this.roleLoading = false;
+                    this.cdr.detectChanges();
                 },
 
                 error: (error) => {
@@ -476,6 +477,7 @@ export class UserRolePermissionComponent implements OnInit {
                     this.menus = (result.items ?? []).filter((x) => !x.isInactive);
 
                     this.menuLoading = false;
+                    this.cdr.detectChanges();
                 },
 
                 error: (error) => {

@@ -1,0 +1,384 @@
+<div class="card audit-log-page">
+    <div class="audit-page-header">
+        <div>
+            <h2 class="m-0">Audit Log</h2>
+            <p class="text-color-secondary mt-2 mb-0">
+                Read-only history of system and business activities
+            </p>
+        </div>
+
+        <p-button
+            label="Refresh"
+            icon="pi pi-refresh"
+            severity="secondary"
+            [outlined]="true"
+            [disabled]="loading"
+            (onClick)="refresh()">
+        </p-button>
+    </div>
+
+    <section class="audit-filter-panel" aria-label="Audit Log search filters">
+        <div class="audit-filter-header">
+            <div>
+                <h3><i class="pi pi-filter"></i> Search filters</h3>
+                <p>Choose a suggestion or type a value to search.</p>
+            </div>
+            <span class="audit-filter-count" *ngIf="auditActiveFilterCount > 0">
+                {{ auditActiveFilterCount }} active
+            </span>
+        </div>
+
+        <div class="audit-filter-grid audit-filter-primary">
+            <div class="audit-filter-field">
+                <label for="audit-user">User</label>
+                <p-autocomplete
+                    inputId="audit-user"
+                    [(ngModel)]="userName"
+                    [suggestions]="filteredUsers"
+                    (completeMethod)="completeUsers($event.query)"
+                    [dropdown]="true"
+                    dropdownMode="blank"
+                    [minLength]="0"
+                    [completeOnFocus]="true"
+                    appendTo="body"
+                    [forceSelection]="false"
+                    [showEmptyMessage]="true"
+                    emptyMessage="No suggestions"
+                    placeholder="Search user name"
+                    styleClass="audit-autocomplete"
+                    (keydown.enter)="refresh()">
+                </p-autocomplete>
+            </div>
+            <div class="audit-filter-field">
+                <label for="audit-action">Action</label>
+                <p-autocomplete
+                    inputId="audit-action"
+                    [(ngModel)]="action"
+                    [suggestions]="filteredActions"
+                    (completeMethod)="completeActions($event.query)"
+                    [dropdown]="true"
+                    dropdownMode="blank"
+                    [minLength]="0"
+                    [completeOnFocus]="true"
+                    appendTo="body"
+                    [forceSelection]="false"
+                    [showEmptyMessage]="true"
+                    emptyMessage="No suggestions"
+                    placeholder="e.g. UPDATE"
+                    styleClass="audit-autocomplete"
+                    (keydown.enter)="refresh()">
+                </p-autocomplete>
+            </div>
+            <div class="audit-filter-field">
+                <label for="audit-type">Audit type</label>
+                <p-autocomplete
+                    inputId="audit-type"
+                    [(ngModel)]="auditType"
+                    [suggestions]="filteredTypes"
+                    (completeMethod)="completeTypes($event.query)"
+                    [dropdown]="true"
+                    dropdownMode="blank"
+                    [minLength]="0"
+                    [completeOnFocus]="true"
+                    appendTo="body"
+                    [forceSelection]="false"
+                    [showEmptyMessage]="true"
+                    emptyMessage="No suggestions"
+                    placeholder="e.g. DATA"
+                    styleClass="audit-autocomplete"
+                    (keydown.enter)="refresh()">
+                </p-autocomplete>
+            </div>
+            <div class="audit-filter-field">
+                <label for="audit-result">Result</label>
+                <select id="audit-result" [(ngModel)]="successFilter">
+                    <option value="">All results</option>
+                    <option value="true">Success</option>
+                    <option value="false">Failed</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="button" class="audit-advanced-toggle"
+                [attr.aria-expanded]="auditAdvancedOpen"
+                (click)="auditAdvancedOpen = !auditAdvancedOpen">
+            <i class="pi" [ngClass]="auditAdvancedOpen ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+            {{ auditAdvancedOpen ? 'Hide advanced filters' : 'Advanced filters' }}
+        </button>
+
+        <div class="audit-filter-grid audit-filter-advanced" *ngIf="auditAdvancedOpen">
+            <div class="audit-filter-field">
+                <label for="audit-table">Table name</label>
+                <p-autocomplete
+                    inputId="audit-table"
+                    [(ngModel)]="tableName"
+                    [suggestions]="filteredTables"
+                    (completeMethod)="completeTables($event.query)"
+                    [dropdown]="true"
+                    dropdownMode="blank"
+                    [minLength]="0"
+                    [completeOnFocus]="true"
+                    appendTo="body"
+                    [forceSelection]="false"
+                    [showEmptyMessage]="true"
+                    emptyMessage="No suggestions"
+                    placeholder="e.g. ihrp_department"
+                    styleClass="audit-autocomplete"
+                    (keydown.enter)="refresh()">
+                </p-autocomplete>
+            </div>
+            <div class="audit-filter-field">
+                <label for="audit-record">Record ID</label>
+                <input id="audit-record" pInputText placeholder="Enter record ID"
+                       [(ngModel)]="recordId" (keyup.enter)="refresh()" />
+            </div>
+            <div class="audit-filter-field">
+                <label for="audit-from">From (local time)</label>
+                <input id="audit-from" type="datetime-local" class="p-inputtext p-component"
+                       [(ngModel)]="fromDate" />
+            </div>
+            <div class="audit-filter-field">
+                <label for="audit-to">To (exclusive, local time)</label>
+                <input id="audit-to" type="datetime-local" class="p-inputtext p-component"
+                       [(ngModel)]="toDate" />
+            </div>
+        </div>
+
+        <div class="audit-filter-actions">
+            <span class="audit-filter-hint">Suggestions include common values and the currently loaded page.</span>
+            <p-button label="Clear" icon="pi pi-times" severity="secondary" [outlined]="true"
+                      (onClick)="clearFilters()"></p-button>
+            <p-button label="Search" icon="pi pi-search" [disabled]="loading"
+                      (onClick)="refresh()"></p-button>
+        </div>
+    </section>
+    <div *ngIf="errorMessage"
+         class="text-red-500 mb-3"
+         role="alert">
+        {{ errorMessage }}
+    </div>
+
+    <div class="audit-table-heading">
+        <div>
+            <h3>Activity History</h3>
+            <span>Review recorded system and business events</span>
+        </div>
+        <div class="audit-record-count">
+            {{ totalRecords }} records
+        </div>
+    </div>
+
+    <p-table
+        [value]="items"
+        [lazy]="true"
+        [lazyLoadOnInit]="false"
+        [loading]="loading"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="first"
+        [totalRecords]="totalRecords"
+        [rowsPerPageOptions]="[10, 20, 50, 100]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+        (onLazyLoad)="onLazyLoad($event)"
+        styleClass="p-datatable-gridlines audit-log-table">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>Type</th>
+                <th>Action</th>
+                <th>Table</th>
+                <th>Record ID</th>
+                <th>Result</th>
+                <th>Details</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+            <tr>
+                <td>{{ item.createdAt | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+                <td>{{ item.userName || '-' }}</td>
+                <td>{{ item.auditType }}</td>
+                <td>{{ item.action }}</td>
+                <td>{{ item.tableName || '-' }}</td>
+                <td>{{ item.recordId || '-' }}</td>
+                <td>
+                    <span class="audit-status" [class.audit-status-success]="item.isSuccess" [class.audit-status-failed]="!item.isSuccess" [class.text-green-500]="item.isSuccess"
+                          [class.text-red-500]="!item.isSuccess">
+                        {{ item.isSuccess ? 'Success' : 'Failed' }}
+                    </span>
+                </td>
+                <td>
+                    <p-button
+                        icon="pi pi-eye"
+                        label="View"
+                        size="small"
+                        severity="secondary"
+                        [text]="true"
+                        (onClick)="openDetail(item)">
+                    </p-button>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="8" class="text-center p-4">
+                    No Audit Log records found.
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog
+    header="Audit Log Details"
+    [(visible)]="detailVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    [autoZIndex]="true"
+    [baseZIndex]="10000"
+    [style]="{ width: '1100px', maxWidth: '96vw', maxHeight: '90vh' }"
+    [contentStyle]="{ overflowY: 'auto', maxHeight: 'calc(90vh - 8rem)' }">
+
+    <div class="audit-detail">
+        <div *ngIf="detailLoading" class="audit-detail-loading">
+            <i class="pi pi-spin pi-spinner"></i>
+            Loading details...
+        </div>
+
+        <div *ngIf="detailError"
+             class="text-red-500"
+             role="alert">
+            {{ detailError }}
+        </div>
+
+        <ng-container *ngIf="selected as item">
+            <div class="audit-detail-summary">
+                <div class="audit-detail-title">
+                    <div>
+                        <span class="audit-detail-eyebrow">
+                            Audit Event
+                        </span>
+                        <h3>#{{ item.auditId }} — {{ item.action }}</h3>
+                    </div>
+
+                    <span class="audit-status"
+                          [class.audit-status-success]="item.isSuccess"
+                          [class.audit-status-failed]="!item.isSuccess">
+                        {{ item.isSuccess ? 'Success' : 'Failed' }}
+                    </span>
+                </div>
+
+                <div class="audit-detail-divider"></div>
+
+                <h4 class="audit-detail-group-heading">
+                    <i class="pi pi-info-circle"></i>
+                    Event Information
+                </h4>
+
+                <div class="audit-detail-grid">
+                    <div>
+                        <label>Time</label>
+                        <strong>{{ item.createdAt | date:'yyyy-MM-dd HH:mm:ss' }}</strong>
+                    </div>
+                    <div>
+                        <label>User</label>
+                        <strong>{{ item.userName || '-' }}</strong>
+                    </div>
+                    <div>
+                        <label>Audit Type</label>
+                        <strong>{{ item.auditType }}</strong>
+                    </div>
+                    <div>
+                        <label>Action</label>
+                        <strong>{{ item.action }}</strong>
+                    </div>
+                    <div>
+                        <label>Table</label>
+                        <strong>{{ item.tableName || '-' }}</strong>
+                    </div>
+                    <div>
+                        <label>Record ID</label>
+                        <strong>{{ item.recordId || '-' }}</strong>
+                    </div>
+                    <div>
+                        <label>IP Address</label>
+                        <strong>{{ item.ipAddress || '-' }}</strong>
+                    </div>
+                </div>
+
+                <div class="audit-detail-divider"></div>
+
+                <h4 class="audit-detail-group-heading">
+                    <i class="pi pi-align-left"></i>
+                    Description
+                </h4>
+
+                <div class="audit-detail-description">
+                    <label>Description</label>
+                    <p>{{ item.description || '-' }}</p>
+                </div>
+            </div>
+
+            <section class="audit-detail-section">
+                <h3>
+                    <i class="pi pi-list-check"></i>
+                    Changed Fields
+                </h3>
+                <p class="audit-detail-help">
+                    Fields with different old and new values.
+                </p>
+
+                <div class="audit-compare-scroll">
+                    <table class="audit-compare-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Old Value</th>
+                                <th>New Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let change of getChangedFields(item)">
+                                <td class="audit-field-name">
+                                    {{ change.field }}
+                                </td>
+                                <td class="audit-old-value">
+                                    {{ change.oldValue }}
+                                </td>
+                                <td class="audit-new-value">
+                                    {{ change.newValue }}
+                                </td>
+                            </tr>
+                            <tr *ngIf="getChangedFields(item).length === 0">
+                                <td colspan="3" class="audit-no-changes">
+                                    No changed fields detected.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <details class="audit-detail-section audit-raw-collapse"><summary><i class="pi pi-code"></i> Raw Audit Data<span>Show original JSON</span></summary>
+
+                <div class="audit-json-grid">
+                    <div class="audit-json-panel">
+                        <h4>Old Values</h4>
+                        <pre>{{ formatJson(item.oldValues) }}</pre>
+                    </div>
+
+                    <div class="audit-json-panel">
+                        <h4>New Values</h4>
+                        <pre>{{ formatJson(item.newValues) }}</pre>
+                    </div>
+                </div>
+            </details>
+        </ng-container>
+    </div>
+</p-dialog>

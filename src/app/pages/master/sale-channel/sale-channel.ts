@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -32,6 +32,8 @@ import { ExcelExportButton } from '../../../shared/components/excel-export-butto
 })
 export class SaleChannelPage implements OnInit {
     private readonly saleChannelService = inject(SaleChannelService);
+    // 80U.49L.15H.6B - API change detection
+    private readonly cdr = inject(ChangeDetectorRef);
 
     private readonly permissionService = inject(PermissionService);
 
@@ -79,7 +81,7 @@ export class SaleChannelPage implements OnInit {
             error: () => this.showError('Unable to load Sale Channel permissions.')
         });
 
-        this.loadPage();
+        // 80U.49L.15H.6B - PrimeNG lazy loads initial page.
     }
 
     onLazyLoad(event: TableLazyLoadEvent): void {
@@ -282,6 +284,7 @@ export class SaleChannelPage implements OnInit {
                     this.saleChannels = result.items ?? [];
 
                     this.totalRecords = result.totalCount ?? 0;
+                    this.cdr.detectChanges();
 
                     if (this.saleChannels.length === 0 && this.first > 0 && this.totalRecords > 0) {
                         this.first = Math.max(0, this.first - this.pageSize);

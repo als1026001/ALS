@@ -1,4 +1,4 @@
-﻿import { Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { routePermissionGuard } from '../../core/guards/route-permission.guard';
 
 export const featureRoutes: Routes = [
@@ -37,4 +37,12 @@ export const featureRoutes: Routes = [
         loadComponent: () =>
             import('./permission-admin-role-scope/permission-admin-role-scope').then(m => m.PermissionAdminRoleScope)
     },
+    {
+        path: 'auditLog',
+        canActivate: [routePermissionGuard],
+        data: { permissionRoute: '/auditLog' },
+        loadComponent: () =>
+            import('./audit-log/audit-log')
+                .then(m => m.AuditLogComponent)
+    }
 ];

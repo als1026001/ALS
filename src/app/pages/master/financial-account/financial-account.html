@@ -6,11 +6,11 @@
     <p-toolbar styleClass="mb-4">
         <ng-template pTemplate="start">
             <div class="flex gap-2">
-                <p-button label="New" icon="pi pi-plus" (onClick)="openNew()"> </p-button>
+                <p-button label="New" icon="pi pi-plus" [disabled]="!canCreate" (onClick)="openNew()"> </p-button>
 
                 <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" (onClick)="refresh()"> </p-button>
 
-                <app-excel-export-button endpoint="financialaccount/export" fileName="FinancialAccount" [search]="search" [sortField]="sortField" [sortDirection]="sortDirection" />
+                <app-excel-export-button *ngIf="canView" endpoint="financialaccount/export" fileName="FinancialAccount" [search]="search" [sortField]="sortField" [sortDirection]="sortDirection" />
             </div>
         </ng-template>
 
@@ -111,9 +111,9 @@
 
                 <td>
                     <div class="flex gap-2">
-                        <p-button icon="pi pi-pencil" severity="success" [text]="true" ariaLabel="Edit" (onClick)="edit(item)"> </p-button>
+                        <p-button icon="pi pi-pencil" severity="success" [text]="true" ariaLabel="Edit" [disabled]="!canUpdate" (onClick)="edit(item)"> </p-button>
 
-                        <p-button icon="pi pi-trash" severity="danger" [text]="true" ariaLabel="Delete" (onClick)="delete(item)"> </p-button>
+                        <p-button icon="pi pi-trash" severity="danger" [text]="true" ariaLabel="Delete" [disabled]="!canDelete" (onClick)="delete(item)"> </p-button>
                     </div>
                 </td>
             </tr>
@@ -237,7 +237,7 @@
         <div class="dialog-footer">
             <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true" (onClick)="dialogVisible = false"> </p-button>
 
-            <p-button label="Save" icon="pi pi-save" (onClick)="save()"> </p-button>
+            <p-button label="Save" icon="pi pi-save" [disabled]="editingId == null ? !canCreate : !canUpdate" (onClick)="save()"> </p-button>
         </div>
     </ng-template>
 </p-dialog>

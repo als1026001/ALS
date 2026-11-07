@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -28,6 +28,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class UserComponent implements OnInit {
     private readonly userService = inject(UserService);
+    // 80U.49L.15H.7F.2 - NG0100 synchronization
+    private readonly cdr = inject(ChangeDetectorRef);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly messageService = inject(MessageService);
@@ -113,6 +115,7 @@ export class UserComponent implements OnInit {
                     this.users = result.items;
                     this.totalRecords = result.totalCount;
                     this.loading = false;
+                    this.cdr.detectChanges();
                 },
                 error: (error) => {
                     this.loading = false;

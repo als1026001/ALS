@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -31,6 +31,8 @@ import { MenuSetupService } from '../../../core/services/menu-setup.service';
 })
 export class ListViewComponent implements OnInit {
     private readonly service = inject(ListViewService);
+    // 80U.49L.15H.7D.2 - API change detection
+    private readonly cdr = inject(ChangeDetectorRef);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly menuSetupService = inject(MenuSetupService);
@@ -112,6 +114,7 @@ export class ListViewComponent implements OnInit {
                     this.items = result.items ?? [];
                     this.totalRecords = result.totalCount ?? 0;
                     this.loading = false;
+                    this.cdr.detectChanges();
                 },
 
                 error: (error) => {
@@ -369,6 +372,7 @@ export class ListViewComponent implements OnInit {
                     this.menus = (result.items ?? []).filter((menu) => !menu.isInactive);
 
                     this.loadingMenus = false;
+                    this.cdr.detectChanges();
                 },
 
                 error: (error) => {

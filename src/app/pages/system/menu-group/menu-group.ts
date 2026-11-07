@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -28,6 +28,8 @@ import { MenuGroupService } from '../../../core/services/menu-group.service';
 })
 export class MenuGroupComponent implements OnInit {
     private readonly menuGroupService = inject(MenuGroupService);
+    // 80U.49L.15H.7F.2 - NG0100 synchronization
+    private readonly cdr = inject(ChangeDetectorRef);
 
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
@@ -114,6 +116,7 @@ export class MenuGroupComponent implements OnInit {
                 this.totalRecords = result.totalCount;
 
                 this.loading = false;
+                this.cdr.detectChanges();
             },
 
             error: (error) => {

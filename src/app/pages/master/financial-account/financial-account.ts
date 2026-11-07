@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -17,6 +17,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { CreateFinancialAccountRequest, FinancialAccount, UpdateFinancialAccountRequest } from '../../../core/models/financial-account.model';
 
 import { FinancialAccountService } from '../../../core/services/financial-account.service';
+import { PermissionService } from '../../../core/services/permission.service';
 
 import { SelectModule } from 'primeng/select';
 
@@ -32,6 +33,14 @@ import { ExcelExportButton } from '../../../shared/components/excel-export-butto
 })
 export class FinancialAccountPage implements OnInit {
     private readonly service = inject(FinancialAccountService);
+    private readonly permissionService = inject(PermissionService);
+    readonly permissionRoute = '/financialAccount';
+    canView = false;
+    canCreate = false;
+    canUpdate = false;
+    canDelete = false;
+    // 80U.49L.15H.6B - API change detection
+    private readonly cdr = inject(ChangeDetectorRef);
 
     private readonly messageService = inject(MessageService);
 
@@ -74,11 +83,25 @@ export class FinancialAccountPage implements OnInit {
     };
 
     ngOnInit(): void {
-        this.loadData();
-        this.loadFatherAccounts();
+        this.permissionService.getRouteAccess(this.permissionRoute).subscribe({
+            next: access => {
+                this.canView = access.canView;
+                this.canCreate = access.canCreate;
+                this.canUpdate = access.canUpdate;
+                this.canDelete = access.canDelete;
+                if (this.canView) {
+                    this.loadFatherAccounts();
+                    this.loadData();
+                }
+            },
+            error: () => this.messageService.add({
+                severity: 'error', summary: 'Error', detail: 'Unable to load permissions.'
+            })
+        });
     }
 
     loadData(): void {
+        if (!this.canView) { return; }
         this.loading = true;
 
         this.service
@@ -93,6 +116,7 @@ export class FinancialAccountPage implements OnInit {
                 next: (result) => {
                     this.items = result.items ?? [];
                     this.totalRecords = result.totalCount ?? 0;
+                    this.cdr.detectChanges();
                     this.loading = false;
                 },
 
@@ -146,6 +170,7 @@ export class FinancialAccountPage implements OnInit {
     }
 
     openNew(): void {
+        if (!this.canCreate) { return; }
         this.editingId = null;
         this.submitted = false;
 
@@ -165,6 +190,7 @@ export class FinancialAccountPage implements OnInit {
     }
 
     edit(item: FinancialAccount): void {
+        if (!this.canUpdate) { return; }
         this.editingId = item.accountId;
 
         this.submitted = false;
@@ -193,6 +219,7 @@ export class FinancialAccountPage implements OnInit {
     }
 
     save(): void {
+        if (this.editingId == null ? !this.canCreate : !this.canUpdate) { return; }
         this.submitted = true;
 
         if (!this.form.accountNo.trim()) {
@@ -283,6 +310,7 @@ export class FinancialAccountPage implements OnInit {
     }
 
     delete(item: FinancialAccount): void {
+        if (!this.canDelete) { return; }
         this.confirmationService.confirm({
             message: `Delete '${item.accountNo}'?`,
 
@@ -291,6 +319,7 @@ export class FinancialAccountPage implements OnInit {
             icon: 'pi pi-exclamation-triangle',
 
             accept: () => {
+                if (!this.canDelete) { return; }
                 this.service.delete(item.accountId).subscribe({
                     next: () => {
                         this.messageService.add({
@@ -338,9 +367,11 @@ export class FinancialAccountPage implements OnInit {
     }
 
     loadFatherAccounts(): void {
+        if (!this.canView) { return; }
         this.service.getLookup().subscribe({
             next: (result) => {
                 this.fatherAccounts = result ?? [];
+                this.cdr.detectChanges();
             },
 
             error: (error) => {

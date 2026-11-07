@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -40,6 +40,9 @@ import { RouteAccess } from '@/app/core/models/permission.model';
 })
 export class MenuSetupPage implements OnInit {
     private readonly service = inject(MenuSetupService);
+
+    // 80U.49L.15H.7H.2 - NG0100 synchronization
+    private readonly cdr = inject(ChangeDetectorRef);
 
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
@@ -126,6 +129,7 @@ export class MenuSetupPage implements OnInit {
                     this.totalRecords = result.totalCount ?? 0;
 
                     this.loading = false;
+                    this.cdr.detectChanges();
                 },
 
                 error: (error) => {
@@ -157,6 +161,7 @@ export class MenuSetupPage implements OnInit {
                 }));
 
                 this.parentLoading = false;
+                this.cdr.detectChanges();
             },
 
             error: (error) => {

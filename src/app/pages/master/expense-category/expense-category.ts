@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -40,6 +40,8 @@ interface ExpenseCategoryForm {
 })
 export class ExpenseCategoryPage implements OnInit {
     private readonly service = inject(ExpenseCategoryService);
+    // 80U.49L.15H.6B - API change detection
+    private readonly cdr = inject(ChangeDetectorRef);
 
     private readonly permissionService = inject(PermissionService);
 
@@ -47,7 +49,7 @@ export class ExpenseCategoryPage implements OnInit {
 
     private readonly confirmationService = inject(ConfirmationService);
 
-    readonly permissionRoute = '/index';
+    readonly permissionRoute = '/expenseCategory';
 
     items: ExpenseCategory[] = [];
 
@@ -135,6 +137,7 @@ export class ExpenseCategoryPage implements OnInit {
                     this.items = result.items ?? [];
 
                     this.totalRecords = result.totalCount ?? 0;
+                    this.cdr.detectChanges();
 
                     this.loading = false;
                 },
@@ -151,6 +154,7 @@ export class ExpenseCategoryPage implements OnInit {
         this.service.getAccounts().subscribe({
             next: (result) => {
                 this.accounts = result ?? [];
+                this.cdr.detectChanges();
             },
 
             error: () => {
@@ -232,6 +236,10 @@ export class ExpenseCategoryPage implements OnInit {
     }
 
     save(): void {
+        if (this.editMode ? !this.canUpdate : !this.canCreate) {
+            this.showError('Access denied.');
+            return;
+        }
         const expenseNo = this.form.expenseNo.trim();
 
         const expenseName = this.form.expenseName.trim();
@@ -326,6 +334,7 @@ export class ExpenseCategoryPage implements OnInit {
     }
 
     private delete(expenseId: number): void {
+        if (!this.canDelete) { return; }
         this.service.delete(expenseId).subscribe({
             next: () => {
                 this.showSuccess('Expense Category deleted.');

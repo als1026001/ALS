@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -34,6 +34,8 @@ import { MenuFieldService } from '../../../core/services/menu-field.service';
 })
 export class ListViewFilterComponent implements OnInit {
     private readonly service = inject(ListViewFilterService);
+    // 80U.49L.15H.7E.2 - NG0100 synchronization
+    private readonly cdr = inject(ChangeDetectorRef);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly listViewService = inject(ListViewService);
@@ -130,6 +132,7 @@ export class ListViewFilterComponent implements OnInit {
                     this.items = result.items ?? [];
                     this.totalRecords = result.totalCount ?? 0;
                     this.loading = false;
+                    this.cdr.detectChanges();
                 },
 
                 error: (error) => {
@@ -377,6 +380,7 @@ export class ListViewFilterComponent implements OnInit {
                     this.listViews = (result.items ?? []).filter((view) => view.isActive !== false);
 
                     this.loadingListViews = false;
+                    this.cdr.detectChanges();
 
                     completed?.();
                 },
@@ -408,6 +412,7 @@ export class ListViewFilterComponent implements OnInit {
                     this.fields = allFields.filter((field) => field.isAvailable || field.fieldId === currentFieldId);
 
                     this.loadingFields = false;
+                    this.cdr.detectChanges();
                 },
 
                 error: (error) => {
