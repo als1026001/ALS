@@ -44,5 +44,13 @@ export const featureRoutes: Routes = [
         loadComponent: () =>
             import('./audit-log/audit-log')
                 .then(m => m.AuditLogComponent)
+    },
+    {
+        path: 'activeSessions',
+        canActivate: [routePermissionGuard],
+        data: { permissionRoute: '/activeSessions' },
+        loadComponent: () =>
+            import('./active-sessions/active-sessions')
+                .then(m => m.ActiveSessionsComponent)
     }
 ];

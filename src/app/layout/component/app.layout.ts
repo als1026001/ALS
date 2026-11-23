@@ -1,3 +1,5 @@
+import { DestroyRef } from '@angular/core';
+import { SessionHeartbeatService } from '../../core/services/session-heartbeat.service';
 import { Component, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -23,9 +25,17 @@ import { LayoutService } from '@/app/layout/service/layout.service';
     </div> `
 })
 export class AppLayout {
+    private readonly sessionHeartbeat = inject(SessionHeartbeatService);
+    private readonly heartbeatDestroyRef = inject(DestroyRef);
+
     layoutService = inject(LayoutService);
 
     constructor() {
+        this.sessionHeartbeat.start();
+        this.heartbeatDestroyRef.onDestroy(() => {
+            this.sessionHeartbeat.stop();
+        });
+
         effect(() => {
             const state = this.layoutService.layoutState();
             if (state.mobileMenuActive) {
